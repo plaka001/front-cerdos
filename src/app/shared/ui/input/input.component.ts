@@ -15,27 +15,25 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
     ],
     template: `
     <div class="mb-4">
-      <label *ngIf="label" [for]="id" class="block text-sm font-medium text-gray-700 mb-1">
+      <label *ngIf="label" [for]="id" class="block text-sm font-medium text-slate-300 mb-1.5">
         {{ label }}
       </label>
       <div class="relative rounded-md shadow-sm">
-                  <input
-            [type]="type"
-            [id]="id"
-            [name]="name"
-            [placeholder]="placeholder"
-            [disabled]="disabled"
-            [(ngModel)]="value"
-            (blur)="onTouched()"
-            class="focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md h-12 px-3 text-left"
-            [class.border-red-300]="error"
-            [class.text-red-900]="error"
-            [class.placeholder-red-300]="error"
-            [class.focus:ring-red-500]="error"
-            [class.focus:border-red-500]="error"
-          />
+        <input
+          [type]="type"
+          [id]="id"
+          [name]="name"
+          [placeholder]="placeholder"
+          [disabled]="disabled"
+          [(ngModel)]="value"
+          (blur)="onTouched()"
+          class="block w-full h-12 rounded-md border-slate-600 bg-slate-700 text-white shadow-sm focus:border-white focus:ring-white focus:ring-2 sm:text-sm transition-all px-3 placeholder-slate-400"
+          [class.border-red-500]="error"
+          [class.focus:ring-red-500]="error"
+          [class.focus:border-red-500]="error"
+        />
       </div>
-      <p *ngIf="error" class="mt-2 text-sm text-red-600">{{ error }}</p>
+      <p *ngIf="error" class="mt-2 text-sm text-red-400">{{ error }}</p>
     </div>
   `
 })
