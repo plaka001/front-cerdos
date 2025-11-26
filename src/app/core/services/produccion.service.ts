@@ -1,0 +1,520 @@
+import { Injectable, inject, signal } from '@angular/core';
+import { SupabaseService } from './supabase.service';
+import { Cerda, CicloReproductivo, Lote, CerdaDetalle, LoteDetalle, Insumo, SalidaInsumo } from '../models';
+
+@Injectable({
+    providedIn: 'root'
+})
+export class ProduccionService {
+    private supabase = inject(SupabaseService).client;
+
+    cerdas = signal<Cerda[]>([]);
+    lotes = signal<Lote[]>([]);
+    loading = signal<boolean>(false);
+    error = signal<string | null>(null);
+
+    constructor() {
+        this.init();
+    }
+
+    private async init() {
+        await Promise.all([
+            this.loadCerdas(),
+            this.loadLotes()
+        ]);
+    }
+
+    async loadCerdas() {
+        try {
+            this.loading.set(true);
+            this.error.set(null);
+
+            const { data, error } = await this.supabase
+                .from('cerdas')
+                .select('*')
+                .order('chapeta');
+
+            if (error) {
+                console.error('Error cargando cerdas:', error);
+                this.error.set(error.message);
+                return;
+            }
+
+            if (data) {
+                this.cerdas.set(data as Cerda[]);
+            }
+        } catch (err: any) {
+            console.error('Error inesperado:', err);
+            this.error.set(err.message || 'Error al cargar las cerdas');
+        } finally {
+            this.loading.set(false);
+        }
+    }
+
+    async getCerdasConCiclos(): Promise<CerdaDetalle[]> {
+        try {
+            this.loading.set(true);
+            this.error.set(null);
+
+            const { data, error } = await this.supabase
+                .from('cerdas')
+                .select(`
+                    *,
+                    ciclos_reproductivos (
+                        id,
+                        fecha_inseminacion,
+                        fecha_parto_probable,
+                        fecha_parto_real,
+                        fecha_destete,
+                        nacidos_vivos,
+                        nacidos_muertos,
+                        estado
+                    )
+                `)
+                .eq('activa', true)
+                .order('chapeta');
+
+            if (error) {
+                console.error('Error cargando cerdas con ciclos:', error);
+                this.error.set(error.message);
+                return [];
+            }
+
+            const hoy = new Date();
+            const cerdasDetalle: CerdaDetalle[] = (data || []).map((item: any) => {
+                const cicloActivo = item.ciclos_reproductivos?.find((c: any) => c.estado === 'abierto');
+
+                const cerda: CerdaDetalle = {
+                    ...item,
+                    cicloActivo: cicloActivo || undefined
+                };
+
+                if (cerda.cicloActivo) {
+                    const fechaInseminacion = new Date(cerda.cicloActivo.fecha_inseminacion);
+
+                    if (cerda.estado === 'gestante' && cerda.cicloActivo.fecha_parto_probable) {
+                        const fechaParto = new Date(cerda.cicloActivo.fecha_parto_probable);
+                        cerda.diasParaParto = Math.ceil((fechaParto.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+                        cerda.diasGestacion = Math.abs(Math.ceil((hoy.getTime() - fechaInseminacion.getTime()) / (1000 * 60 * 60 * 24)));
+                    }
+
+                    if (cerda.estado === 'lactante' && cerda.cicloActivo.fecha_parto_real) {
+                        const fechaParto = new Date(cerda.cicloActivo.fecha_parto_real);
+                        cerda.diasLactancia = Math.abs(Math.ceil((hoy.getTime() - fechaParto.getTime()) / (1000 * 60 * 60 * 24)));
+                    }
+                }
+
+                return cerda;
+            });
+
+            return cerdasDetalle;
+        } catch (err: any) {
+            console.error('Error inesperado:', err);
+            this.error.set(err.message || 'Error al cargar cerdas con ciclos');
+            return [];
+        } finally {
+            this.loading.set(false);
+        }
+    }
+
+    async loadLotes() {
+        try {
+            this.loading.set(true);
+            this.error.set(null);
+
+            const { data, error } = await this.supabase
+                .from('lotes')
+                .select('*')
+                .order('codigo');
+
+            if (error) {
+                console.error('Error cargando lotes:', error);
+                this.error.set(error.message);
+                return;
+            }
+
+            if (data) {
+                this.lotes.set(data as Lote[]);
+            }
+        } catch (err: any) {
+            console.error('Error inesperado:', err);
+            this.error.set(err.message || 'Error al cargar los lotes');
+        } finally {
+            this.loading.set(false);
+        }
+    }
+
+    async registrarInseminacion(cerdaId: number, data: { fecha: string; macho: string; observaciones?: string }) {
+        const ciclo: Partial<CicloReproductivo> = {
+            cerda_id: cerdaId,
+            fecha_inseminacion: data.fecha,
+            estado: 'abierto',
+            nacidos_vivos: 0,
+            nacidos_muertos: 0,
+            momias: 0,
+            lechones_destetados: 0,
+            observaciones: data.observaciones || undefined
+        };
+
+        await this.registrarEventoCerda(ciclo);
+        await this.actualizarEstadoCerda(cerdaId, 'gestante');
+    }
+
+    async registrarParto(cerdaId: number, cicloId: number, data: { fecha: string; nacidos_vivos: number; nacidos_muertos: number; momias: number; observaciones?: string }) {
+        try {
+            this.error.set(null);
+
+            const { error } = await this.supabase
+                .from('ciclos_reproductivos')
+                .update({
+                    fecha_parto_real: data.fecha,
+                    nacidos_vivos: data.nacidos_vivos,
+                    nacidos_muertos: data.nacidos_muertos,
+                    momias: data.momias,
+                    observaciones: data.observaciones || null
+                })
+                .eq('id', cicloId);
+
+            if (error) throw error;
+
+            await this.actualizarEstadoCerda(cerdaId, 'lactante');
+        } catch (err: any) {
+            console.error('Error registrando parto:', err);
+            this.error.set(err.message);
+            throw err;
+        }
+    }
+
+    async registrarDestete(cerdaId: number, cicloId: number, data: { fecha: string; cantidad: number; peso: number; crear_lote: boolean; observaciones?: string }) {
+        try {
+            this.error.set(null);
+
+            const { error: errorCiclo } = await this.supabase
+                .from('ciclos_reproductivos')
+                .update({
+                    fecha_destete: data.fecha,
+                    lechones_destetados: data.cantidad,
+                    peso_promedio_destete: data.peso,
+                    estado: 'cerrado',
+                    observaciones: data.observaciones || null
+                })
+                .eq('id', cicloId);
+
+            if (errorCiclo) throw errorCiclo;
+
+            if (data.crear_lote) {
+                const { error: errorLote } = await this.supabase
+                    .from('lotes')
+                    .insert({
+                        codigo: `L-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
+                        fecha_inicio: data.fecha,
+                        cantidad_inicial: data.cantidad,
+                        cantidad_actual: data.cantidad,
+                        peso_promedio_inicial: data.peso,
+                        estado: 'activo'
+                    });
+
+                if (errorLote) throw errorLote;
+            }
+
+            await this.actualizarEstadoCerda(cerdaId, 'vacia');
+        } catch (err: any) {
+            console.error('Error registrando destete:', err);
+            this.error.set(err.message);
+            throw err;
+        }
+    }
+
+    async registrarEventoCerda(ciclo: Partial<CicloReproductivo>) {
+        try {
+            this.error.set(null);
+
+            const { data, error } = await this.supabase
+                .from('ciclos_reproductivos')
+                .insert(ciclo)
+                .select()
+                .single();
+
+            if (error) {
+                console.error('Error registrando evento:', error);
+                this.error.set(error.message);
+                throw error;
+            }
+
+            return data as CicloReproductivo;
+        } catch (err: any) {
+            console.error('Error inesperado:', err);
+            this.error.set(err.message || 'Error al registrar evento');
+            throw err;
+        }
+    }
+
+    async actualizarEstadoCerda(id: number, estado: string) {
+        try {
+            this.error.set(null);
+
+            const { error } = await this.supabase
+                .from('cerdas')
+                .update({ estado })
+                .eq('id', id);
+
+            if (error) {
+                console.error('Error actualizando estado:', error);
+                this.error.set(error.message);
+                throw error;
+            }
+
+            await this.loadCerdas();
+        } catch (err: any) {
+            console.error('Error inesperado:', err);
+            this.error.set(err.message || 'Error al actualizar estado');
+            throw err;
+        }
+    }
+
+    async getLotes(): Promise<LoteDetalle[]> {
+        try {
+            this.loading.set(true);
+            this.error.set(null);
+
+            const { data, error } = await this.supabase
+                .from('lotes')
+                .select('*')
+                .order('estado', { ascending: true })
+                .order('fecha_inicio', { ascending: false });
+
+            if (error) {
+                console.error('Error cargando lotes:', error);
+                this.error.set(error.message);
+                return [];
+            }
+
+            const hoy = new Date();
+            const lotesConDias: LoteDetalle[] = (data || []).map((lote: any) => {
+                const fechaInicio = new Date(lote.fecha_inicio);
+                const diasEnGranja = Math.floor((hoy.getTime() - fechaInicio.getTime()) / (1000 * 60 * 60 * 24));
+
+                return {
+                    ...lote,
+                    diasEnGranja
+                };
+            });
+
+            return lotesConDias;
+        } catch (err: any) {
+            console.error('Error inesperado:', err);
+            this.error.set(err.message || 'Error al cargar los lotes');
+            return [];
+        } finally {
+            this.loading.set(false);
+        }
+    }
+
+    async getInsumosAlimento(): Promise<Insumo[]> {
+        try {
+            const { data, error } = await this.supabase
+                .from('insumos')
+                .select('*')
+                .eq('tipo', 'alimento')
+                .gt('stock_actual', 0)
+                .eq('activo', true)
+                .order('nombre');
+
+            if (error) {
+                console.error('Error cargando alimentos:', error);
+                throw error;
+            }
+
+            return (data || []) as Insumo[];
+        } catch (err: any) {
+            console.error('Error inesperado:', err);
+            throw err;
+        }
+    }
+
+    async registrarConsumo(data: {
+        insumo_id: number;
+        lote_id: number;
+        cantidad: number;
+        costo_unitario_momento: number;
+    }): Promise<void> {
+        try {
+            this.error.set(null);
+
+            const salidaData: Partial<SalidaInsumo> = {
+                fecha: new Date().toISOString().split('T')[0],
+                insumo_id: data.insumo_id,
+                cantidad: data.cantidad,
+                destino_tipo: 'lote',
+                lote_id: data.lote_id,
+                costo_unitario_momento: data.costo_unitario_momento
+            };
+
+            const { error } = await this.supabase
+                .from('salidas_insumos')
+                .insert(salidaData);
+
+            if (error) {
+                console.error('Error registrando consumo:', error);
+                this.error.set(error.message);
+                throw error;
+            }
+        } catch (err: any) {
+            console.error('Error inesperado:', err);
+            this.error.set(err.message || 'Error al registrar consumo');
+            throw err;
+        }
+    }
+
+    async registrarMortalidad(data: {
+        lote_id: number;
+        fecha: string;
+        tipo: string;
+        cantidad_afectada: number;
+        observacion: string | null;
+    }): Promise<void> {
+        try {
+            this.error.set(null);
+
+            const { error: errorEvento } = await this.supabase
+                .from('eventos_sanitarios')
+                .insert({
+                    fecha: data.fecha,
+                    tipo: data.tipo,
+                    lote_id: data.lote_id,
+                    cantidad_afectada: data.cantidad_afectada,
+                    observacion: data.observacion
+                });
+
+            if (errorEvento) {
+                console.error('Error registrando evento:', errorEvento);
+                this.error.set(errorEvento.message);
+                throw errorEvento;
+            }
+
+            const { data: loteActual, error: errorGetLote } = await this.supabase
+                .from('lotes')
+                .select('cantidad_actual')
+                .eq('id', data.lote_id)
+                .single();
+
+            if (errorGetLote) {
+                console.error('Error obteniendo lote:', errorGetLote);
+                this.error.set(errorGetLote.message);
+                throw errorGetLote;
+            }
+
+            const nuevaCantidad = loteActual.cantidad_actual - data.cantidad_afectada;
+
+            const { error: errorUpdateLote } = await this.supabase
+                .from('lotes')
+                .update({ cantidad_actual: nuevaCantidad })
+                .eq('id', data.lote_id);
+
+            if (errorUpdateLote) {
+                console.error('Error actualizando lote:', errorUpdateLote);
+                this.error.set(errorUpdateLote.message);
+                throw errorUpdateLote;
+            }
+        } catch (err: any) {
+            console.error('Error inesperado:', err);
+            this.error.set(err.message || 'Error al registrar mortalidad');
+            throw err;
+        }
+    }
+
+    async registrarPesaje(data: {
+        lote_id: number;
+        fecha: string;
+        peso_promedio: number;
+    }): Promise<void> {
+        try {
+            this.error.set(null);
+
+            const { error } = await this.supabase
+                .from('lotes')
+                .update({ peso_promedio_actual: data.peso_promedio })
+                .eq('id', data.lote_id);
+
+            if (error) {
+                console.error('Error registrando pesaje:', error);
+                this.error.set(error.message);
+                throw error;
+            }
+        } catch (err: any) {
+            console.error('Error inesperado:', err);
+            this.error.set(err.message || 'Error al registrar pesaje');
+            throw err;
+        }
+    }
+
+    async registrarVenta(data: {
+        lote_id: number;
+        lote_codigo: string;
+        fecha: string;
+        cliente: string;
+        cantidad_vendida: number;
+        peso_total: number;
+        precio_por_kilo: number;
+        total_venta: number;
+        cerrar_lote: boolean;
+    }): Promise<void> {
+        try {
+            this.error.set(null);
+
+            const descripcion = `Venta Lote ${data.lote_codigo} - ${data.cliente}`;
+
+            const { data: categorias } = await this.supabase
+                .from('categorias_movimiento')
+                .select('id')
+                .eq('nombre', 'Venta de Cerdos')
+                .eq('tipo', 'ingreso')
+                .single();
+
+            const { error: errorIngreso } = await this.supabase
+                .from('movimientos_caja')
+                .insert({
+                    fecha: data.fecha,
+                    tipo: 'ingreso',
+                    categoria_id: categorias?.id || null,
+                    monto: data.total_venta,
+                    descripcion: descripcion,
+                    lote_relacionado_id: data.lote_id
+                });
+
+            if (errorIngreso) {
+                console.error('Error registrando ingreso:', errorIngreso);
+                this.error.set(errorIngreso.message);
+                throw errorIngreso;
+            }
+
+            const updateData: any = {
+                cantidad_actual: 0
+            };
+
+            if (data.cerrar_lote) {
+                updateData.estado = 'cerrado_vendido';
+                updateData.fecha_cierre = data.fecha;
+            }
+
+            const { error: errorUpdateLote } = await this.supabase
+                .from('lotes')
+                .update(updateData)
+                .eq('id', data.lote_id);
+
+            if (errorUpdateLote) {
+                console.error('Error actualizando lote:', errorUpdateLote);
+                this.error.set(errorUpdateLote.message);
+                throw errorUpdateLote;
+            }
+        } catch (err: any) {
+            console.error('Error inesperado:', err);
+            this.error.set(err.message || 'Error al registrar venta');
+            throw err;
+        }
+    }
+
+    clearError() {
+        this.error.set(null);
+    }
+}

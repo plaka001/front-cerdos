@@ -1,0 +1,112 @@
+<div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" (click)="onClose()">
+    <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-lg border border-slate-700 max-h-[90vh] flex flex-col"
+        (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-slate-700 flex-shrink-0">
+            <h3 class="text-lg font-bold text-white">Venta - {{ lote.codigo }}</h3>
+            <button (click)="onClose()" class="text-slate-400 hover:text-white p-1" type="button">
+                <lucide-icon name="x" [size]="20"></lucide-icon>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="overflow-y-auto flex-1 overscroll-contain">
+            <div class="p-4 space-y-3">
+
+                <!-- Row 1: Fecha y Cliente -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Fecha -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1.5">Fecha Venta</label>
+                        <input type="date" formControlName="fecha"
+                            class="w-full appearance-none bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 min-w-0"
+                            style="color-scheme: dark;">
+                        @if (form.get('fecha')?.touched && form.get('fecha')?.invalid) {
+                        <p class="text-red-400 text-xs mt-1">Requerido</p>
+                        }
+                    </div>
+
+                    <!-- Cliente -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1.5">Cliente</label>
+                        <input type="text" formControlName="cliente"
+                            class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 min-w-0"
+                            placeholder="Comprador">
+                        @if (form.get('cliente')?.touched && form.get('cliente')?.invalid) {
+                        <p class="text-red-400 text-xs mt-1">Requerido</p>
+                        }
+                    </div>
+                </div>
+
+                <!-- Row 2: Cantidad -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Cantidad Vendida</label>
+                    <input type="number" formControlName="cantidad_vendida" min="1" [max]="lote.cantidad_actual"
+                        class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        placeholder="0">
+                    <div class="flex justify-between mt-1">
+                        @if (!isCantidadValida() && form.get('cantidad_vendida')?.value) {
+                        <span class="text-red-400 text-xs">Máx: {{ lote.cantidad_actual }}</span>
+                        }
+                        <span class="text-slate-500 text-xs ml-auto">Disponibles: {{ lote.cantidad_actual }}</span>
+                    </div>
+                </div>
+
+                <!-- Row 3: Peso y Precio -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1.5">Peso Total (kg)</label>
+                        <input type="number" formControlName="peso_total" step="0.01" min="0.01"
+                            class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            placeholder="0">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1.5">Precio x Kg ($)</label>
+                        <input type="number" formControlName="precio_por_kilo" step="100" min="0.01"
+                            class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            placeholder="0">
+                    </div>
+                </div>
+
+                <!-- Total -->
+                <div
+                    class="bg-amber-900/30 border border-amber-700/50 rounded-xl p-3 flex justify-between items-center">
+                    <span class="text-xs text-amber-400 font-medium">Total Venta</span>
+                    <span class="text-xl font-bold text-amber-400">
+                        ${{ totalVenta().toLocaleString('es-CO', { maximumFractionDigits: 0 }) }}
+                    </span>
+                </div>
+
+                <!-- Checkbox -->
+                <label
+                    class="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-700/30 cursor-pointer transition-colors">
+                    <input type="checkbox" formControlName="cerrar_lote"
+                        class="w-4 h-4 rounded border-slate-600 bg-slate-700 text-amber-500 focus:ring-offset-0 focus:ring-1 focus:ring-amber-500">
+                    <span class="text-xs text-slate-300">Cerrar lote definitivamente</span>
+                </label>
+
+                @if (error()) {
+                <div class="bg-red-900/20 border border-red-700/50 rounded-lg p-2">
+                    <p class="text-red-400 text-xs">{{ error() }}</p>
+                </div>
+                }
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="flex gap-3 p-4 border-t border-slate-700 bg-slate-800 flex-shrink-0">
+                <button type="button" (click)="onClose()"
+                    class="flex-1 px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" [disabled]="form.invalid || !isCantidadValida() || loading()"
+                    class="flex-1 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                    @if (loading()) {
+                    <lucide-icon name="loader-2" [size]="16" class="animate-spin"></lucide-icon>
+                    }
+                    {{ loading() ? 'Registrar' : 'Registrar' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,89 @@
+<div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" (click)="onClose()">
+    <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700 max-h-[90vh] flex flex-col"
+        (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-slate-700 flex-shrink-0">
+            <h3 class="text-lg font-bold text-white">Baja - {{ lote.codigo }}</h3>
+            <button (click)="onClose()" class="text-slate-400 hover:text-white p-1" type="button">
+                <lucide-icon name="x" [size]="20"></lucide-icon>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="overflow-y-auto flex-1 overscroll-contain">
+            <div class="p-4 space-y-4">
+                <!-- Fecha -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Fecha</label>
+                    <input type="date" formControlName="fecha"
+                        class="w-full appearance-none bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500 min-w-0"
+                        style="color-scheme: dark;">
+                    @if (form.get('fecha')?.touched && form.get('fecha')?.invalid) {
+                    <p class="text-red-400 text-xs mt-1">Requerido</p>
+                    }
+                </div>
+
+                <!-- Tipo -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Tipo de Baja</label>
+                    <select formControlName="tipo"
+                        class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
+                        @for (tipo of tiposBaja; track tipo.value) {
+                        <option [value]="tipo.value">{{ tipo.label }}</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Cantidad -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Cantidad</label>
+                    <input type="number" formControlName="cantidad_afectada" min="1" [max]="lote.cantidad_actual"
+                        class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                        placeholder="0">
+                    @if (!isCantidadValida() && form.get('cantidad_afectada')?.value) {
+                    <p class="text-red-400 text-xs mt-1">Máx: {{ lote.cantidad_actual }}</p>
+                    }
+                    <p class="text-slate-500 text-xs mt-1">Disponibles: {{ lote.cantidad_actual }}</p>
+                </div>
+
+                <!-- Observación -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">
+                        Causa/Observación
+                        @if (form.get('tipo')?.value === 'muerte') {
+                        <span class="text-red-400">*</span>
+                        }
+                    </label>
+                    <textarea formControlName="observacion" rows="3"
+                        class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                        placeholder="Describa la causa..."></textarea>
+                    @if (form.get('observacion')?.touched && form.get('observacion')?.invalid) {
+                    <p class="text-red-400 text-xs mt-1">Obligatorio para muerte</p>
+                    }
+                </div>
+
+                @if (error()) {
+                <div class="bg-red-900/20 border border-red-700/50 rounded-lg p-2">
+                    <p class="text-red-400 text-xs">{{ error() }}</p>
+                </div>
+                }
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="flex gap-3 p-4 border-t border-slate-700 bg-slate-800 flex-shrink-0">
+                <button type="button" (click)="onClose()"
+                    class="flex-1 px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" [disabled]="form.invalid || !isCantidadValida() || loading()"
+                    class="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                    @if (loading()) {
+                    <lucide-icon name="loader-2" [size]="16" class="animate-spin"></lucide-icon>
+                    }
+                    {{ loading() ? 'Guardar' : 'Guardar' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

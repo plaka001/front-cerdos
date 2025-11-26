@@ -1,0 +1,258 @@
+<div class="min-h-screen pb-20" style="background-color: var(--color-bg);">
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="flex items-center justify-center h-screen">
+    <div class="text-center fade-in">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style="border-color: var(--color-primary);">
+      </div>
+      <p class="mt-4 text-label">Cargando dashboard...</p>
+    </div>
+  </div>
+  }
+
+  <!-- Error State -->
+  @else if (error()) {
+  <div class="p-4">
+    <div class="card" style="background: var(--color-critical-light); border-color: var(--color-critical);">
+      <div class="flex items-start p-4">
+        <lucide-icon name="alert-triangle" [size]="24"
+          style="color: var(--color-critical); margin-right: 12px;"></lucide-icon>
+        <div>
+          <h3 class="text-h3" style="color: var(--color-critical-dark);">Error</h3>
+          <p class="text-small mt-1">{{ error() }}</p>
+          <button (click)="cargarDatos()" class="mt-3 text-small underline" style="color: var(--color-critical);">
+            Reintentar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Dashboard Content -->
+  @else if (dashboardData()) {
+  <div class="p-5 space-y-6 fade-in">
+
+    <!-- ========== HEADER SECTION ========== -->
+    <div class="mb-6">
+      <h1 class="text-h1 mb-2">Resumen de la Granja</h1>
+      <p class="text-small capitalize" style="color: var(--color-text-secondary);">{{ fechaActual }}</p>
+
+      <!-- Enhanced Financial Summary Badge - CLICKEABLE -->
+      <div (click)="navegarA('/finanzas')" class="card-finance mt-4 p-4 cursor-pointer transition-all hover:shadow-md">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full" style="background: var(--color-info);">
+              <lucide-icon name="dollar-sign" [size]="20" style="color: white;"></lucide-icon>
+            </div>
+            <div class="ml-3">
+              <p class="text-label font-medium" style="color: var(--color-text-secondary);">Gasto del Mes</p>
+              <p class="text-h2" style="color: var(--color-text-primary); margin-top: 2px;">
+                ${{ dashboardData()!.kpis.gastoMes.toLocaleString('es-CO') }}
+              </p>
+            </div>
+          </div>
+          <lucide-icon name="chevron-right" [size]="20" style="color: var(--color-info);"></lucide-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ALERTS SECTION ========== -->
+    @if (dashboardData()!.alertasInsumos.length > 0 || dashboardData()!.alertasPartos.length > 0) {
+    <div class="space-y-4">
+      <h2 class="text-h2 flex items-center">
+        <lucide-icon name="alert-triangle" [size]="22"
+          style="color: var(--color-warning); margin-right: 8px;"></lucide-icon>
+        Alertas de la Granja
+      </h2>
+
+      <!-- Critical Alert - Low Inventory - CLICKEABLE -->
+      @if (dashboardData()!.alertasInsumos.length > 0) {
+      <div class="card-alert cursor-pointer transition-all hover:shadow-md">
+        <button (click)="toggleDetalleInsumos()" class="w-full p-4 text-left flex items-center justify-between"
+          style="background: transparent; border: none; cursor: pointer;">
+          <div class="flex items-center">
+            <div class="flex items-center justify-center w-12 h-12 rounded-full"
+              style="background: var(--color-critical);">
+              <lucide-icon name="wheat" [size]="24" style="color: white;"></lucide-icon>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-h3">Inventario Bajo</h3>
+              <p class="text-small mt-1">
+                {{ dashboardData()!.alertasInsumos.length }} insumo(s) requieren atención
+              </p>
+            </div>
+          </div>
+          <lucide-icon [name]="mostrarDetalleInsumos() ? 'chevron-up' : 'chevron-down'" [size]="20"
+            style="color: var(--color-critical);"></lucide-icon>
+        </button>
+
+        <!-- Expandable Detail - Table Format -->
+        @if (mostrarDetalleInsumos()) {
+        <div class="px-4 pb-4 pt-2 accordion-enter">
+          <div class="border-t pt-3" style="border-color: #475569;">
+            <!-- Table Header -->
+            <div class="grid grid-cols-3 gap-2 mb-2 px-2">
+              <span class="text-label font-semibold" style="color: var(--color-text-secondary);">Nombre</span>
+              <span class="text-label font-semibold text-right"
+                style="color: var(--color-text-secondary);">Actual</span>
+              <span class="text-label font-semibold text-right"
+                style="color: var(--color-text-secondary);">Mínimo</span>
+            </div>
+            <!-- Table Rows with Visual Indicators -->
+            @for (insumo of dashboardData()!.alertasInsumos; track insumo.nombre) {
+            <div class="alert-table-row grid grid-cols-3 gap-2 rounded" [class.critical]="insumo.stockActual === 0">
+              <span class="text-body font-medium" style="color: var(--color-text-primary);">{{ insumo.nombre }}</span>
+              <span class="text-body text-right font-semibold"
+                [style.color]="insumo.stockActual === 0 ? 'var(--color-critical)' : 'var(--color-text-primary)'">
+                {{ insumo.stockActual }} {{ insumo.unidad }}
+              </span>
+              <span class="text-body text-right" style="color: var(--color-text-secondary);">
+                {{ insumo.stockMinimo }}
+              </span>
+            </div>
+            }
+            <!-- Action Button -->
+            <button (click)="navegarA('/inventario')" class="btn-alert-outline mt-3 w-full">
+              Ir a Inventario
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+      }
+
+      <!-- Preventive Alert - Upcoming Births - CLICKEABLE -->
+      @if (dashboardData()!.alertasPartos.length > 0) {
+      <div class="card-alert warning cursor-pointer transition-all hover:shadow-md">
+        <button (click)="toggleDetallePartos()" class="w-full p-4 text-left flex items-center justify-between"
+          style="background: transparent; border: none; cursor: pointer;">
+          <div class="flex items-center">
+            <div class="flex items-center justify-center w-12 h-12 rounded-full"
+              style="background: var(--color-warning);">
+              <lucide-icon name="baby" [size]="24" style="color: white;"></lucide-icon>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-h3">Partos Próximos</h3>
+              <p class="text-small mt-1">
+                Partos en los próximos días
+              </p>
+            </div>
+          </div>
+          <lucide-icon [name]="mostrarDetallePartos() ? 'chevron-up' : 'chevron-down'" [size]="20"
+            style="color: var(--color-warning-dark);"></lucide-icon>
+        </button>
+
+        <!-- Expandable Detail - List Format with Badges -->
+        @if (mostrarDetallePartos()) {
+        <div class="px-4 pb-4 pt-2 accordion-enter">
+          <div class="border-t pt-3" style="border-color: var(--color-warning);">
+            @for (parto of dashboardData()!.alertasPartos; track parto.chapetaCerda) {
+            <div class="alert-table-row flex justify-between items-center rounded mb-1">
+              <span class="text-body font-medium" style="color: var(--color-text-primary);">
+                Cerda {{ parto.chapetaCerda }}
+              </span>
+              <div class="flex items-center gap-2">
+                <span class="text-body" style="color: var(--color-info);">
+                  {{ formatearFechaParto(parto.fechaProbable) }}
+                </span>
+                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold"
+                  [style.background]="parto.diasRestantes <= 2 ? 'var(--color-critical)' : 'var(--color-warning)'"
+                  style="color: white;">
+                  {{ parto.diasRestantes }}d
+                </span>
+              </div>
+            </div>
+            }
+            <!-- Action Button -->
+            <button (click)="navegarA('/produccion')" class="btn-alert-outline warning mt-3 w-full">
+              Ir a Producción
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+    }
+
+    <!-- ========== KPI INDICATORS - CLICKEABLE ========== -->
+    <div>
+      <h2 class="text-h2 mb-4">Indicadores</h2>
+      <div class="grid grid-cols-2 gap-4">
+
+        <!-- Pie de Cría - CLICKEABLE -->
+        <div (click)="navegarA('/produccion')" class="card p-4 cursor-pointer transition-all hover:shadow-md">
+          <div class="flex items-center justify-between mb-3">
+            <lucide-icon name="piggy-bank" [size]="28" style="color: var(--color-primary);"></lucide-icon>
+            <lucide-icon name="chevron-right" [size]="18" style="color: var(--color-text-label);"></lucide-icon>
+          </div>
+          <p class="text-4xl font-bold mb-1" style="color: var(--color-text-primary);">
+            {{ dashboardData()!.kpis.totalCerdas }}
+          </p>
+          <p class="text-label">Pie de Cría</p>
+        </div>
+
+        <!-- En Engorde - CLICKEABLE -->
+        <div (click)="navegarA('/lotes')" class="card p-4 cursor-pointer transition-all hover:shadow-md">
+          <div class="flex items-center justify-between mb-3">
+            <lucide-icon name="trending-up" [size]="28" style="color: var(--color-info);"></lucide-icon>
+            <lucide-icon name="chevron-right" [size]="18" style="color: var(--color-text-label);"></lucide-icon>
+          </div>
+          <p class="text-4xl font-bold mb-1" style="color: var(--color-text-primary);">
+            {{ dashboardData()!.kpis.totalEngorde }}
+          </p>
+          <p class="text-label">En Engorde</p>
+        </div>
+
+        <!-- Lotes Activos - CLICKEABLE -->
+        <div (click)="navegarA('/lotes')" class="card p-4 cursor-pointer transition-all hover:shadow-md">
+          <div class="flex items-center justify-between mb-3">
+            <lucide-icon name="wheat" [size]="28" style="color: #D97706;"></lucide-icon>
+            <lucide-icon name="chevron-right" [size]="18" style="color: var(--color-text-label);"></lucide-icon>
+          </div>
+          <p class="text-4xl font-bold mb-1" style="color: var(--color-text-primary);">
+            {{ dashboardData()!.kpis.lotesActivos }}
+          </p>
+          <p class="text-label">Lotes Activos</p>
+        </div>
+
+        <!-- Mortalidad Mes - CLICKEABLE -->
+        <div (click)="navegarA('/produccion')" class="card p-4 cursor-pointer transition-all hover:shadow-md">
+          <div class="flex items-center justify-between mb-3">
+            <lucide-icon name="alert-triangle" [size]="28"
+              [style.color]="dashboardData()!.kpis.tasaMortalidad > 2.5 ? 'var(--color-critical)' : '#10B981'">
+            </lucide-icon>
+            <lucide-icon name="chevron-right" [size]="18" style="color: var(--color-text-label);"></lucide-icon>
+          </div>
+          <p class="text-4xl font-bold mb-1"
+            [style.color]="dashboardData()!.kpis.tasaMortalidad > 2.5 ? 'var(--color-critical)' : '#10B981'">
+            {{ dashboardData()!.kpis.tasaMortalidad }}%
+          </p>
+          <p class="text-label">Mortalidad Mes</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========== QUICK ACTIONS ========== -->
+    <div>
+      <h2 class="text-h2 mb-4">Acciones Rápidas</h2>
+      <div class="space-y-3">
+
+        <button (click)="navegarA('/finanzas')" class="btn btn-primary w-full py-4 text-base">
+          <lucide-icon name="dollar-sign" [size]="20" class="mr-2"></lucide-icon>
+          Registrar Gasto
+        </button>
+
+        <button (click)="navegarA('/produccion')" class="btn btn-secondary w-full py-4 text-base">
+          <lucide-icon name="alert-triangle" [size]="20" class="mr-2"></lucide-icon>
+          Registrar Evento
+        </button>
+
+      </div>
+    </div>
+
+  </div>
+  }
+</div>
