@@ -27,10 +27,12 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
           [disabled]="disabled"
           [(ngModel)]="value"
           (blur)="onTouched()"
-          class="block w-full h-12 rounded-md border-slate-600 bg-slate-700 text-white shadow-sm focus:border-white focus:ring-white focus:ring-2 sm:text-sm transition-all px-3 placeholder-slate-400"
+          class="appearance-none block w-full h-12 leading-[3rem] rounded-md border-slate-600 bg-slate-700 text-white shadow-sm focus:border-white focus:ring-white focus:ring-2 sm:text-sm transition-all px-3 placeholder-slate-400"
           [class.border-red-500]="error"
           [class.focus:ring-red-500]="error"
           [class.focus:border-red-500]="error"
+          [style.color-scheme]="type === 'date' ? 'dark' : 'auto'"
+          [style.min-height]="'48px'"
         />
       </div>
       <p *ngIf="error" class="mt-2 text-sm text-red-400">{{ error }}</p>
