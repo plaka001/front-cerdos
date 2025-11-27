@@ -16,13 +16,13 @@ export class AuthService {
     loading = signal<boolean>(true);
 
     constructor() {
-        this.initializeAuth();
+        // La inicialización se llama explícitamente desde APP_INITIALIZER
     }
 
     /**
      * Inicializa la autenticación verificando si existe una sesión activa
      */
-    private async initializeAuth() {
+    async init(): Promise<void> {
         try {
             // Obtener sesión actual de Supabase
             const { data: { session } } = await this.supabaseService.client.auth.getSession();

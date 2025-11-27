@@ -5,11 +5,12 @@ import { ProduccionService } from '../../../core/services/produccion.service';
 import { CerdaDetalle } from '../../../core/models';
 import { EventModalComponent } from '../components/event-modal/event-modal.component';
 import { NuevaCerdaModalComponent } from '../components/nueva-cerda-modal/nueva-cerda-modal.component';
+import { AlimentarCerdasModalComponent } from '../components/alimentar-cerdas-modal/alimentar-cerdas-modal.component';
 
 @Component({
     selector: 'app-cerdas-list',
     standalone: true,
-    imports: [CommonModule, LucideAngularModule, EventModalComponent, NuevaCerdaModalComponent],
+    imports: [CommonModule, LucideAngularModule, EventModalComponent, NuevaCerdaModalComponent, AlimentarCerdasModalComponent],
     templateUrl: './cerdas-list.component.html'
 })
 export class CerdasListComponent implements OnInit {
@@ -26,6 +27,9 @@ export class CerdasListComponent implements OnInit {
 
     // Nueva Cerda Modal
     nuevaCerdaModalOpen = signal<boolean>(false);
+
+    // Alimentar Cerdas Modal
+    alimentarModalOpen = signal<boolean>(false);
 
     async ngOnInit() {
         await this.cargarCerdas();
@@ -77,6 +81,20 @@ export class CerdasListComponent implements OnInit {
     async onNuevaCerdaGuardada() {
         this.cerrarNuevaCerdaModal();
         await this.cargarCerdas();
+    }
+
+    // Alimentar Cerdas Logic
+    abrirAlimentarModal() {
+        this.alimentarModalOpen.set(true);
+    }
+
+    cerrarAlimentarModal() {
+        this.alimentarModalOpen.set(false);
+    }
+
+    async onAlimentacionGuardada() {
+        this.cerrarAlimentarModal();
+        // No necesitamos recargar cerdas, pero podríamos mostrar un toast
     }
 
     // Helpers para visualización
