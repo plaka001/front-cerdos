@@ -27,7 +27,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
           [disabled]="disabled"
           [(ngModel)]="value"
           (blur)="onTouched()"
-          class="appearance-none block w-full h-12 leading-[3rem] rounded-md border-slate-600 bg-slate-700 text-white shadow-sm focus:border-white focus:ring-white focus:ring-2 sm:text-sm transition-all px-3 placeholder-slate-400"
+          class="appearance-none block w-full h-12 leading-[3rem] md:leading-normal rounded-md border-slate-600 bg-slate-700 text-white shadow-sm focus:border-white focus:ring-white focus:ring-2 sm:text-sm transition-all px-3 placeholder-slate-400"
           [class.border-red-500]="error"
           [class.focus:ring-red-500]="error"
           [class.focus:border-red-500]="error"

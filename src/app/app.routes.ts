@@ -13,5 +13,6 @@ export const routes: Routes = [
     { path: 'produccion', component: CerdasListComponent },
     { path: 'lotes', component: LotesListComponent },
     { path: 'finanzas', component: RegistroTransaccionComponent },
+    { path: 'reportes', loadComponent: () => import('./features/reportes/reportes.component').then(m => m.ReportesComponent) },
     { path: '**', redirectTo: '/dashboard' }
 ];

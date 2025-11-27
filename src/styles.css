@@ -325,11 +325,18 @@ body {
     max-height: 500px;
   }
 }
+
 /* DATE INPUT FIX FOR MOBILE */
-input[type="date"], input[type="datetime-local"], input[type="time"] {
-  display: flex !important;
-  align-items: center !important;
-  line-height: 48px !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+/* DATE INPUT FIX FOR MOBILE ONLY */
+@media (max-width: 768px) {
+
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="time"] {
+    display: flex !important;
+    align-items: center !important;
+    line-height: 48px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
 }

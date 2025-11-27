@@ -154,3 +154,16 @@ export interface EventoSanitario {
     cantidad_afectada: number; // default 1
     observacion?: string;
 }
+
+export interface ReporteRentabilidad {
+    lote_id: number;
+    codigo: string;
+    estado: EstadoLote;
+    cantidad_inicial: number;
+    cantidad_actual: number;
+    inversion_animales: number;
+    costo_alimentacion: number;
+    costo_total_acumulado: number;
+    total_ventas: number;
+    ganancia_neta: number;
+}
