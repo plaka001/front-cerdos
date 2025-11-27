@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { ReportesService } from '../../core/services/reportes.service';
-import { ReporteRentabilidad } from '../../core/models';
+import { ReporteRentabilidad, ReporteCostosMaternidad } from '../../core/models';
 
 @Component({
     selector: 'app-reportes',
@@ -14,6 +14,8 @@ export class ReportesComponent implements OnInit {
     private reportesService = inject(ReportesService);
 
     reportes = signal<ReporteRentabilidad[]>([]);
+    reporteMaternidad = signal<ReporteCostosMaternidad[]>([]);
+    activeTab = signal<'lotes' | 'maternidad'>('lotes');
     loading = signal<boolean>(true);
     error = signal<string | null>(null);
 
@@ -24,10 +26,15 @@ export class ReportesComponent implements OnInit {
     async loadReportes() {
         try {
             this.loading.set(true);
-            const data = await this.reportesService.getReporteRentabilidad();
-            this.reportes.set(data);
+            const [dataLotes, dataMaternidad] = await Promise.all([
+                this.reportesService.getReporteRentabilidad(),
+                this.reportesService.getReporteMaternidad()
+            ]);
+
+            this.reportes.set(dataLotes);
+            this.reporteMaternidad.set(dataMaternidad);
         } catch (err) {
-            this.error.set('Error al cargar el reporte de rentabilidad.');
+            this.error.set('Error al cargar los reportes financieros.');
         } finally {
             this.loading.set(false);
         }

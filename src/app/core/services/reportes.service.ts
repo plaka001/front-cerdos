@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
-import { ReporteRentabilidad } from '../models';
+import { ReporteRentabilidad, ReporteCostosMaternidad } from '../models';
 
 @Injectable({
     providedIn: 'root'
@@ -19,6 +19,21 @@ export class ReportesService {
             return data as ReporteRentabilidad[];
         } catch (error) {
             console.error('Error al obtener reporte de rentabilidad:', error);
+            throw error;
+        }
+    }
+
+    async getReporteMaternidad(): Promise<ReporteCostosMaternidad[]> {
+        try {
+            const { data, error } = await this.supabase.client
+                .from('reporte_costos_maternidad')
+                .select('*')
+                .order('mes', { ascending: false });
+
+            if (error) throw error;
+            return data as ReporteCostosMaternidad[];
+        } catch (error) {
+            console.error('Error al obtener reporte de maternidad:', error);
             throw error;
         }
     }

@@ -514,6 +514,119 @@ export class ProduccionService {
         }
     }
 
+    async crearCerda(data: {
+        chapeta: string;
+        raza: string;
+        fecha_nacimiento: string;
+        partos_acumulados: number;
+        fue_comprada: boolean;
+        valor_compra?: number;
+        fecha_compra?: string;
+    }): Promise<void> {
+        try {
+            this.error.set(null);
+
+            // 1. Insertar Cerda
+            const { data: cerda, error: errorCerda } = await this.supabase
+                .from('cerdas')
+                .insert({
+                    chapeta: data.chapeta,
+                    raza: data.raza,
+                    fecha_nacimiento: data.fecha_nacimiento,
+                    partos_acumulados: data.partos_acumulados,
+                    estado: 'vacia',
+                    activa: true
+                })
+                .select()
+                .single();
+
+            if (errorCerda) throw errorCerda;
+
+            // 2. Registrar Compra si aplica
+            if (data.fue_comprada && data.valor_compra && data.valor_compra > 0) {
+                const descripcion = `Compra Cerda ${data.chapeta} `;
+
+                // Buscar categoría
+                const { data: categorias } = await this.supabase
+                    .from('categorias_movimiento')
+                    .select('id')
+                    .eq('nombre', 'Compra de Pie de Cría') // Ajustar nombre según BD
+                    .eq('tipo', 'egreso') // Ajustar tipo según BD
+                    .single();
+
+                // Si no existe, usar una genérica o null (o crearla, pero por ahora null si no existe)
+                // Idealmente deberíamos asegurar que existe la categoría.
+
+                const { error: errorEgreso } = await this.supabase
+                    .from('movimientos_caja')
+                    .insert({
+                        fecha: data.fecha_compra || new Date().toISOString().split('T')[0],
+                        tipo: 'egreso',
+                        categoria_id: categorias?.id || null,
+                        monto: data.valor_compra,
+                        descripcion: descripcion,
+                        metodo_pago: 'efectivo' // Default
+                    });
+
+                if (errorEgreso) {
+                    console.error('Error registrando egreso de compra:', errorEgreso);
+                    // No revertimos la cerda, pero avisamos (o podríamos revertir)
+                }
+            }
+
+            await this.loadCerdas();
+
+        } catch (err: any) {
+            console.error('Error creando cerda:', err);
+            this.error.set(err.message || 'Error al crear la cerda');
+            throw err;
+        }
+    }
+
+    /**
+     * Registrar alimentación grupal para cerdas (maternidad/gestación)
+     */
+    async registrarAlimentacionCerdas(data: {
+        insumo_id: number;
+        cantidad: number;  // en kg
+        costo_unitario_momento: number;
+        etapa: string;  // 'Gestación' o 'Lactancia'
+    }): Promise<void> {
+        try {
+            this.error.set(null);
+
+            const notas = data.etapa
+                ? `Alimentación Grupal - ${data.etapa}`
+                : 'Alimentación Grupal - Maternidad';
+
+            // Insertar en salidas_insumos
+            const { error: errorSalida } = await this.supabase
+                .from('salidas_insumos')
+                .insert({
+                    insumo_id: data.insumo_id,
+                    cantidad: data.cantidad,
+                    fecha: new Date().toISOString().split('T')[0],
+                    costo_unitario_momento: data.costo_unitario_momento,
+                    destino_tipo: 'cerda',  // CRÍTICO: Identifica gasto de cerdas
+                    lote_id: null,
+                    cerda_id: null,  // Gasto grupal, no específico
+                    notas: notas
+                });
+
+            if (errorSalida) {
+                console.error('Error registrando salida de insumo:', errorSalida);
+                throw errorSalida;
+            }
+
+            console.log('Alimentación de cerdas registrada correctamente');
+
+        } catch (err: any) {
+            console.error('Error en registrarAlimentacionCerdas:', err);
+            this.error.set(err.message || 'Error al registrar la alimentación');
+            throw err;
+        }
+    }
+
     clearError() {
         this.error.set(null);
     }

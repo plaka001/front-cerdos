@@ -4,11 +4,12 @@ import { LucideAngularModule } from 'lucide-angular';
 import { ProduccionService } from '../../../core/services/produccion.service';
 import { CerdaDetalle } from '../../../core/models';
 import { EventModalComponent } from '../components/event-modal/event-modal.component';
+import { NuevaCerdaModalComponent } from '../components/nueva-cerda-modal/nueva-cerda-modal.component';
 
 @Component({
     selector: 'app-cerdas-list',
     standalone: true,
-    imports: [CommonModule, LucideAngularModule, EventModalComponent],
+    imports: [CommonModule, LucideAngularModule, EventModalComponent, NuevaCerdaModalComponent],
     templateUrl: './cerdas-list.component.html'
 })
 export class CerdasListComponent implements OnInit {
@@ -22,6 +23,9 @@ export class CerdasListComponent implements OnInit {
     selectedCerda = signal<CerdaDetalle | null>(null);
     modalOpen = signal<boolean>(false);
     modalType = signal<'inseminacion' | 'parto' | 'destete' | null>(null);
+
+    // Nueva Cerda Modal
+    nuevaCerdaModalOpen = signal<boolean>(false);
 
     async ngOnInit() {
         await this.cargarCerdas();
@@ -59,6 +63,20 @@ export class CerdasListComponent implements OnInit {
     async onEventoGuardado() {
         this.cerrarModal();
         await this.cargarCerdas(); // Recargar datos para ver cambios
+    }
+
+    // Nueva Cerda Logic
+    abrirNuevaCerdaModal() {
+        this.nuevaCerdaModalOpen.set(true);
+    }
+
+    cerrarNuevaCerdaModal() {
+        this.nuevaCerdaModalOpen.set(false);
+    }
+
+    async onNuevaCerdaGuardada() {
+        this.cerrarNuevaCerdaModal();
+        await this.cargarCerdas();
     }
 
     // Helpers para visualización

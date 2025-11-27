@@ -1,18 +1,63 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { PanelCerdasComponent } from './features/produccion/panel-cerdas/panel-cerdas.component';
-import { RegistroTransaccionComponent } from './features/finanzas/registro-transaccion/registro-transaccion.component';
-import { AlimentarLoteComponent } from './features/alimentacion/alimentar-lote/alimentar-lote.component';
+import { authGuard, publicGuard } from './core/guards/auth.guard';
 
+// Layout
+import { LayoutComponent } from './core/layout/layout.component';
+
+// Auth
+import { LoginComponent } from './features/auth/login/login.component';
+
+// Features
+import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { CerdasListComponent } from './features/produccion/cerdas-list/cerdas-list.component';
 import { LotesListComponent } from './features/produccion/lotes-list/lotes-list.component';
+import { RegistroTransaccionComponent } from './features/finanzas/registro-transaccion/registro-transaccion.component';
 
 export const routes: Routes = [
-    { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-    { path: 'dashboard', component: DashboardComponent },
-    { path: 'produccion', component: CerdasListComponent },
-    { path: 'lotes', component: LotesListComponent },
-    { path: 'finanzas', component: RegistroTransaccionComponent },
-    { path: 'reportes', loadComponent: () => import('./features/reportes/reportes.component').then(m => m.ReportesComponent) },
-    { path: '**', redirectTo: '/dashboard' }
+    // Ruta Pública: Login
+    {
+        path: 'login',
+        component: LoginComponent,
+        canActivate: [publicGuard] // Si ya está logueado, redirige a dashboard
+    },
+
+    // Rutas Protegidas: Todas bajo Layout con AuthGuard
+    {
+        path: '',
+        component: LayoutComponent,
+        canActivate: [authGuard], // Requiere autenticación
+        children: [
+            {
+                path: '',
+                redirectTo: 'dashboard',
+                pathMatch: 'full'
+            },
+            {
+                path: 'dashboard',
+                component: DashboardComponent
+            },
+            {
+                path: 'produccion',
+                component: CerdasListComponent
+            },
+            {
+                path: 'lotes',
+                component: LotesListComponent
+            },
+            {
+                path: 'finanzas',
+                component: RegistroTransaccionComponent
+            },
+            {
+                path: 'reportes',
+                loadComponent: () => import('./features/reportes/reportes.component').then(m => m.ReportesComponent)
+            }
+        ]
+    },
+
+    // Wildcard: Redirigir a dashboard (el guard lo mandará al login si no está autenticado)
+    {
+        path: '**',
+        redirectTo: ''
+    }
 ];

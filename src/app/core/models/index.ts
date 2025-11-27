@@ -167,3 +167,10 @@ export interface ReporteRentabilidad {
     total_ventas: number;
     ganancia_neta: number;
 }
+
+export interface ReporteCostosMaternidad {
+    mes: string;
+    total_gastos_madres: number;
+    total_lechones_producidos: number;
+    costo_por_lechon: number;
+}
