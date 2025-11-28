@@ -80,6 +80,14 @@ import { CategoriaFinanciera, Insumo, TipoMovimientoCaja } from '../../../core/m
                 </option>
               </select>
               
+              <!-- ✅ NUEVO: Mensaje cuando no hay insumos -->
+              @if (filteredInsumos().length === 0 && categoriaId()) {
+                <div class="mt-3 bg-yellow-900/20 border-l-4 border-yellow-500 p-3 rounded-r-md flex items-start gap-3">
+                  <span class="text-lg">⚠️</span>
+                  <p class="text-sm text-yellow-200 font-medium">No hay insumos de este tipo registrados. Primero debes crear el insumo en Inventario.</p>
+                </div>
+              }
+              
               <!-- Info Badge -->
               @if (textoPresentacion()) {
                 <div class="mt-3 bg-slate-700/50 border-l-4 border-slate-500 p-3 rounded-r-md flex items-start gap-3">
@@ -152,6 +160,7 @@ export class RegistroTransaccionComponent {
     });
   });
 
+  // ✅ REFACTORED: Filtrado reactivo mejorado de insumos
   filteredInsumos = computed(() => {
     const catId = this.categoriaId();
     const allInsumos = this.insumos();
@@ -163,18 +172,25 @@ export class RegistroTransaccionComponent {
 
     const nombreCat = cat.nombre.toLowerCase();
 
+    // Filtrar por tipo de insumo basado en el nombre de la categoría
     if (nombreCat.includes('alimento')) {
       return allInsumos.filter(i => i.tipo === 'alimento');
     }
-    if (nombreCat.includes('medicamento') || nombreCat.includes('medicina') || nombreCat.includes('sanidad')) {
-      return allInsumos.filter(i => i.tipo === 'medicamento');
-    }
-    if (nombreCat.includes('vacuna') || nombreCat.includes('biologico')) {
-      return allInsumos.filter(i => i.tipo === 'biologico');
+
+    if (nombreCat.includes('medicamento') ||
+      nombreCat.includes('medicina') ||
+      nombreCat.includes('sanidad') ||
+      nombreCat.includes('veterinario')) {
+      // Medicamentos Y biológicos (vacunas)
+      return allInsumos.filter(i => i.tipo === 'medicamento' || i.tipo === 'biologico');
     }
 
-    // Si es una compra operativa pero no específica, mostrar todo
-    return allInsumos;
+    if (nombreCat.includes('material')) {
+      return allInsumos.filter(i => i.tipo === 'material');
+    }
+
+    // Si no coincide con ninguna categoría específica, no mostrar insumos
+    return [];
   });
 
   // Computed Helpers para UX
@@ -231,6 +247,18 @@ export class RegistroTransaccionComponent {
     this.form.get('insumo_id')?.valueChanges.subscribe(val => this.insumoId.set(val));
     this.form.get('cantidad_comprada')?.valueChanges.subscribe(val => this.cantidad.set(Number(val) || 0));
     this.form.get('monto')?.valueChanges.subscribe(val => this.monto.set(Number(val) || 0));
+    // ✅ NUEVO: Effect para resetear insumo cuando cambia la categoría
+    effect(() => {
+      // Leer la categoría (esto registra la dependencia)
+      const catId = this.categoriaId();
+
+      // Limpiar el insumo seleccionado cuando cambia la categoría
+      // Esto previene que quede seleccionado un alimento cuando cambias a medicamentos
+      if (catId) {
+        this.form.get('insumo_id')?.setValue(null, { emitEvent: false });
+        this.insumoId.set(null);
+      }
+    }, { allowSignalWrites: true }); // ✅ FIX: Permitir escritura en signals dentro del effect
   }
 
   setTipo(t: TipoMovimientoCaja) {
@@ -242,10 +270,20 @@ export class RegistroTransaccionComponent {
     const catId = this.form.get('categoria_id')?.value;
     if (!catId) return false;
     const cat = this.categorias().find(c => c.id == catId);
-    // Lógica: Si la categoría es "Compra Alimento" o "Medicamentos" (o cualquier operativo que implique stock)
-    // En el SQL: 'Compra Alimento', 'Medicamentos' son operativos. 'Nomina' es operativo pero no insumo.
-    // Una forma robusta es ver si el nombre contiene "Compra" o "Medicamento" o "Insumo".
-    return cat ? ['Compra Alimento', 'Medicamentos'].includes(cat.nombre) : false;
+
+    if (!cat) return false;
+
+    const nombre = cat.nombre.toLowerCase();
+
+    // ✅ Lógica mejorada: Detectar cualquier categoría de compra de inventario
+    return nombre.includes('alimento') ||
+      nombre.includes('medicamento') ||
+      nombre.includes('medicina') ||
+      nombre.includes('sanidad') ||
+      nombre.includes('veterinario') ||
+      nombre.includes('material') ||
+      nombre.includes('insumo') ||
+      nombre.includes('compra');
   }
 
   updateValidators(catId: number) {

@@ -41,30 +41,34 @@
             <div class="relative bg-slate-800 rounded-2xl border border-slate-700 shadow-md p-5 transition-all hover:shadow-lg flex flex-col"
                 [class.opacity-60]="isLoteCerrado(lote)">
 
-                <!-- Badge: Días en Granja (Top Right) -->
-                <div class="absolute top-5 right-5">
-                    <span
-                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                        {{ lote.diasEnGranja }} días
-                    </span>
-                </div>
-
                 <!-- Card Header -->
-                <div class="flex items-center mb-6 pr-20">
-                    <div class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-2xl">
-                        📦
+                <div class="flex items-start justify-between mb-4">
+                    <!-- Left: Icon + Info -->
+                    <div class="flex items-center flex-1">
+                        <div
+                            class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-2xl flex-shrink-0">
+                            📦
+                        </div>
+                        <div class="ml-4 flex-1 min-w-0">
+                            <h3 class="text-xl font-bold text-white truncate">{{ lote.codigo }}</h3>
+                            <p class="text-sm text-slate-400">{{ lote.ubicacion }}</p>
+                        </div>
                     </div>
-                    <div class="ml-4 flex-1">
-                        <h3 class="text-xl font-bold text-white">{{ lote.codigo }}</h3>
-                        <p class="text-sm text-slate-400">{{ lote.ubicacion }}</p>
+
+                    <!-- Right: Actions -->
+                    <div class="flex items-center gap-2 ml-4 flex-shrink-0">
+                        <!-- Badge: Días en Granja -->
+                        <span
+                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                            {{ lote.diasEnGranja }} días
+                        </span>
+                        <!-- Botón Ver Historial -->
+                        <button (click)="verHistorial(lote); $event.stopPropagation()"
+                            class="p-2 text-slate-400 hover:text-emerald-400 hover:bg-slate-700 rounded-lg transition-colors"
+                            title="Ver Historial">
+                            <lucide-icon name="eye" [size]="20"></lucide-icon>
+                        </button>
                     </div>
-                    <!-- Botón Ver Historial -->
-                    <button
-                        (click)="verHistorial(lote); $event.stopPropagation()"
-                        class="p-2 text-slate-400 hover:text-emerald-400 hover:bg-slate-700 rounded-lg transition-colors"
-                        title="Ver Historial">
-                        <lucide-icon name="eye" [size]="20"></lucide-icon>
-                    </button>
                 </div>
 
                 <!-- Data Grid -->
