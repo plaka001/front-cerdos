@@ -21,7 +21,7 @@
                         <option value="">Seleccione alimento</option>
                         @for (insumo of insumos(); track insumo.id) {
                         <option [value]="insumo.id">
-                            {{ insumo.nombre }} ({{ insumo.stock_actual }}{{ insumo.unidad_medida_uso }})
+                            {{ insumo.nombre }} ({{ insumo.stock_actual }}{{ insumo.unidad_medida }})
                         </option>
                         }
                     </select>

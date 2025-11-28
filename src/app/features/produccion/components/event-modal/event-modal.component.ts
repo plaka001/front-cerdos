@@ -58,7 +58,19 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
               <app-input label="Fecha de Destete" type="date" formControlName="fecha"></app-input>
               
               <div class="grid grid-cols-2 gap-4">
-                <app-input label="Cantidad" type="number" formControlName="cantidad" placeholder="0"></app-input>
+                <div>
+                  <app-input label="Cantidad" type="number" formControlName="cantidad" placeholder="0"></app-input>
+                  @if (form.get('cantidad')?.hasError('max') && form.get('cantidad')?.touched) {
+                    <p class="text-xs text-red-400 mt-1">
+                      Error: La cerda solo tiene {{ maxLechonesDestete() }} lechones vivos registrados.
+                    </p>
+                  }
+                  @if (maxLechonesDestete() && maxLechonesDestete()! > 0) {
+                    <p class="text-xs text-slate-400 mt-1">
+                      Máximo permitido: {{ maxLechonesDestete() }} lechones
+                    </p>
+                  }
+                </div>
                 <app-input label="Peso Prom. (Kg)" type="number" formControlName="peso" placeholder="0.0"></app-input>
               </div>
               
@@ -112,6 +124,7 @@ export class EventModalComponent {
   form!: FormGroup;
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
+  maxLechonesDestete = signal<number | null>(null);
 
   ngOnInit() {
     this.initForm();
@@ -135,9 +148,20 @@ export class EventModalComponent {
         observaciones: ['']
       });
     } else if (this.tipoEvento === 'destete') {
+      // Obtener nacidos_vivos del ciclo activo para validación
+      const nacidosVivos = this.cerda.cicloActivo?.nacidos_vivos || 0;
+      this.maxLechonesDestete.set(nacidosVivos);
+
+      // Validación: cantidad no puede exceder nacidos_vivos
+      const validadoresCantidad = [
+        Validators.required,
+        Validators.min(1),
+        Validators.max(nacidosVivos)
+      ];
+
       this.form = this.fb.group({
         fecha: [hoy, Validators.required],
-        cantidad: [null, [Validators.required, Validators.min(1)]],
+        cantidad: [null, validadoresCantidad],
         peso: [null, [Validators.required, Validators.min(0)]],
         crear_lote: [true],
         observaciones: ['']
@@ -184,6 +208,17 @@ export class EventModalComponent {
           this.error.set('Esta cerda no tiene un ciclo reproductivo activo.');
           return;
         }
+
+        // Validación adicional: verificar que cantidad no exceda nacidos_vivos
+        const cantidad = val.cantidad;
+        const nacidosVivos = this.cerda.cicloActivo.nacidos_vivos || 0;
+        
+        if (cantidad > nacidosVivos) {
+          this.error.set(`Error: La cerda solo tiene ${nacidosVivos} lechones vivos registrados. No se pueden destetar más de los que nacieron vivos.`);
+          this.loading.set(false);
+          return;
+        }
+
         await this.produccionService.registrarDestete(this.cerda.id, this.cerda.cicloActivo.id, val);
       }
 

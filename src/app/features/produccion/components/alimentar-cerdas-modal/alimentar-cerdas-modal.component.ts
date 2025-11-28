@@ -39,7 +39,7 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
               <option [value]="null">Seleccione un producto</option>
               @for (insumo of insumosDisponibles(); track insumo.id) {
                 <option [value]="insumo.id">
-                  {{ insumo.nombre }} (Stock: {{ insumo.stock_actual }} {{ insumo.unidad_medida_uso }})
+                  {{ insumo.nombre }} (Stock: {{ insumo.stock_actual }} {{ insumo.unidad_medida }})
                 </option>
               }
             </select>
@@ -53,11 +53,11 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
             <div class="bg-slate-700/50 border-l-4 border-emerald-500 p-3 rounded-r-md">
               <p class="text-sm text-slate-300">
                 <span class="font-semibold">📦 Presentación:</span> 
-                {{ insumoSeleccionado()!.presentacion_compra }} {{ insumoSeleccionado()!.unidad_medida_uso }}/bulto
+                {{ insumoSeleccionado()!.presentacion_compra }} {{ insumoSeleccionado()!.unidad_medida }}/bulto
               </p>
               <p class="text-sm text-slate-300 mt-1">
                 <span class="font-semibold">💵 Costo:</span> 
-                \${{ insumoSeleccionado()!.costo_promedio.toLocaleString('es-CO') }} / {{ insumoSeleccionado()!.unidad_medida_uso }}
+                \${{ insumoSeleccionado()!.costo_promedio.toLocaleString('es-CO') }} / {{ insumoSeleccionado()!.unidad_medida }}
               </p>
             </div>
           }

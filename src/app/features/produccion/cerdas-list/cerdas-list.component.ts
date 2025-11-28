@@ -39,18 +39,83 @@ export class CerdasListComponent implements OnInit {
         try {
             this.loading.set(true);
             const data = await this.produccionService.getCerdasConCiclos();
-            console.log('🐷 Cerdas cargadas:', data);
-
-            // Force new array reference to trigger change detection
-            this.cerdas.set([...data]);
-
-            console.log('🐷 Signal actualizado. Estados:', data.map(c => ({ chapeta: c.chapeta, estado: c.estado })));
+            // Ordenar cerdas por prioridad: críticas primero, luego por estado y urgencia
+            const cerdasOrdenadas = this.ordenarCerdasPorPrioridad(data);
+            this.cerdas.set(cerdasOrdenadas);
         } catch (err: any) {
-            console.error('❌ Error cargando cerdas:', err);
             this.error.set('Error cargando la lista de cerdas');
         } finally {
             this.loading.set(false);
         }
+    }
+
+    /**
+     * Ordena las cerdas por prioridad:
+     * 1. Cerdas gestantes con parto en ≤3 días (CRÍTICO)
+     * 2. Cerdas lactantes con ≥21 días (necesitan destete)
+     * 3. Cerdas gestantes con parto en ≤7 días (ADVERTENCIA)
+     * 4. Cerdas lactantes con ≥14 días
+     * 5. Resto de cerdas gestantes
+     * 6. Resto de cerdas lactantes
+     * 7. Cerdas vacías (ordenadas por chapeta)
+     */
+    private ordenarCerdasPorPrioridad(cerdas: CerdaDetalle[]): CerdaDetalle[] {
+        return [...cerdas].sort((a, b) => {
+            // Función para obtener prioridad numérica (menor = más prioritario)
+            const getPrioridad = (cerda: CerdaDetalle): number => {
+                // CRÍTICO: Gestante con parto en ≤3 días
+                if (cerda.estado === 'gestante' && cerda.cicloActivo?.fecha_parto_probable) {
+                    const dias = this.getDiasDiferencia(cerda.cicloActivo.fecha_parto_probable, true);
+                    if (dias <= 3) return 1; // Máxima prioridad
+                    if (dias <= 7) return 3; // Alta prioridad
+                    return 5; // Prioridad media
+                }
+
+                // CRÍTICO: Lactante con ≥21 días (necesita destete)
+                if (cerda.estado === 'lactante' && cerda.cicloActivo?.fecha_parto_real) {
+                    const dias = this.getDiasDiferencia(cerda.cicloActivo.fecha_parto_real, false);
+                    if (dias >= 21) return 2; // Muy alta prioridad
+                    if (dias >= 14) return 4; // Prioridad alta
+                    return 6; // Prioridad media-baja
+                }
+
+                // Gestante sin fecha de parto o con más de 7 días
+                if (cerda.estado === 'gestante') return 5;
+
+                // Lactante con menos de 14 días
+                if (cerda.estado === 'lactante') return 6;
+
+                // Vacía: menor prioridad
+                return 7;
+            };
+
+            const prioridadA = getPrioridad(a);
+            const prioridadB = getPrioridad(b);
+
+            // Si tienen la misma prioridad, ordenar por criterio secundario
+            if (prioridadA === prioridadB) {
+                // Para cerdas gestantes con la misma prioridad, ordenar por días hasta parto (menos días primero)
+                if (a.estado === 'gestante' && b.estado === 'gestante' && 
+                    a.cicloActivo?.fecha_parto_probable && b.cicloActivo?.fecha_parto_probable) {
+                    const diasA = this.getDiasDiferencia(a.cicloActivo.fecha_parto_probable, true);
+                    const diasB = this.getDiasDiferencia(b.cicloActivo.fecha_parto_probable, true);
+                    return diasA - diasB;
+                }
+
+                // Para cerdas lactantes con la misma prioridad, ordenar por días de lactancia (más días primero)
+                if (a.estado === 'lactante' && b.estado === 'lactante' && 
+                    a.cicloActivo?.fecha_parto_real && b.cicloActivo?.fecha_parto_real) {
+                    const diasA = this.getDiasDiferencia(a.cicloActivo.fecha_parto_real, false);
+                    const diasB = this.getDiasDiferencia(b.cicloActivo.fecha_parto_real, false);
+                    return diasB - diasA; // Más días primero (más urgente)
+                }
+
+                // Para el resto, ordenar alfabéticamente por chapeta
+                return (a.chapeta || '').localeCompare(b.chapeta || '');
+            }
+
+            return prioridadA - prioridadB;
+        });
     }
 
     abrirModalEvento(cerda: CerdaDetalle) {

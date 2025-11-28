@@ -1,7 +1,7 @@
 export type TipoInsumo = 'alimento' | 'medicamento' | 'biologico' | 'material' | 'otro';
 export type UnidadMedida = 'kg' | 'gr' | 'ml' | 'dosis' | 'unidad' | 'bulto';
 export type EstadoCerda = 'vacia' | 'gestante' | 'lactante' | 'descarte';
-export type EstadoLote = 'activo' | 'cerrado_vendido' | 'cerrado';
+export type EstadoLote = 'activo' | 'cerrado_vendido';
 export type TipoFlujo = 'operativo' | 'inversion' | 'administrativo';
 export type DestinoSalida = 'lote' | 'cerda' | 'general';
 export type TipoMovimientoCaja = 'ingreso' | 'egreso';
@@ -10,9 +10,9 @@ export type TipoEventoSanitario = 'muerte' | 'enfermedad' | 'tratamiento';
 export interface CategoriaFinanciera {
     id: number;
     nombre: string;
-    tipo: TipoFlujo;
+    tipo_flujo: TipoFlujo;
     descripcion?: string;
-    es_automatica?: boolean; // default false - true para categorías usadas solo por el sistema
+    es_automatica?: boolean; // default false - true para categoras usadas solo por el sistema
     created_at?: string;
 }
 
@@ -26,6 +26,7 @@ export interface Insumo {
     costo_promedio: number; // default 0
     stock_minimo: number; // default 5
     activo: boolean; // default true
+    created_at?: string;
 }
 
 export interface Cerda {
@@ -43,7 +44,7 @@ export interface Cerda {
 export interface CicloReproductivo {
     id: number;
     cerda_id: number;
-    // Inseminación
+    // Inseminacin
     fecha_inseminacion?: string;
     padre_semen?: string;
     costo_servicio: number; // default 0
@@ -56,10 +57,10 @@ export interface CicloReproductivo {
     // Destete
     fecha_destete?: string;
     lechones_destetados: number; // default 0
-    destetados?: number; // Alias for lechones_destetados
     peso_promedio_destete?: number;
     estado: string; // default 'abierto'
     observaciones?: string;
+    created_at?: string;
 }
 
 export interface CerdaDetalle extends Cerda {
@@ -104,6 +105,7 @@ export interface LoteOrigen {
     lote_id: number;
     ciclo_id: number;
     cantidad_aportada: number;
+    created_at?: string;
 }
 
 export interface CompraInsumo {
@@ -130,7 +132,7 @@ export interface SalidaInsumo {
     costo_unitario_momento: number;
     costo_total_salida?: number; // generated
     notas?: string;
-    registrado_por?: string;
+    created_at?: string;
 }
 
 export interface MovimientoCaja {
@@ -143,6 +145,7 @@ export interface MovimientoCaja {
     metodo_pago: string; // default 'efectivo'
     lote_relacionado_id?: number;
     url_comprobante?: string;
+    created_at?: string;
 }
 
 export interface EventoSanitario {
@@ -153,6 +156,7 @@ export interface EventoSanitario {
     cerda_id?: number;
     cantidad_afectada: number; // default 1
     observacion?: string;
+    created_at?: string;
 }
 
 export interface ReporteRentabilidad {

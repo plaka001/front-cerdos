@@ -5,7 +5,7 @@ export interface Insumo {
     id?: number;
     nombre: string;
     tipo: 'alimento' | 'medicamento' | 'biologico' | 'material' | 'otro';
-    unidad_medida: 'kg' | 'ml' | 'dosis' | 'unidad';
+    unidad_medida: 'kg' | 'gr' | 'ml' | 'dosis' | 'unidad' | 'bulto';
     presentacion_compra: number;
     stock_minimo: number;
     stock_actual?: number;

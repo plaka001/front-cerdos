@@ -73,12 +73,13 @@
 
                     <!-- Badge -->
                     <div>
-                        @if (cerda.estado === 'gestante' && cerda.cicloActivo?.fecha_parto_probable) {
-                        @if (getDiasDiferencia(cerda.cicloActivo!.fecha_parto_probable, true) <= 3) { <span
+                        @if (cerda.estado === 'gestante') {
+                        @if (cerda.cicloActivo?.fecha_parto_probable) {
+                        @if (getDiasDiferencia(cerda.cicloActivo?.fecha_parto_probable, true) <= 3) { <span
                             class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-900 text-red-300">
                             {{ getBadgeLabel(cerda) }}
                             </span>
-                            } @else if (getDiasDiferencia(cerda.cicloActivo!.fecha_parto_probable, true) <= 7) { <span
+                            } @else if (getDiasDiferencia(cerda.cicloActivo?.fecha_parto_probable, true) <= 7) { <span
                                 class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-900 text-amber-300">
                                 {{ getBadgeLabel(cerda) }}
                                 </span>
@@ -86,6 +87,12 @@
                                 <span
                                     class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-900 text-emerald-300">
                                     {{ getBadgeLabel(cerda) }}
+                                </span>
+                                }
+                                } @else {
+                                <span
+                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-900 text-emerald-300">
+                                    Gestante
                                 </span>
                                 }
                                 } @else if (cerda.estado === 'lactante') {
@@ -151,19 +158,17 @@
     <!-- Event Modal -->
     @if (modalOpen()) {
     <app-event-modal [cerda]="selectedCerda()!" [tipoEvento]="modalType()!" (close)="cerrarModal()"
-        (saved)="onEventoGuardado()">
-    </app-event-modal>
+        (saved)="onEventoGuardado()"></app-event-modal>
     }
 
     <!-- Nueva Cerda Modal -->
     @if (nuevaCerdaModalOpen()) {
-    <app-nueva-cerda-modal (close)="cerrarNuevaCerdaModal()" (saved)="onNuevaCerdaGuardada()">
-    </app-nueva-cerda-modal>
+    <app-nueva-cerda-modal (close)="cerrarNuevaCerdaModal()" (saved)="onNuevaCerdaGuardada()"></app-nueva-cerda-modal>
     }
 
     <!-- Alimentar Cerdas Modal -->
     @if (alimentarModalOpen()) {
-    <app-alimentar-cerdas-modal (close)="cerrarAlimentarModal()" (saved)="onAlimentacionGuardada()">
-    </app-alimentar-cerdas-modal>
+    <app-alimentar-cerdas-modal (close)="cerrarAlimentarModal()"
+        (saved)="onAlimentacionGuardada()"></app-alimentar-cerdas-modal>
     }
 </div>

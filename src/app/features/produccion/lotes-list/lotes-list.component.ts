@@ -125,6 +125,6 @@ export class LotesListComponent implements OnInit {
 
     // Helper para determinar si el lote está cerrado
     isLoteCerrado(lote: LoteDetalle): boolean {
-        return lote.estado === 'cerrado_vendido' || lote.estado === 'cerrado';
+        return lote.estado === 'cerrado_vendido';
     }
 }

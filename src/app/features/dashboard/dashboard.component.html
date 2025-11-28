@@ -40,10 +40,16 @@
           <h1 class="text-h1">Resumen de la Granja</h1>
           <p class="text-small capitalize" style="color: var(--color-text-secondary);">{{ fechaActual }}</p>
         </div>
-        <button (click)="navegarA('/configuracion')"
-          class="p-2 text-slate-400 hover:text-white transition-colors bg-slate-800 rounded-full border border-slate-700 shadow-sm">
-          <lucide-icon name="settings" [size]="24"></lucide-icon>
-        </button>
+        <div class="flex items-center gap-2">
+          <button (click)="navegarA('/configuracion')"
+            class="p-2 text-slate-400 hover:text-white transition-colors bg-slate-800 rounded-full border border-slate-700 shadow-sm">
+            <lucide-icon name="settings" [size]="24"></lucide-icon>
+          </button>
+          <button (click)="onLogout()"
+            class="p-2 text-slate-400 hover:text-red-400 transition-colors bg-slate-800 rounded-full border border-slate-700 shadow-sm">
+            <lucide-icon name="logOut" [size]="24"></lucide-icon>
+          </button>
+        </div>
       </div>
 
       <!-- Enhanced Financial Summary Badge - CLICKEABLE -->
@@ -261,6 +267,38 @@
       </div>
     </div>
 
+  </div>
+  }
+
+  <!-- Logout Confirmation Modal -->
+  @if (showLogoutConfirm()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in" (click)="showLogoutConfirm.set(false)">
+    <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-700 p-6 animate-in zoom-in-95 duration-200" (click)="$event.stopPropagation()">
+      <div class="flex items-start gap-4">
+        <div class="flex-shrink-0 w-12 h-12 bg-red-900/20 rounded-full flex items-center justify-center">
+          <lucide-icon name="logOut" [size]="24" class="text-red-400"></lucide-icon>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-lg font-bold text-white mb-2">Cerrar Sesión</h3>
+          <p class="text-sm text-slate-300">¿Estás seguro que deseas salir de la aplicación?</p>
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-6">
+        <button 
+          (click)="showLogoutConfirm.set(false)"
+          class="flex-1 py-2.5 px-4 bg-slate-700 text-white font-medium rounded-lg hover:bg-slate-600 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button 
+          (click)="confirmLogout()"
+          class="flex-1 py-2.5 px-4 bg-red-600 text-white font-medium rounded-lg hover:bg-red-500 transition-colors"
+        >
+          Salir
+        </button>
+      </div>
+    </div>
   </div>
   }
 </div>

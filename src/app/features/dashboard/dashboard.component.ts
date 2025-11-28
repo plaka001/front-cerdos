@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardService } from '../../core/services/dashboard.service';
+import { AuthService } from '../../core/services/auth.service';
 import { DashboardData, AlertaInsumo, AlertaParto } from '../../core/models/dashboard.model';
 
 @Component({
@@ -14,6 +15,10 @@ import { DashboardData, AlertaInsumo, AlertaParto } from '../../core/models/dash
 export class DashboardComponent implements OnInit {
   private dashboardService = inject(DashboardService);
   private router = inject(Router);
+  private authService = inject(AuthService);
+
+  // Estado para modal de confirmación de salida
+  showLogoutConfirm = signal<boolean>(false);
 
   // Signals para estado reactivo
   dashboardData = signal<DashboardData | null>(null);
@@ -68,5 +73,14 @@ export class DashboardComponent implements OnInit {
       month: 'short',
       day: 'numeric'
     });
+  }
+
+  onLogout() {
+    this.showLogoutConfirm.set(true);
+  }
+
+  async confirmLogout() {
+    this.showLogoutConfirm.set(false);
+    await this.authService.signOut();
   }
 }

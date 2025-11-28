@@ -26,10 +26,10 @@ import { AuthService } from '../../../core/services/auth.service';
           <span class="text-2xl">📊</span>
           <span class="text-xs mt-1">Reportes</span>
         </a>
-        <button (click)="onLogout()" class="nav-link flex flex-col items-center justify-center w-full h-full">
-          <span class="text-2xl">🚪</span>
-          <span class="text-xs mt-1">Salir</span>
-        </button>
+        <a routerLink="/inventario" routerLinkActive="active-nav-link" class="nav-link flex flex-col items-center justify-center w-full h-full">
+          <span class="text-2xl">📦</span>
+          <span class="text-xs mt-1">Inventario</span>
+        </a>
       </div>
     </nav>
 
