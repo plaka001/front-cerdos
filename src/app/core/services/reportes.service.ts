@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
-import { ReporteRentabilidad, ReporteCostosMaternidad } from '../models';
+import { ReporteRentabilidad, ReporteCostosMaternidad, ReporteGastoCategoria } from '../models';
 
 @Injectable({
     providedIn: 'root'
@@ -34,6 +34,22 @@ export class ReportesService {
             return data as ReporteCostosMaternidad[];
         } catch (error) {
             console.error('Error al obtener reporte de maternidad:', error);
+            throw error;
+        }
+    }
+
+    async getReporteGastosGenerales(): Promise<ReporteGastoCategoria[]> {
+        try {
+            const { data, error } = await this.supabase.client
+                .from('reporte_gastos_categoria')
+                .select('*')
+                .order('mes', { ascending: false })
+                .order('total_gastado', { ascending: false });
+
+            if (error) throw error;
+            return data as ReporteGastoCategoria[];
+        } catch (error) {
+            console.error('Error al obtener reporte de gastos:', error);
             throw error;
         }
     }

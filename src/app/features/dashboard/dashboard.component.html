@@ -56,7 +56,7 @@
             <div class="ml-3">
               <p class="text-label font-medium" style="color: var(--color-text-secondary);">Gasto del Mes</p>
               <p class="text-h2" style="color: var(--color-text-primary); margin-top: 2px;">
-                \${{ dashboardData()!.kpis.gastoMes.toLocaleString('es-CO') }}
+                ${{ dashboardData()!.kpis.gastoMes.toLocaleString('es-CO') }}
               </p>
             </div>
           </div>
@@ -108,7 +108,7 @@
                 style="color: var(--color-text-secondary);">Mínimo</span>
             </div>
             <!-- Table Rows with Visual Indicators -->
-            @for (insumo of dashboardData()!.alertasInsumos; track insumo.nombre) {
+            @for (insumo of dashboardData()!.alertasInsumos; track insumo.id) {
             <div class="alert-table-row grid grid-cols-3 gap-2 rounded" [class.critical]="insumo.stockActual === 0">
               <span class="text-body font-medium" style="color: var(--color-text-primary);">{{ insumo.nombre }}</span>
               <span class="text-body text-right font-semibold"

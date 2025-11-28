@@ -145,19 +145,33 @@ export class ProduccionService {
     }
 
     async registrarInseminacion(cerdaId: number, data: { fecha: string; macho: string; observaciones?: string }) {
-        const ciclo: Partial<CicloReproductivo> = {
-            cerda_id: cerdaId,
-            fecha_inseminacion: data.fecha,
-            estado: 'abierto',
-            nacidos_vivos: 0,
-            nacidos_muertos: 0,
-            momias: 0,
-            lechones_destetados: 0,
-            observaciones: data.observaciones || undefined
-        };
+        try {
+            this.error.set(null);
 
-        await this.registrarEventoCerda(ciclo);
-        await this.actualizarEstadoCerda(cerdaId, 'gestante');
+            // Step 1: Insert new reproductive cycle
+            const ciclo: Partial<CicloReproductivo> = {
+                cerda_id: cerdaId,
+                fecha_inseminacion: data.fecha,
+                padre_semen: data.macho,
+                estado: 'abierto',
+                nacidos_vivos: 0,
+                nacidos_muertos: 0,
+                momias: 0,
+                lechones_destetados: 0,
+                observaciones: data.observaciones || undefined
+            };
+
+            const nuevoCiclo = await this.registrarEventoCerda(ciclo);
+
+            // Step 2: CRITICAL - Update cerda status to 'gestante'
+            await this.actualizarEstadoCerda(cerdaId, 'gestante');
+
+            return nuevoCiclo;
+        } catch (err: any) {
+            console.error('Error registrando inseminación:', err);
+            this.error.set(err.message || 'Error al registrar inseminación');
+            throw err;
+        }
     }
 
     async registrarParto(cerdaId: number, cicloId: number, data: { fecha: string; nacidos_vivos: number; nacidos_muertos: number; momias: number; observaciones?: string }) {
@@ -264,7 +278,7 @@ export class ProduccionService {
                 throw error;
             }
 
-            await this.loadCerdas();
+            // Component will handle reload with getCerdasConCiclos()
         } catch (err: any) {
             console.error('Error inesperado:', err);
             this.error.set(err.message || 'Error al actualizar estado');
@@ -488,10 +502,23 @@ export class ProduccionService {
                 throw errorIngreso;
             }
 
+            // CRITICAL: Get current cantidad_actual to calculate remaining animals
+            const { data: loteActual, error: errorLote } = await this.supabase
+                .from('lotes')
+                .select('cantidad_actual')
+                .eq('id', data.lote_id)
+                .single();
+
+            if (errorLote) throw errorLote;
+
+            // MATH: Always subtract sold quantity
+            const nuevaCantidad = (loteActual?.cantidad_actual || 0) - data.cantidad_vendida;
+
             const updateData: any = {
-                cantidad_actual: 0
+                cantidad_actual: Math.max(0, nuevaCantidad) // Never negative
             };
 
+            // Only close if explicitly requested
             if (data.cerrar_lote) {
                 updateData.estado = 'cerrado_vendido';
                 updateData.fecha_cierre = data.fecha;

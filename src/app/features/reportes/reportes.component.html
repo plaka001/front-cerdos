@@ -14,16 +14,24 @@
     </div>
 
     <!-- Tabs -->
-    <div class="flex space-x-1 rounded-xl bg-slate-800 p-1 mb-6 border border-slate-700 w-full md:w-auto self-start">
-        <button (click)="activeTab.set('lotes')" [class.bg-slate-600]="activeTab() === 'lotes'"
-            [class.text-white]="activeTab() === 'lotes'" [class.shadow]="activeTab() === 'lotes'"
-            class="w-full md:w-48 rounded-lg py-2.5 text-sm font-medium leading-5 text-slate-400 ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2 transition-all">
+    <div class="flex flex-wrap gap-2 mb-6 w-full">
+        <button (click)="activeTab.set('lotes')" [class.bg-emerald-600]="activeTab() === 'lotes'"
+            [class.text-white]="activeTab() === 'lotes'" [class.bg-slate-800]="activeTab() !== 'lotes'"
+            [class.text-slate-400]="activeTab() !== 'lotes'"
+            class="flex-1 min-w-[140px] md:flex-none md:w-48 rounded-lg py-2.5 text-sm font-medium transition-all border border-slate-700 shadow-sm">
             Rentabilidad Lotes
         </button>
-        <button (click)="activeTab.set('maternidad')" [class.bg-slate-600]="activeTab() === 'maternidad'"
-            [class.text-white]="activeTab() === 'maternidad'" [class.shadow]="activeTab() === 'maternidad'"
-            class="w-full md:w-48 rounded-lg py-2.5 text-sm font-medium leading-5 text-slate-400 ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2 transition-all">
+        <button (click)="activeTab.set('maternidad')" [class.bg-emerald-600]="activeTab() === 'maternidad'"
+            [class.text-white]="activeTab() === 'maternidad'" [class.bg-slate-800]="activeTab() !== 'maternidad'"
+            [class.text-slate-400]="activeTab() !== 'maternidad'"
+            class="flex-1 min-w-[140px] md:flex-none md:w-48 rounded-lg py-2.5 text-sm font-medium transition-all border border-slate-700 shadow-sm">
             Costos Maternidad
+        </button>
+        <button (click)="activeTab.set('gastos')" [class.bg-emerald-600]="activeTab() === 'gastos'"
+            [class.text-white]="activeTab() === 'gastos'" [class.bg-slate-800]="activeTab() !== 'gastos'"
+            [class.text-slate-400]="activeTab() !== 'gastos'"
+            class="flex-1 min-w-[140px] md:flex-none md:w-48 rounded-lg py-2.5 text-sm font-medium transition-all border border-slate-700 shadow-sm">
+            Gastos Generales
         </button>
     </div>
 
@@ -64,7 +72,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-700/50">
-                @for (item of reportes(); track item.lote_id) {
+                @for (item of reportes(); track $index) {
                 <tr class="hover:bg-slate-700/30 transition-colors group">
                     <td class="p-4">
                         <div class="font-bold text-white text-lg">{{ item.codigo }}</div>
@@ -118,7 +126,7 @@
 
     <!-- Mobile Cards (Visible on Mobile) -->
     <div class="md:hidden space-y-4">
-        @for (item of reportes(); track item.lote_id) {
+        @for (item of reportes(); track $index) {
         <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 shadow-lg relative overflow-hidden">
             <!-- Status Badge Top Right -->
             <div class="absolute top-4 right-4">
@@ -195,7 +203,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-700/50">
-                @for (item of reporteMaternidad(); track item.mes) {
+                @for (item of reporteMaternidad(); track $index) {
                 <tr class="hover:bg-slate-700/30 transition-colors">
                     <td class="p-4 font-bold text-white">{{ item.mes }}</td>
                     <td class="p-4 text-right text-slate-300">
@@ -218,7 +226,7 @@
 
     <!-- Mobile Cards -->
     <div class="md:hidden space-y-4">
-        @for (item of reporteMaternidad(); track item.mes) {
+        @for (item of reporteMaternidad(); track $index) {
         <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 shadow-lg">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-bold text-white">{{ item.mes }}</h3>
@@ -253,5 +261,81 @@
     </div>
     }
     }
+
+    <!-- TAB: GASTOS GENERALES -->
+    @if (activeTab() === 'gastos') {
+    <div class="space-y-6">
+
+        <!-- Controls & Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Month Selector -->
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <label class="block text-sm font-medium text-slate-400 mb-2">Seleccionar Mes</label>
+                <select [ngModel]="mesSeleccionado()" (ngModelChange)="mesSeleccionado.set($event)"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                    @for (mes of mesesDisponibles(); track mes) {
+                    <option [value]="mes">{{ mes }}</option>
+                    }
+                    @if (mesesDisponibles().length === 0) {
+                    <option [value]="mesSeleccionado()">{{ mesSeleccionado() }} (Sin datos)</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Total Card -->
+            <div
+                class="bg-gradient-to-br from-slate-800 to-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col justify-center">
+                <span class="text-slate-400 text-sm font-medium">Total Gastos del Mes</span>
+                <div class="text-3xl font-bold text-white mt-1">
+                    {{ totalGastosMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Distribution List -->
+        <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+            <div class="p-4 border-b border-slate-700">
+                <h3 class="font-bold text-white">Distribución de Gastos</h3>
+            </div>
+
+            <div class="p-4 space-y-5">
+                @for (item of gastosFiltrados(); track item.categoria_nombre) {
+                <div>
+                    <div class="flex justify-between items-end mb-1">
+                        <div>
+                            <span class="text-white font-medium">{{ item.categoria_nombre }}</span>
+                            <span class="ml-2 text-xs px-1.5 py-0.5 rounded bg-slate-700 text-slate-400 uppercase">
+                                {{ item.tipo_flujo }}
+                            </span>
+                        </div>
+                        <span class="text-slate-300 font-mono">
+                            {{ item.total_gastado | currency:'COP':'symbol-narrow':'1.0-0' }}
+                        </span>
+                    </div>
+
+                    <!-- Bar -->
+                    <div class="h-3 w-full bg-slate-700/50 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-500"
+                            [style.width.%]="getBarWidth(item.total_gastado)" [ngClass]="{
+                                    'bg-emerald-500': item.tipo_flujo === 'operativo',
+                                    'bg-purple-500': item.tipo_flujo === 'inversion',
+                                    'bg-blue-500': item.tipo_flujo === 'administrativo'
+                                }">
+                        </div>
+                    </div>
+                </div>
+                }
+
+                @if (gastosFiltrados().length === 0) {
+                <div class="text-center py-10 text-slate-500">
+                    <lucide-icon name="search" [size]="32" class="mx-auto mb-2 opacity-50"></lucide-icon>
+                    <p>No hay gastos registrados para este mes.</p>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+    }
+
     }
 </div>

@@ -20,7 +20,7 @@ export interface Insumo {
     id: number;
     nombre: string;
     tipo: TipoInsumo;
-    unidad_medida_uso: UnidadMedida;
+    unidad_medida: UnidadMedida;
     presentacion_compra: number; // default 40
     stock_actual: number; // default 0
     costo_promedio: number; // default 0
@@ -173,4 +173,12 @@ export interface ReporteCostosMaternidad {
     total_gastos_madres: number;
     total_lechones_producidos: number;
     costo_por_lechon: number;
+}
+
+export interface ReporteGastoCategoria {
+    mes: string;
+    categoria_nombre: string;
+    tipo_flujo: 'operativo' | 'inversion' | 'administrativo';
+    total_gastado: number;
+    cantidad_movimientos: number;
 }

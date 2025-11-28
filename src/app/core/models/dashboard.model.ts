@@ -9,6 +9,7 @@ export interface DashboardKpi {
 }
 
 export interface AlertaInsumo {
+    id: number;
     nombre: string;
     stockActual: number;
     stockMinimo: number;

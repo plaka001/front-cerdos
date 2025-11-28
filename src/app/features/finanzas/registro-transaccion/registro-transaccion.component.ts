@@ -187,7 +187,7 @@ export class RegistroTransaccionComponent {
   textoPresentacion = computed(() => {
     const insumo = this.selectedInsumo();
     if (!insumo) return '';
-    return `Presentación: ${insumo.presentacion_compra} ${insumo.unidad_medida_uso}`;
+    return `Presentación: ${insumo.presentacion_compra} ${insumo.unidad_medida}`;
   });
 
   textoTotalInventario = computed(() => {
@@ -195,7 +195,7 @@ export class RegistroTransaccionComponent {
     const cant = this.cantidad();
     if (!insumo || !cant) return '';
     const total = cant * insumo.presentacion_compra;
-    return `Entrarán ${total.toLocaleString()} ${insumo.unidad_medida_uso} al inventario`;
+    return `Entrarán ${total.toLocaleString()} ${insumo.unidad_medida} al inventario`;
   });
 
   textoPrecioUnitario = computed(() => {

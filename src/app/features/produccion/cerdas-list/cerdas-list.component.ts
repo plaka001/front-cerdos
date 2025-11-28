@@ -39,8 +39,14 @@ export class CerdasListComponent implements OnInit {
         try {
             this.loading.set(true);
             const data = await this.produccionService.getCerdasConCiclos();
-            this.cerdas.set(data);
+            console.log('🐷 Cerdas cargadas:', data);
+
+            // Force new array reference to trigger change detection
+            this.cerdas.set([...data]);
+
+            console.log('🐷 Signal actualizado. Estados:', data.map(c => ({ chapeta: c.chapeta, estado: c.estado })));
         } catch (err: any) {
+            console.error('❌ Error cargando cerdas:', err);
             this.error.set('Error cargando la lista de cerdas');
         } finally {
             this.loading.set(false);
@@ -65,8 +71,10 @@ export class CerdasListComponent implements OnInit {
     }
 
     async onEventoGuardado() {
+        // CRITICAL: Reload data FIRST to ensure UI updates
+        await this.cargarCerdas();
+        // THEN close modal
         this.cerrarModal();
-        await this.cargarCerdas(); // Recargar datos para ver cambios
     }
 
     // Nueva Cerda Logic

@@ -107,7 +107,7 @@ export class DashboardService {
         // Consultar insumos activos y filtrar en cliente
         const { data, error } = await this.supabase
             .from('insumos')
-            .select('nombre, stock_actual, stock_minimo, unidad_medida_uso')
+            .select('id, nombre, stock_actual, stock_minimo, unidad_medida')
             .eq('activo', true)
             .order('stock_actual', { ascending: true });
 
@@ -120,10 +120,11 @@ export class DashboardService {
         return (data || [])
             .filter(insumo => insumo.stock_actual <= insumo.stock_minimo)
             .map(insumo => ({
+                id: insumo.id,
                 nombre: insumo.nombre,
                 stockActual: insumo.stock_actual,
                 stockMinimo: insumo.stock_minimo,
-                unidad: insumo.unidad_medida_uso
+                unidad: insumo.unidad_medida
             }));
     }
 

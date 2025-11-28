@@ -38,7 +38,24 @@ export class RegistrarVentaModalComponent implements OnInit {
             cantidad_vendida: [this.lote.cantidad_actual, [Validators.required, Validators.min(1), Validators.max(this.lote.cantidad_actual)]],
             peso_total: ['', [Validators.required, Validators.min(0.01)]],
             precio_por_kilo: ['', [Validators.required, Validators.min(0.01)]],
-            cerrar_lote: [true]
+            cerrar_lote: [false] // Default: NOT checked
+        });
+
+        // Smart checkbox logic
+        this.setupSmartCheckbox();
+    }
+
+    private setupSmartCheckbox() {
+        this.form.get('cantidad_vendida')?.valueChanges.subscribe((cantidad: number) => {
+            const cerrarLoteControl = this.form.get('cerrar_lote');
+
+            if (cantidad === this.lote.cantidad_actual) {
+                // Selling ALL animals -> Auto-check
+                cerrarLoteControl?.setValue(true, { emitEvent: false });
+            } else {
+                // Selling PARTIAL -> Uncheck
+                cerrarLoteControl?.setValue(false, { emitEvent: false });
+            }
         });
     }
 

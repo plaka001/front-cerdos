@@ -19,15 +19,23 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
         {{ label }}
       </label>
       <div class="relative rounded-md shadow-sm">
+        <!-- Currency prefix indicator -->
+        <div *ngIf="type === 'currency'" class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-slate-400 sm:text-sm">$</span>
+        </div>
+        
         <input
-          [type]="type"
+          [type]="getInputType()"
           [id]="id"
           [name]="name"
           [placeholder]="placeholder"
           [disabled]="disabled"
-          [(ngModel)]="value"
-          (blur)="onTouched()"
+          [(ngModel)]="displayValue"
+          (input)="onInput($event)"
+          (blur)="onBlur()"
+          (focus)="onFocus()"
           class="appearance-none block w-full h-12 leading-[3rem] md:leading-normal rounded-md border-slate-600 bg-slate-700 text-white shadow-sm focus:border-white focus:ring-white focus:ring-2 sm:text-sm transition-all px-3 placeholder-slate-400"
+          [class.pl-7]="type === 'currency'"
           [class.border-red-500]="error"
           [class.focus:ring-red-500]="error"
           [class.focus:border-red-500]="error"
@@ -49,6 +57,8 @@ export class InputComponent implements ControlValueAccessor {
     @Input() disabled = false;
 
     val = '';
+    displayValue = '';
+    isFocused = false;
 
     onChange: any = () => { };
     onTouched: any = () => { };
@@ -63,9 +73,83 @@ export class InputComponent implements ControlValueAccessor {
         this.onTouched();
     }
 
-    writeValue(value: any): void {
-        if (value !== undefined) {
+    getInputType(): string {
+        return this.type === 'currency' ? 'text' : this.type;
+    }
+
+    onInput(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        let value = input.value;
+
+        if (this.type === 'currency') {
+            // Remove all non-numeric characters except dots and commas
+            const numericValue = value.replace(/[^\d]/g, '');
+
+            if (numericValue) {
+                const numberValue = parseInt(numericValue, 10);
+                this.val = numberValue.toString();
+                this.onChange(numberValue);
+
+                // Update display with formatted value only while typing
+                if (!this.isFocused) {
+                    this.displayValue = this.formatCurrency(numberValue);
+                } else {
+                    this.displayValue = numericValue;
+                }
+            } else {
+                this.val = '';
+                this.displayValue = '';
+                this.onChange(null);
+            }
+        } else {
             this.val = value;
+            this.displayValue = value;
+            this.onChange(value);
+        }
+    }
+
+    onFocus(): void {
+        this.isFocused = true;
+        if (this.type === 'currency' && this.val) {
+            // Show raw number when focused
+            this.displayValue = this.val;
+        }
+    }
+
+    onBlur(): void {
+        this.isFocused = false;
+        this.onTouched();
+
+        if (this.type === 'currency' && this.val) {
+            // Format when losing focus
+            const numValue = parseInt(this.val, 10);
+            this.displayValue = this.formatCurrency(numValue);
+        }
+    }
+
+    formatCurrency(value: number): string {
+        return value.toLocaleString('es-CO', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+    }
+
+    writeValue(value: any): void {
+        if (value !== undefined && value !== null) {
+            this.val = value.toString();
+
+            if (this.type === 'currency') {
+                if (!this.isFocused) {
+                    this.displayValue = this.formatCurrency(parseInt(this.val, 10));
+                } else {
+                    this.displayValue = this.val;
+                }
+            } else {
+                this.displayValue = this.val;
+            }
+        } else {
+            this.val = '';
+            this.displayValue = '';
         }
     }
 
