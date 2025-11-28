@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { SupabaseService } from './supabase.service';
-import { Cerda, CicloReproductivo, Lote, CerdaDetalle, LoteDetalle, Insumo, SalidaInsumo } from '../models';
+import { Cerda, CicloReproductivo, Lote, CerdaDetalle, LoteDetalle, Insumo, SalidaInsumo, EventoSanitario } from '../models';
 
 @Injectable({
     providedIn: 'root'
@@ -772,6 +772,59 @@ export class ProduccionService {
         } catch (err: any) {
             console.error(`Error en obtenerCategoriaId para "${nombreCategoria}":`, err);
             return null;
+        }
+    }
+
+    /**
+     * Obtiene el historial sanitario de un lote
+     */
+    async getHistorialSanitario(loteId: number): Promise<EventoSanitario[]> {
+        try {
+            const { data, error } = await this.supabase
+                .from('eventos_sanitarios')
+                .select('*')
+                .eq('lote_id', loteId)
+                .order('fecha', { ascending: false });
+
+            if (error) {
+                console.error('Error cargando historial sanitario:', error);
+                throw error;
+            }
+
+            return (data || []) as EventoSanitario[];
+        } catch (err: any) {
+            console.error('Error inesperado cargando historial sanitario:', err);
+            throw err;
+        }
+    }
+
+    /**
+     * Obtiene el historial de alimentación de un lote
+     */
+    async getHistorialAlimento(loteId: number): Promise<SalidaInsumo[]> {
+        try {
+            const { data, error } = await this.supabase
+                .from('salidas_insumos')
+                .select(`
+                    *,
+                    insumos (
+                        nombre,
+                        unidad_medida
+                    )
+                `)
+                .eq('lote_id', loteId)
+                .eq('destino_tipo', 'lote')
+                .order('fecha', { ascending: false });
+
+            if (error) {
+                console.error('Error cargando historial de alimento:', error);
+                throw error;
+            }
+
+            return (data || []) as any[];
+        } catch (err: any) {
+            console.error('Error inesperado cargando historial de alimento:', err);
+            throw err;
         }
     }
 

@@ -7,11 +7,12 @@ import { AlimentarLoteModalComponent } from '../components/alimentar-lote-modal/
 import { RegistrarMortalidadModalComponent } from '../components/registrar-mortalidad-modal/registrar-mortalidad-modal.component';
 import { RegistrarPesajeModalComponent } from '../components/registrar-pesaje-modal/registrar-pesaje-modal.component';
 import { RegistrarVentaModalComponent } from '../components/registrar-venta-modal/registrar-venta-modal.component';
+import { LoteDetalleModalComponent } from '../components/lote-detalle-modal/lote-detalle-modal.component';
 
 @Component({
     selector: 'app-lotes-list',
     standalone: true,
-    imports: [CommonModule, LucideAngularModule, AlimentarLoteModalComponent, RegistrarMortalidadModalComponent, RegistrarPesajeModalComponent, RegistrarVentaModalComponent],
+    imports: [CommonModule, LucideAngularModule, AlimentarLoteModalComponent, RegistrarMortalidadModalComponent, RegistrarPesajeModalComponent, RegistrarVentaModalComponent, LoteDetalleModalComponent],
     templateUrl: './lotes-list.component.html'
 })
 export class LotesListComponent implements OnInit {
@@ -29,6 +30,8 @@ export class LotesListComponent implements OnInit {
     loteSeleccionadoPesaje = signal<LoteDetalle | null>(null);
     showVentaModal = signal<boolean>(false);
     loteSeleccionadoVenta = signal<LoteDetalle | null>(null);
+    showDetalleModal = signal<boolean>(false);
+    loteSeleccionadoDetalle = signal<LoteDetalle | null>(null);
 
     async ngOnInit() {
         await this.cargarLotes();
@@ -126,5 +129,16 @@ export class LotesListComponent implements OnInit {
     // Helper para determinar si el lote está cerrado
     isLoteCerrado(lote: LoteDetalle): boolean {
         return lote.estado === 'cerrado_vendido';
+    }
+
+    // Ver historial del lote
+    verHistorial(lote: LoteDetalle) {
+        this.loteSeleccionadoDetalle.set(lote);
+        this.showDetalleModal.set(true);
+    }
+
+    onDetalleClosed() {
+        this.showDetalleModal.set(false);
+        this.loteSeleccionadoDetalle.set(null);
     }
 }
