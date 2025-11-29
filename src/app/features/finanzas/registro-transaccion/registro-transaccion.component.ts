@@ -2,6 +2,7 @@ import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { FinanzasService } from '../../../core/services/finanzas.service';
+import { StorageService } from '../../../core/services/storage.service';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { InputComponent } from '../../../shared/ui/input/input.component';
 import { CardComponent } from '../../../shared/ui/card/card.component';
@@ -112,6 +113,33 @@ import { CategoriaFinanciera, Insumo, TipoMovimientoCaja } from '../../../core/m
             <app-input label="Proveedor" formControlName="proveedor" placeholder="Nombre del proveedor"></app-input>
           </div>
 
+          <!-- File Upload -->
+          <div class="pt-2">
+            <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*,.pdf" hidden>
+            
+            @if (!selectedFile()) {
+              <button type="button" (click)="fileInput.click()" 
+                class="w-full py-3 px-4 rounded-lg border-2 border-dashed border-slate-600 text-slate-400 hover:text-white hover:border-slate-400 hover:bg-slate-700/30 transition-all flex items-center justify-center gap-2">
+                <span class="text-xl">📎</span>
+                <span class="font-medium">Adjuntar Comprobante</span>
+              </button>
+            } @else {
+              <div class="w-full py-3 px-4 rounded-lg bg-slate-700/50 border border-slate-600 flex items-center justify-between group">
+                <div class="flex items-center gap-3 overflow-hidden">
+                  <span class="text-xl flex-shrink-0">📄</span>
+                  <span class="text-sm text-slate-200 truncate font-medium">{{ selectedFile()?.name }}</span>
+                </div>
+                <button type="button" (click)="removeFile()" 
+                  class="p-1.5 rounded-full text-slate-400 hover:text-red-400 hover:bg-red-900/20 transition-colors"
+                  title="Eliminar archivo">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            }
+          </div>
+
           <div class="pt-2">
             <app-button type="submit" [disabled]="form.invalid || loading()" [fullWidth]="true" [variant]="tipo() === 'ingreso' ? 'primary' : 'danger'">
               {{ loading() ? 'Guardando...' : 'Guardar Movimiento' }}
@@ -134,10 +162,12 @@ import { CategoriaFinanciera, Insumo, TipoMovimientoCaja } from '../../../core/m
 export class RegistroTransaccionComponent {
   private fb = inject(FormBuilder);
   private finanzasService = inject(FinanzasService);
+  private storageService = inject(StorageService);
 
   form: FormGroup;
   loading = signal(false);
   tipo = signal<TipoMovimientoCaja>('egreso');
+  selectedFile = signal<File | null>(null);
 
   // Signals para inputs reactivos
   insumoId = signal<number | null>(null);
@@ -302,6 +332,22 @@ export class RegistroTransaccionComponent {
     cantCtrl?.updateValueAndValidity();
   }
 
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      // Validar tamaño (ej: max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        this.showToast('El archivo es demasiado grande (Max 5MB)', 'error');
+        return;
+      }
+      this.selectedFile.set(file);
+    }
+  }
+
+  removeFile() {
+    this.selectedFile.set(null);
+  }
+
   async onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -313,6 +359,17 @@ export class RegistroTransaccionComponent {
       const val = this.form.value;
       const tipoActual = this.tipo();
 
+      // 1. Subir archivo si existe
+      let urlComprobante: string | undefined;
+      const file = this.selectedFile();
+      if (file) {
+        const url = await this.storageService.uploadFile(file, 'comprobantes_movimientos');
+        if (!url) {
+          throw new Error('Error al subir el comprobante');
+        }
+        urlComprobante = url;
+      }
+
       // Preparar objeto base de movimiento
       const movimiento = {
         fecha: val.fecha,
@@ -320,7 +377,8 @@ export class RegistroTransaccionComponent {
         categoria_id: val.categoria_id,
         monto: val.monto,
         descripcion: val.descripcion,
-        metodo_pago: 'efectivo' // Default
+        metodo_pago: 'efectivo', // Default
+        url_comprobante: urlComprobante
       };
 
       let compra = undefined;
@@ -348,6 +406,7 @@ export class RegistroTransaccionComponent {
       const fecha = val.fecha;
       this.form.reset({ fecha });
       this.setTipo('egreso'); // Reset to default
+      this.selectedFile.set(null); // Reset file
 
       // Reset signals
       this.insumoId.set(null);

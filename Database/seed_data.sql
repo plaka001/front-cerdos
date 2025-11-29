@@ -142,3 +142,13 @@ UPDATE movimientos_caja
 SET categoria_id = (SELECT id FROM categorias_financieras WHERE nombre = 'Venta de Cerdos' LIMIT 1)
 WHERE categoria_id IS NULL AND (descripcion ILIKE '%venta lote%' OR descripcion ILIKE '%venta cerdo%');
 
+-- 4. CATEGORÍA MATERIALES/INSUMOS (Agregado recientemente)
+-- Crear la categoría para materiales (si no existe)
+INSERT INTO categorias_financieras (nombre, tipo_flujo, descripcion, es_automatica)
+SELECT 'Compra Materiales/Insumos', 'operativo', 'Agujas, desinfectantes, herramientas', false
+WHERE NOT EXISTS (SELECT 1 FROM categorias_financieras WHERE nombre = 'Compra Materiales/Insumos');
+
+-- Asegurarnos de que sea visible en el formulario manual
+UPDATE categorias_financieras 
+SET es_automatica = false 
+WHERE nombre = 'Compra Materiales/Insumos';
