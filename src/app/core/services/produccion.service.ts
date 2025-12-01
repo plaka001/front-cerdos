@@ -259,10 +259,11 @@ export class ProduccionService {
         }
     }
 
-    async registrarDestete(cerdaId: number, cicloId: number, data: { fecha: string; cantidad: number; peso: number; crear_lote: boolean; observaciones?: string }) {
+    async registrarDestete(cerdaId: number, cicloId: number, data: { fecha: string; cantidad: number; peso: number; crear_lote: boolean; observaciones?: string; valor_venta?: number; comprador?: string }) {
         try {
             this.error.set(null);
 
+            // 1. Cerrar ciclo (Común)
             const { error: errorCiclo } = await this.supabase
                 .from('ciclos_reproductivos')
                 .update({
@@ -276,7 +277,9 @@ export class ProduccionService {
 
             if (errorCiclo) throw errorCiclo;
 
+            // 2. Bifurcación: Lote vs Venta
             if (data.crear_lote) {
+                // Camino A: Crear Lote
                 const { error: errorLote } = await this.supabase
                     .from('lotes')
                     .insert({
@@ -289,6 +292,42 @@ export class ProduccionService {
                     });
 
                 if (errorLote) throw errorLote;
+            } else {
+                // Camino B: Venta Inmediata
+                // Buscar categoría 'Venta de Lechones'
+                const { data: catData } = await this.supabase
+                    .from('categorias_financieras')
+                    .select('id')
+                    .eq('nombre', 'Venta de Lechones')
+                    .single();
+
+                const categoriaId = catData?.id;
+
+                if (!categoriaId) {
+                    console.warn('Categoría "Venta de Lechones" no encontrada. Se registrará sin categoría.');
+                }
+
+                // Obtener chapeta para descripción
+                const { data: cerda } = await this.supabase
+                    .from('cerdas')
+                    .select('chapeta')
+                    .eq('id', cerdaId)
+                    .single();
+
+                const descripcion = `Venta de Lechones al Destete - Cerda ${cerda?.chapeta || '?'}${data.comprador ? ' - Cliente: ' + data.comprador : ''}`;
+
+                const { error: errorVenta } = await this.supabase
+                    .from('movimientos_caja')
+                    .insert({
+                        fecha: data.fecha,
+                        tipo: 'ingreso',
+                        categoria_id: categoriaId,
+                        monto: data.valor_venta || 0,
+                        descripcion: descripcion,
+                        metodo_pago: 'efectivo'
+                    });
+
+                if (errorVenta) throw errorVenta;
             }
 
             await this.actualizarEstadoCerda(cerdaId, 'vacia');

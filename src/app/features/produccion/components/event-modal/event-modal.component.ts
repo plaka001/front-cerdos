@@ -81,6 +81,23 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
                 </label>
               </div>
 
+              <!-- ✅ NUEVO: Sección de Venta -->
+              @if (!form.get('crear_lote')?.value) {
+                <div class="p-4 bg-blue-900/20 rounded-lg border border-blue-800/50 space-y-3 animate-in fade-in slide-in-from-top-2">
+                  <h4 class="text-sm font-bold text-blue-200 flex items-center gap-2">
+                    <lucide-icon name="dollar-sign" [size]="16"></lucide-icon>
+                    Datos de Venta
+                  </h4>
+                  
+                  <app-input label="Valor Total Venta ($)" type="currency" formControlName="valor_venta" placeholder="0"></app-input>
+                  <app-input label="Cliente / Comprador (Opcional)" formControlName="comprador" placeholder="Nombre del cliente"></app-input>
+                  
+                  <p class="text-xs text-blue-300/80 italic">
+                    ℹ️ Se registrará un Ingreso en Caja por "Venta de Lechones".
+                  </p>
+                </div>
+              }
+
               <app-input label="Observaciones (opcional)" formControlName="observaciones" placeholder="Condiciones de los lechones, etc..."></app-input>
             </div>
           }
@@ -164,9 +181,30 @@ export class EventModalComponent {
         cantidad: [null, validadoresCantidad],
         peso: [null, [Validators.required, Validators.min(0)]],
         crear_lote: [true],
+        valor_venta: [null],
+        comprador: [''],
         observaciones: ['']
       });
+
+      // Escuchar cambios en crear_lote
+      this.form.get('crear_lote')?.valueChanges.subscribe(crear => {
+        this.updateDesteteValidators(crear);
+      });
     }
+  }
+
+  updateDesteteValidators(crearLote: boolean) {
+    const valorVentaCtrl = this.form.get('valor_venta');
+    const compradorCtrl = this.form.get('comprador');
+
+    if (!crearLote) {
+      valorVentaCtrl?.setValidators([Validators.required, Validators.min(0)]);
+    } else {
+      valorVentaCtrl?.clearValidators();
+      valorVentaCtrl?.setValue(null);
+      compradorCtrl?.setValue('');
+    }
+    valorVentaCtrl?.updateValueAndValidity();
   }
 
   getTitle(): string {
@@ -212,14 +250,22 @@ export class EventModalComponent {
         // Validación adicional: verificar que cantidad no exceda nacidos_vivos
         const cantidad = val.cantidad;
         const nacidosVivos = this.cerda.cicloActivo.nacidos_vivos || 0;
-        
+
         if (cantidad > nacidosVivos) {
           this.error.set(`Error: La cerda solo tiene ${nacidosVivos} lechones vivos registrados. No se pueden destetar más de los que nacieron vivos.`);
           this.loading.set(false);
           return;
         }
 
-        await this.produccionService.registrarDestete(this.cerda.id, this.cerda.cicloActivo.id, val);
+        await this.produccionService.registrarDestete(this.cerda.id, this.cerda.cicloActivo.id, {
+          fecha: val.fecha,
+          cantidad: val.cantidad,
+          peso: val.peso,
+          crear_lote: val.crear_lote,
+          observaciones: val.observaciones,
+          valor_venta: val.valor_venta,
+          comprador: val.comprador
+        });
       }
 
       this.saved.emit();

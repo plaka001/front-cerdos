@@ -27,11 +27,11 @@
             class="flex-1 min-w-[140px] md:flex-none md:w-48 rounded-lg py-2.5 text-sm font-medium transition-all border border-slate-700 shadow-sm">
             Costos Maternidad
         </button>
-        <button (click)="activeTab.set('gastos')" [class.bg-emerald-600]="activeTab() === 'gastos'"
-            [class.text-white]="activeTab() === 'gastos'" [class.bg-slate-800]="activeTab() !== 'gastos'"
-            [class.text-slate-400]="activeTab() !== 'gastos'"
+        <button (click)="activeTab.set('flujo')" [class.bg-emerald-600]="activeTab() === 'flujo'"
+            [class.text-white]="activeTab() === 'flujo'" [class.bg-slate-800]="activeTab() !== 'flujo'"
+            [class.text-slate-400]="activeTab() !== 'flujo'"
             class="flex-1 min-w-[140px] md:flex-none md:w-48 rounded-lg py-2.5 text-sm font-medium transition-all border border-slate-700 shadow-sm">
-            Gastos Generales
+            Flujo de Caja
         </button>
     </div>
 
@@ -263,76 +263,130 @@
     }
 
     <!-- TAB: GASTOS GENERALES -->
-    @if (activeTab() === 'gastos') {
+    <!-- TAB: Flujo de Caja -->
+    @if (activeTab() === 'flujo') {
     <div class="space-y-6">
 
-        <!-- Controls & Summary -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Month Selector -->
-            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                <label class="block text-sm font-medium text-slate-400 mb-2">Seleccionar Mes</label>
-                <select [ngModel]="mesSeleccionado()" (ngModelChange)="mesSeleccionado.set($event)"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                    @for (mes of mesesDisponibles(); track mes) {
-                    <option [value]="mes">{{ mes }}</option>
-                    }
-                    @if (mesesDisponibles().length === 0) {
-                    <option [value]="mesSeleccionado()">{{ mesSeleccionado() }} (Sin datos)</option>
-                    }
-                </select>
+        <!-- Month Selector -->
+        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+            <label class="block text-sm font-medium text-slate-400 mb-2">Seleccionar Mes</label>
+            <select [ngModel]="mesSeleccionado()" (ngModelChange)="mesSeleccionado.set($event)"
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                @for (mes of mesesDisponibles(); track mes) {
+                <option [value]="mes">{{ mes }}</option>
+                }
+                @if (mesesDisponibles().length === 0) {
+                <option [value]="mesSeleccionado()">{{ mesSeleccionado() }} (Sin datos)</option>
+                }
+            </select>
+        </div>
+
+        <!-- Balance Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Ingresos Card -->
+            <div
+                class="bg-gradient-to-br from-emerald-900/30 to-emerald-800/20 p-5 rounded-xl border border-emerald-700/50">
+                <div class="flex items-center gap-2 mb-2"><span
+                        class="text-emerald-300 text-sm font-medium">Ingresos</span>
+                </div>
+                <div class="text-3xl font-bold text-emerald-400">
+                    {{ totalIngresosMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </div>
             </div>
 
-            <!-- Total Card -->
-            <div
-                class="bg-gradient-to-br from-slate-800 to-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col justify-center">
-                <span class="text-slate-400 text-sm font-medium">Total Gastos del Mes</span>
-                <div class="text-3xl font-bold text-white mt-1">
-                    {{ totalGastosMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
+            <!-- Egresos Card -->
+            <div class="bg-gradient-to-br from-red-900/30 to-red-800/20 p-5 rounded-xl border border-red-700/50">
+                <div class="flex items-center gap-2 mb-2"><span class="text-red-300 text-sm font-medium">Egresos</span>
+                </div>
+                <div class="text-3xl font-bold text-red-400">
+                    {{ totalEgresosMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </div>
+            </div>
+
+            <!-- Balance Card -->
+            <div class="bg-gradient-to-br from-blue-900/30 to-blue-800/20 p-5 rounded-xl border border-blue-700/50">
+                <div class="flex items-center gap-2 mb-2"><span class="text-blue-300 text-sm font-medium">Balance
+                        Neto</span>
+                </div>
+                <div class="text-3xl font-bold" [ngClass]="{
+                    'text-emerald-400': balanceMes() > 0,
+                    'text-red-400': balanceMes() < 0,
+                    'text-slate-400': balanceMes() === 0
+                }">
+                    {{ balanceMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
                 </div>
             </div>
         </div>
 
-        <!-- Distribution List -->
-        <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-            <div class="p-4 border-b border-slate-700">
-                <h3 class="font-bold text-white">Distribución de Gastos</h3>
-            </div>
+        <!-- Detailed Lists: Two Columns -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            <div class="p-4 space-y-5">
-                @for (item of gastosFiltrados(); track item.categoria_nombre) {
-                <div>
-                    <div class="flex justify-between items-end mb-1">
-                        <div>
+            <!-- INGRESOS Column -->
+            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+                <div class="p-4 border-b border-slate-700 bg-emerald-900/20">
+                    <h3 class="font-bold text-emerald-300 flex items-center gap-2"> Entradas
+                    </h3>
+                </div>
+
+                <div class="p-4 space-y-4">
+                    @for (item of ingresosFiltrados(); track item.categoria_nombre) {
+                    <div>
+                        <div class="flex justify-between items-end mb-1">
                             <span class="text-white font-medium">{{ item.categoria_nombre }}</span>
-                            <span class="ml-2 text-xs px-1.5 py-0.5 rounded bg-slate-700 text-slate-400 uppercase">
-                                {{ item.tipo_flujo }}
+                            <span class="text-emerald-300 font-mono font-bold">
+                                {{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}
                             </span>
                         </div>
-                        <span class="text-slate-300 font-mono">
-                            {{ item.total_gastado | currency:'COP':'symbol-narrow':'1.0-0' }}
-                        </span>
-                    </div>
-
-                    <!-- Bar -->
-                    <div class="h-3 w-full bg-slate-700/50 rounded-full overflow-hidden">
-                        <div class="h-full rounded-full transition-all duration-500"
-                            [style.width.%]="getBarWidth(item.total_gastado)" [ngClass]="{
-                                    'bg-emerald-500': item.tipo_flujo === 'operativo',
-                                    'bg-purple-500': item.tipo_flujo === 'inversion',
-                                    'bg-blue-500': item.tipo_flujo === 'administrativo'
-                                }">
+                        <!-- Green Bar -->
+                        <div class="h-2 w-full bg-slate-700/50 rounded-full overflow-hidden">
+                            <div class="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                                [style.width.%]="getBarWidthIngreso(item.total)">
+                            </div>
                         </div>
                     </div>
-                </div>
-                }
+                    }
 
-                @if (gastosFiltrados().length === 0) {
-                <div class="text-center py-10 text-slate-500">
-                    <lucide-icon name="search" [size]="32" class="mx-auto mb-2 opacity-50"></lucide-icon>
-                    <p>No hay gastos registrados para este mes.</p>
+                    @if (ingresosFiltrados().length === 0) {
+                    <div class="text-center py-10 text-slate-500">
+                        <p>No hay ingresos registrados para este mes.</p>
+                    </div>
+                    }
                 </div>
-                }
             </div>
+
+            <!-- EGRESOS Column -->
+            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+                <div class="p-4 border-b border-slate-700 bg-red-900/20">
+                    <h3 class="font-bold text-red-300 flex items-center gap-2">Salidas
+                    </h3>
+                </div>
+
+                <div class="p-4 space-y-4">
+                    @for (item of egresosFiltrados(); track item.categoria_nombre) {
+                    <div>
+                        <div class="flex justify-between items-end mb-1">
+                            <span class="text-white font-medium">{{ item.categoria_nombre }}</span>
+                            <span class="text-red-300 font-mono font-bold">
+                                {{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                            </span>
+                        </div>
+                        <!-- Red Bar -->
+                        <div class="h-2 w-full bg-slate-700/50 rounded-full overflow-hidden">
+                            <div class="h-full bg-red-500 rounded-full transition-all duration-500"
+                                [style.width.%]="getBarWidthEgreso(item.total)">
+                            </div>
+                        </div>
+                    </div>
+                    }
+
+                    @if (egresosFiltrados().length === 0) {
+                    <div class="text-center py-10 text-slate-500">
+                        <p>No hay egresos registrados para este mes.</p>
+                    </div>
+                    }
+                </div>
+            </div>
+
         </div>
     </div>
     }

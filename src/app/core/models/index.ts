@@ -186,3 +186,10 @@ export interface ReporteGastoCategoria {
     total_gastado: number;
     cantidad_movimientos: number;
 }
+
+export interface ReporteFlujoCaja {
+    mes: string;
+    categoria_nombre: string;
+    tipo: 'ingreso' | 'egreso';
+    total: number;
+}

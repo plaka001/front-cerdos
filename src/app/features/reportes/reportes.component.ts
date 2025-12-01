@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { ReportesService } from '../../core/services/reportes.service';
-import { ReporteRentabilidad, ReporteCostosMaternidad, ReporteGastoCategoria } from '../../core/models';
+import { ReporteRentabilidad, ReporteCostosMaternidad, ReporteFlujoCaja } from '../../core/models';
 
 @Component({
     selector: 'app-reportes',
@@ -16,37 +16,61 @@ export class ReportesComponent implements OnInit {
 
     reportes = signal<ReporteRentabilidad[]>([]);
     reporteMaternidad = signal<ReporteCostosMaternidad[]>([]);
-    reporteGastos = signal<ReporteGastoCategoria[]>([]);
+    reporteFlujoCaja = signal<ReporteFlujoCaja[]>([]);
 
-    activeTab = signal<'lotes' | 'maternidad' | 'gastos'>('lotes');
+    activeTab = signal<'lotes' | 'maternidad' | 'flujo'>('lotes');
     loading = signal<boolean>(true);
     error = signal<string | null>(null);
 
-    // --- Lógica Gastos Generales ---
+    // --- Lógica Flujo de Caja ---
     mesSeleccionado = signal<string>('');
 
     mesesDisponibles = computed(() => {
-        const gastos = this.reporteGastos();
-        const meses = new Set(gastos.map(g => g.mes));
+        const flujo = this.reporteFlujoCaja();
+        const meses = new Set(flujo.map(f => f.mes));
         return Array.from(meses).sort().reverse();
     });
 
-    gastosFiltrados = computed(() => {
+    movimientosFiltrados = computed(() => {
         const mes = this.mesSeleccionado();
         if (!mes) return [];
-        return this.reporteGastos()
-            .filter(g => g.mes === mes)
-            .sort((a, b) => b.total_gastado - a.total_gastado);
+        return this.reporteFlujoCaja().filter(f => f.mes === mes);
     });
 
-    totalGastosMes = computed(() => {
-        return this.gastosFiltrados().reduce((acc, curr) => acc + curr.total_gastado, 0);
+    ingresosFiltrados = computed(() => {
+        return this.movimientosFiltrados()
+            .filter(m => m.tipo === 'ingreso')
+            .sort((a, b) => b.total - a.total);
     });
 
-    maxGastoMes = computed(() => {
-        const gastos = this.gastosFiltrados();
-        if (gastos.length === 0) return 0;
-        return Math.max(...gastos.map(g => g.total_gastado));
+    egresosFiltrados = computed(() => {
+        return this.movimientosFiltrados()
+            .filter(m => m.tipo === 'egreso')
+            .sort((a, b) => b.total - a.total);
+    });
+
+    totalIngresosMes = computed(() => {
+        return this.ingresosFiltrados().reduce((acc, curr) => acc + curr.total, 0);
+    });
+
+    totalEgresosMes = computed(() => {
+        return this.egresosFiltrados().reduce((acc, curr) => acc + curr.total, 0);
+    });
+
+    balanceMes = computed(() => {
+        return this.totalIngresosMes() - this.totalEgresosMes();
+    });
+
+    maxIngresoMes = computed(() => {
+        const ingresos = this.ingresosFiltrados();
+        if (ingresos.length === 0) return 0;
+        return Math.max(...ingresos.map(i => i.total));
+    });
+
+    maxEgresoMes = computed(() => {
+        const egresos = this.egresosFiltrados();
+        if (egresos.length === 0) return 0;
+        return Math.max(...egresos.map(e => e.total));
     });
 
     ngOnInit() {
@@ -56,21 +80,19 @@ export class ReportesComponent implements OnInit {
     async loadReportes() {
         try {
             this.loading.set(true);
-            const [dataLotes, dataMaternidad, dataGastos] = await Promise.all([
+            const [dataLotes, dataMaternidad, dataFlujoCaja] = await Promise.all([
                 this.reportesService.getReporteRentabilidad(),
                 this.reportesService.getReporteMaternidad(),
-                this.reportesService.getReporteGastosGenerales()
+                this.reportesService.getReporteFlujoCaja()
             ]);
 
             this.reportes.set(dataLotes);
             this.reporteMaternidad.set(dataMaternidad);
-            this.reporteGastos.set(dataGastos);
+            this.reporteFlujoCaja.set(dataFlujoCaja);
 
             // Seleccionar mes más reciente por defecto
-            if (dataGastos.length > 0) {
-                // dataGastos viene ordenado por mes DESC desde el servicio
-                // Pero para estar seguros, buscamos el set de meses
-                const meses = Array.from(new Set(dataGastos.map(g => g.mes))).sort().reverse();
+            if (dataFlujoCaja.length > 0) {
+                const meses = Array.from(new Set(dataFlujoCaja.map(f => f.mes))).sort().reverse();
                 if (meses.length > 0) {
                     this.mesSeleccionado.set(meses[0]);
                 }
@@ -102,9 +124,15 @@ export class ReportesComponent implements OnInit {
         return (ganancia / ventas) * 100;
     }
 
-    getBarWidth(gasto: number): number {
-        const max = this.maxGastoMes();
+    getBarWidthIngreso(monto: number): number {
+        const max = this.maxIngresoMes();
         if (max === 0) return 0;
-        return (gasto / max) * 100;
+        return (monto / max) * 100;
+    }
+
+    getBarWidthEgreso(monto: number): number {
+        const max = this.maxEgresoMes();
+        if (max === 0) return 0;
+        return (monto / max) * 100;
     }
 }

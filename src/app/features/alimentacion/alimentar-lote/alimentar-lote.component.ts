@@ -9,10 +9,10 @@ import { CardComponent } from '../../../shared/ui/card/card.component';
 import { SalidaInsumo } from '../../../core/models';
 
 @Component({
-    selector: 'app-alimentar-lote',
-    standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, ButtonComponent, InputComponent, CardComponent],
-    template: `
+  selector: 'app-alimentar-lote',
+  standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, ButtonComponent, InputComponent, CardComponent],
+  template: `
     <div class="max-w-md mx-auto p-4 pb-24">
       <h2 class="text-2xl font-bold text-gray-900 mb-6">Alimentación Diaria</h2>
 
@@ -36,7 +36,7 @@ import { SalidaInsumo } from '../../../core/models';
             <select formControlName="insumo_id" class="block w-full h-12 rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
               <option [ngValue]="null">Seleccione Alimento</option>
               <option *ngFor="let insumo of alimentos()" [value]="insumo.id">
-                {{ insumo.nombre }} (Stock: {{ insumo.stock_actual }} {{ insumo.unidad_medida_uso }})
+                {{ insumo.nombre }} (Stock: {{ insumo.stock_actual }} {{ insumo.unidad_medida }})
               </option>
             </select>
           </div>
@@ -59,56 +59,56 @@ import { SalidaInsumo } from '../../../core/models';
   `
 })
 export class AlimentarLoteComponent {
-    private fb = inject(FormBuilder);
-    private finanzasService = inject(FinanzasService);
-    private produccionService = inject(ProduccionService);
+  private fb = inject(FormBuilder);
+  private finanzasService = inject(FinanzasService);
+  private produccionService = inject(ProduccionService);
 
-    form: FormGroup;
-    loading = signal(false);
+  form: FormGroup;
+  loading = signal(false);
 
-    lotes = this.produccionService.lotes;
-    insumos = this.finanzasService.insumos;
+  lotes = this.produccionService.lotes;
+  insumos = this.finanzasService.insumos;
 
-    alimentos = computed(() => {
-        return this.insumos().filter(i => i.tipo === 'alimento');
+  alimentos = computed(() => {
+    return this.insumos().filter(i => i.tipo === 'alimento');
+  });
+
+  constructor() {
+    this.form = this.fb.group({
+      lote_id: [null, Validators.required],
+      insumo_id: [null, Validators.required],
+      cantidad: [null, [Validators.required, Validators.min(0.1)]],
+      notas: ['']
     });
+  }
 
-    constructor() {
-        this.form = this.fb.group({
-            lote_id: [null, Validators.required],
-            insumo_id: [null, Validators.required],
-            cantidad: [null, [Validators.required, Validators.min(0.1)]],
-            notas: ['']
-        });
+  async onSubmit() {
+    if (this.form.invalid) return;
+
+    this.loading.set(true);
+    try {
+      const val = this.form.value;
+
+      const salida: Partial<SalidaInsumo> = {
+        fecha: new Date().toISOString().split('T')[0],
+        insumo_id: val.insumo_id,
+        cantidad: val.cantidad,
+        destino_tipo: 'lote',
+        lote_id: val.lote_id,
+        notas: val.notas
+        // costo_unitario_momento se calcula en el backend/servicio
+      };
+
+      await this.finanzasService.registrarSalidaInsumo(salida);
+
+      this.form.reset();
+      alert('Alimentación registrada correctamente');
+
+    } catch (error) {
+      console.error(error);
+      alert('Error al registrar alimentación');
+    } finally {
+      this.loading.set(false);
     }
-
-    async onSubmit() {
-        if (this.form.invalid) return;
-
-        this.loading.set(true);
-        try {
-            const val = this.form.value;
-
-            const salida: Partial<SalidaInsumo> = {
-                fecha: new Date().toISOString().split('T')[0],
-                insumo_id: val.insumo_id,
-                cantidad: val.cantidad,
-                destino_tipo: 'lote',
-                lote_id: val.lote_id,
-                notas: val.notas
-                // costo_unitario_momento se calcula en el backend/servicio
-            };
-
-            await this.finanzasService.registrarSalidaInsumo(salida);
-
-            this.form.reset();
-            alert('Alimentación registrada correctamente');
-
-        } catch (error) {
-            console.error(error);
-            alert('Error al registrar alimentación');
-        } finally {
-            this.loading.set(false);
-        }
-    }
+  }
 }

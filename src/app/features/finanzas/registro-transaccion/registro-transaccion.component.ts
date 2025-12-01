@@ -12,152 +12,7 @@ import { CategoriaFinanciera, Insumo, TipoMovimientoCaja } from '../../../core/m
   selector: 'app-registro-transaccion',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, ButtonComponent, InputComponent],
-  template: `
-    <div class="w-full sm:max-w-md sm:mx-auto px-4 sm:p-4 pb-24">
-      <h2 class="text-2xl font-bold text-white mb-6 pt-6 sm:pt-0">Registrar Movimiento</h2>
-
-      <!-- Main Container: Dark Elevation -->
-      <div class="bg-slate-800 rounded-xl shadow-2xl p-6 border border-slate-700/50">
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
-          
-          <!-- Segmented Control (Toggle) -->
-          <div class="bg-slate-900 p-1 rounded-lg grid grid-cols-2 gap-1">
-            <button type="button" 
-              (click)="setTipo('ingreso')"
-              [class]="tipo() === 'ingreso' 
-                ? 'bg-emerald-600 text-white shadow-sm' 
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'"
-              class="py-2.5 px-4 rounded-md text-sm font-bold transition-all duration-200">
-              Ingreso
-            </button>
-            <button type="button" 
-              (click)="setTipo('egreso')"
-              [class]="tipo() === 'egreso' 
-                ? 'bg-red-600 text-white shadow-sm' 
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'"
-              class="py-2.5 px-4 rounded-md text-sm font-bold transition-all duration-200">
-              Gasto
-            </button>
-          </div>
-
-          <!-- Categoría -->
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-1.5">Categoría</label>
-            <select formControlName="categoria_id" class="block w-full h-12 rounded-md border-slate-600 bg-slate-700 text-white shadow-sm focus:border-white focus:ring-white focus:ring-2 sm:text-sm transition-all px-3">
-              <option [ngValue]="null">Seleccione una categoría</option>
-              <option *ngFor="let cat of filteredCategorias()" [value]="cat.id">
-                {{ cat.nombre }}
-              </option>
-            </select>
-          </div>
-
-          <!-- Campos Comunes -->
-          <div>
-            <app-input label="Monto Total ($)" type="currency" formControlName="monto" placeholder="0"></app-input>
-            
-            <!-- Unit Price Widget -->
-            @if (textoPrecioUnitario()) {
-              <div class="flex justify-end mt-1">
-                <span class="text-xs font-mono text-emerald-400 flex items-center gap-1 bg-emerald-900/20 px-2 py-0.5 rounded border border-emerald-900/30">
-                  💰 {{ textoPrecioUnitario() }}
-                </span>
-              </div>
-            }
-          </div>
-          
-          <app-input label="Descripción" formControlName="descripcion" placeholder="Detalle del movimiento"></app-input>
-          <app-input label="Fecha" type="date" formControlName="fecha"></app-input>
-
-          <!-- Campos Específicos de Insumos -->
-          <div *ngIf="esCompraInsumo()" class="border-t border-slate-700/50 pt-5 mt-2 space-y-5">
-            <h3 class="text-sm font-semibold text-white uppercase tracking-wider opacity-80">Detalles de Compra</h3>
-            
-            <div>
-              <label class="block text-sm font-medium text-slate-300 mb-1.5">Insumo</label>
-              <select formControlName="insumo_id" class="block w-full h-12 rounded-md border-slate-600 bg-slate-700 text-white shadow-sm focus:border-white focus:ring-white focus:ring-2 sm:text-sm transition-all px-3">
-                <option [ngValue]="null">Seleccione Insumo</option>
-                <option *ngFor="let insumo of filteredInsumos()" [ngValue]="insumo.id">
-                  {{ insumo.nombre }}
-                </option>
-              </select>
-              
-              <!-- ✅ NUEVO: Mensaje cuando no hay insumos -->
-              @if (filteredInsumos().length === 0 && categoriaId()) {
-                <div class="mt-3 bg-yellow-900/20 border-l-4 border-yellow-500 p-3 rounded-r-md flex items-start gap-3">
-                  <span class="text-lg">⚠️</span>
-                  <p class="text-sm text-yellow-200 font-medium">No hay insumos de este tipo registrados. Primero debes crear el insumo en Inventario.</p>
-                </div>
-              }
-              
-              <!-- Info Badge -->
-              @if (textoPresentacion()) {
-                <div class="mt-3 bg-slate-700/50 border-l-4 border-slate-500 p-3 rounded-r-md flex items-start gap-3">
-                  <span class="text-lg">📦</span>
-                  <p class="text-sm text-slate-300 font-medium">{{ textoPresentacion() }}</p>
-                </div>
-              }
-            </div>
-
-            <div>
-              <app-input label="Cantidad (Bultos/Unidades)" type="tel" formControlName="cantidad_comprada" placeholder="0"></app-input>
-              
-              <!-- Calculation Alert -->
-              @if (textoTotalInventario()) {
-                <div class="mt-3 bg-blue-900/30 border-l-4 border-blue-500 p-3 rounded-r-md flex items-start gap-3">
-                  <span class="text-lg">📥</span>
-                  <p class="text-sm text-white font-medium">{{ textoTotalInventario() }}</p>
-                </div>
-              }
-            </div>
-            
-            <app-input label="Proveedor" formControlName="proveedor" placeholder="Nombre del proveedor"></app-input>
-          </div>
-
-          <!-- File Upload -->
-          <div class="pt-2">
-            <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*,.pdf" hidden>
-            
-            @if (!selectedFile()) {
-              <button type="button" (click)="fileInput.click()" 
-                class="w-full py-3 px-4 rounded-lg border-2 border-dashed border-slate-600 text-slate-400 hover:text-white hover:border-slate-400 hover:bg-slate-700/30 transition-all flex items-center justify-center gap-2">
-                <span class="text-xl">📎</span>
-                <span class="font-medium">Adjuntar Comprobante</span>
-              </button>
-            } @else {
-              <div class="w-full py-3 px-4 rounded-lg bg-slate-700/50 border border-slate-600 flex items-center justify-between group">
-                <div class="flex items-center gap-3 overflow-hidden">
-                  <span class="text-xl flex-shrink-0">📄</span>
-                  <span class="text-sm text-slate-200 truncate font-medium">{{ selectedFile()?.name }}</span>
-                </div>
-                <button type="button" (click)="removeFile()" 
-                  class="p-1.5 rounded-full text-slate-400 hover:text-red-400 hover:bg-red-900/20 transition-colors"
-                  title="Eliminar archivo">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
-                </button>
-              </div>
-            }
-          </div>
-
-          <div class="pt-2">
-            <app-button type="submit" [disabled]="form.invalid || loading()" [fullWidth]="true" [variant]="tipo() === 'ingreso' ? 'primary' : 'danger'">
-              {{ loading() ? 'Guardando...' : 'Guardar Movimiento' }}
-            </app-button>
-          </div>
-
-        </form>
-      </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div *ngIf="toastMessage()" 
-         class="fixed bottom-20 left-0 right-0 mx-auto w-max max-w-[90vw] px-6 py-3 rounded-xl shadow-2xl text-white text-sm font-bold transition-all duration-300 z-50 flex items-center gap-3 border border-white/10 backdrop-blur-md"
-         [ngClass]="toastMessage()?.type === 'success' ? 'bg-emerald-600/90' : 'bg-red-600/90'">
-      <span>{{ toastMessage()?.type === 'success' ? '✅' : '❌' }}</span>
-      {{ toastMessage()?.text }}
-    </div>
-  `
+  templateUrl: './registro-transaccion.component.html'
 })
 export class RegistroTransaccionComponent {
   private fb = inject(FormBuilder);
@@ -189,6 +44,11 @@ export class RegistroTransaccionComponent {
       return t === 'ingreso' ? esVenta : !esVenta;
     });
   });
+
+  ngOnInit(): void {
+    this.finanzasService.loadInsumos();
+    this.finanzasService.loadCategorias();
+  }
 
   // ✅ REFACTORED: Filtrado reactivo mejorado de insumos
   filteredInsumos = computed(() => {
