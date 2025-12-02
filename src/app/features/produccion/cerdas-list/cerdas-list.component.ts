@@ -23,7 +23,10 @@ export class CerdasListComponent implements OnInit {
     // Modal state
     selectedCerda = signal<CerdaDetalle | null>(null);
     modalOpen = signal<boolean>(false);
-    modalType = signal<'inseminacion' | 'parto' | 'destete' | null>(null);
+    modalType = signal<'inseminacion' | 'parto' | 'destete' | 'falla' | 'sanidad' | 'venta' | 'muerte' | null>(null);
+
+    // Dropdown Menu State
+    openMenuId = signal<number | null>(null);
 
     // Nueva Cerda Modal
     nuevaCerdaModalOpen = signal<boolean>(false);
@@ -33,6 +36,14 @@ export class CerdasListComponent implements OnInit {
 
     async ngOnInit() {
         await this.cargarCerdas();
+
+        // Close menu on click outside
+        document.addEventListener('click', (event) => {
+            const target = event.target as HTMLElement;
+            if (!target.closest('.menu-trigger') && !target.closest('.menu-dropdown')) {
+                this.openMenuId.set(null);
+            }
+        });
     }
 
     async cargarCerdas() {
@@ -95,7 +106,7 @@ export class CerdasListComponent implements OnInit {
             // Si tienen la misma prioridad, ordenar por criterio secundario
             if (prioridadA === prioridadB) {
                 // Para cerdas gestantes con la misma prioridad, ordenar por días hasta parto (menos días primero)
-                if (a.estado === 'gestante' && b.estado === 'gestante' && 
+                if (a.estado === 'gestante' && b.estado === 'gestante' &&
                     a.cicloActivo?.fecha_parto_probable && b.cicloActivo?.fecha_parto_probable) {
                     const diasA = this.getDiasDiferencia(a.cicloActivo.fecha_parto_probable, true);
                     const diasB = this.getDiasDiferencia(b.cicloActivo.fecha_parto_probable, true);
@@ -103,7 +114,7 @@ export class CerdasListComponent implements OnInit {
                 }
 
                 // Para cerdas lactantes con la misma prioridad, ordenar por días de lactancia (más días primero)
-                if (a.estado === 'lactante' && b.estado === 'lactante' && 
+                if (a.estado === 'lactante' && b.estado === 'lactante' &&
                     a.cicloActivo?.fecha_parto_real && b.cicloActivo?.fecha_parto_real) {
                     const diasA = this.getDiasDiferencia(a.cicloActivo.fecha_parto_real, false);
                     const diasB = this.getDiasDiferencia(b.cicloActivo.fecha_parto_real, false);
@@ -118,13 +129,27 @@ export class CerdasListComponent implements OnInit {
         });
     }
 
-    abrirModalEvento(cerda: CerdaDetalle) {
-        this.selectedCerda.set(cerda);
+    toggleMenu(id: number, event: Event) {
+        event.stopPropagation();
+        if (this.openMenuId() === id) {
+            this.openMenuId.set(null);
+        } else {
+            this.openMenuId.set(id);
+        }
+    }
 
-        // Determinar tipo de evento según estado
-        if (cerda.estado === 'vacia') this.modalType.set('inseminacion');
-        else if (cerda.estado === 'gestante') this.modalType.set('parto');
-        else if (cerda.estado === 'lactante') this.modalType.set('destete');
+    abrirModalEvento(cerda: CerdaDetalle, tipo?: 'inseminacion' | 'parto' | 'destete' | 'falla' | 'sanidad' | 'venta' | 'muerte') {
+        this.selectedCerda.set(cerda);
+        this.openMenuId.set(null); // Close menu
+
+        if (tipo) {
+            this.modalType.set(tipo);
+        } else {
+            // Default behavior (legacy click)
+            if (cerda.estado === 'vacia') this.modalType.set('inseminacion');
+            else if (cerda.estado === 'gestante') this.modalType.set('parto');
+            else if (cerda.estado === 'lactante') this.modalType.set('destete');
+        }
 
         this.modalOpen.set(true);
     }

@@ -15,46 +15,44 @@
         </div>
 
         <!-- Tabs Navigation -->
-        <div class="flex border-b border-slate-700 bg-slate-800/50">
-            <button (click)="cambiarTab('sanidad')" [class.border-b-2]="tabActivo() === 'sanidad'"
-                [class.border-emerald-500]="tabActivo() === 'sanidad'"
-                [class.text-emerald-400]="tabActivo() === 'sanidad'" [class.text-slate-400]="tabActivo() !== 'sanidad'"
-                class="flex-1 px-6 py-4 font-semibold text-sm transition-colors hover:text-white">
-                <div class="flex items-center justify-center gap-2">
-                    <lucide-icon name="alert-triangle" [size]="18"></lucide-icon>
+        <div class="p-4 border-b border-slate-700 bg-slate-800/50">
+            <div class="flex flex-wrap gap-2">
+                <button (click)="cambiarTab('sanidad')" [class.bg-emerald-600]="tabActivo() === 'sanidad'"
+                    [class.text-white]="tabActivo() === 'sanidad'" [class.bg-slate-700]="tabActivo() !== 'sanidad'"
+                    [class.text-slate-400]="tabActivo() !== 'sanidad'"
+                    class="flex-1 min-w-[120px] md:flex-none md:w-40 rounded-lg py-2.5 px-4 text-sm font-medium transition-all border border-slate-600 shadow-sm flex items-center justify-center gap-2">
+                    <lucide-icon name="alert-triangle" [size]="16"></lucide-icon>
                     <span>Sanidad</span>
                     @if (historialSanitario().length > 0) {
-                    <span class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">
+                    <span class="bg-slate-900 text-slate-300 text-xs px-1.5 py-0.5 rounded-full ml-1">
                         {{ historialSanitario().length }}
                     </span>
                     }
-                </div>
-            </button>
-            <button (click)="cambiarTab('alimentacion')" [class.border-b-2]="tabActivo() === 'alimentacion'"
-                [class.border-emerald-500]="tabActivo() === 'alimentacion'"
-                [class.text-emerald-400]="tabActivo() === 'alimentacion'"
-                [class.text-slate-400]="tabActivo() !== 'alimentacion'"
-                class="flex-1 px-6 py-4 font-semibold text-sm transition-colors hover:text-white">
-                <div class="flex items-center justify-center gap-2">
-                    <lucide-icon name="wheat" [size]="18"></lucide-icon>
+                </button>
+
+                <button (click)="cambiarTab('alimentacion')" [class.bg-emerald-600]="tabActivo() === 'alimentacion'"
+                    [class.text-white]="tabActivo() === 'alimentacion'"
+                    [class.bg-slate-700]="tabActivo() !== 'alimentacion'"
+                    [class.text-slate-400]="tabActivo() !== 'alimentacion'"
+                    class="flex-1 min-w-[120px] md:flex-none md:w-40 rounded-lg py-2.5 px-4 text-sm font-medium transition-all border border-slate-600 shadow-sm flex items-center justify-center gap-2">
+                    <lucide-icon name="wheat" [size]="16"></lucide-icon>
                     <span>Alimentación</span>
                     @if (historialAlimento().length > 0) {
-                    <span class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">
+                    <span class="bg-slate-900 text-slate-300 text-xs px-1.5 py-0.5 rounded-full ml-1">
                         {{ historialAlimento().length }}
                     </span>
                     }
-                </div>
-            </button>
-            <button (click)="cambiarTab('crecimiento')" [class.border-b-2]="tabActivo() === 'crecimiento'"
-                [class.border-emerald-500]="tabActivo() === 'crecimiento'"
-                [class.text-emerald-400]="tabActivo() === 'crecimiento'"
-                [class.text-slate-400]="tabActivo() !== 'crecimiento'"
-                class="flex-1 px-6 py-4 font-semibold text-sm transition-colors hover:text-white">
-                <div class="flex items-center justify-center gap-2">
-                    <lucide-icon name="trending-up" [size]="18"></lucide-icon>
+                </button>
+
+                <button (click)="cambiarTab('crecimiento')" [class.bg-emerald-600]="tabActivo() === 'crecimiento'"
+                    [class.text-white]="tabActivo() === 'crecimiento'"
+                    [class.bg-slate-700]="tabActivo() !== 'crecimiento'"
+                    [class.text-slate-400]="tabActivo() !== 'crecimiento'"
+                    class="flex-1 min-w-[120px] md:flex-none md:w-40 rounded-lg py-2.5 px-4 text-sm font-medium transition-all border border-slate-600 shadow-sm flex items-center justify-center gap-2">
+                    <lucide-icon name="trending-up" [size]="16"></lucide-icon>
                     <span>Crecimiento</span>
-                </div>
-            </button>
+                </button>
+            </div>
         </div>
 
         <!-- Content -->

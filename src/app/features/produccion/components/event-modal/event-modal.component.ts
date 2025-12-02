@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { ProduccionService } from '../../../../core/services/produccion.service';
-import { CerdaDetalle } from '../../../../core/models';
+import { CerdaDetalle, Insumo } from '../../../../core/models';
 import { InputComponent } from '../../../../shared/ui/input/input.component';
 
 @Component({
@@ -102,6 +102,66 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
             </div>
           }
 
+          <!-- Falla Reproductiva -->
+          @if (tipoEvento === 'falla') {
+            <div class="space-y-4">
+              <div class="p-3 bg-amber-900/20 text-amber-300 text-sm rounded-lg border border-amber-900/30">
+                ⚠️ Se reportará la falla del ciclo actual y la cerda volverá a estado "Vacía".
+              </div>
+              <app-input label="Fecha de Reporte" type="date" formControlName="fecha"></app-input>
+              <app-input label="Observaciones" formControlName="observaciones" placeholder="Repetición de celo, aborto, etc..."></app-input>
+            </div>
+          }
+
+          <!-- Evento Sanitario -->
+          @if (tipoEvento === 'sanidad') {
+            <div class="space-y-4">
+              <div class="grid grid-cols-1 gap-4">
+                <div class="space-y-1">
+                  <label class="block text-sm font-medium text-slate-300">Medicamento / Insumo</label>
+                  <select formControlName="insumo_id" 
+                          class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all">
+                    <option value="" disabled>Seleccionar...</option>
+                    @for (item of insumos(); track item.id) {
+                      <option [value]="item.id">{{ item.nombre }} ({{ item.unidad_medida }})</option>
+                    }
+                  </select>
+                </div>
+                
+                <app-input label="Dosis / Cantidad" type="number" formControlName="cantidad" placeholder="0.0"></app-input>
+                <app-input label="Observaciones" formControlName="observaciones" placeholder="Motivo de aplicación..."></app-input>
+              </div>
+            </div>
+          }
+
+          <!-- Venta Descarte -->
+          @if (tipoEvento === 'venta') {
+            <div class="space-y-4">
+              <div class="p-3 bg-red-900/20 text-red-300 text-sm rounded-lg border border-red-900/30">
+                🚫 La cerda será marcada como INACTIVA (Descarte) y saldrá del inventario.
+              </div>
+              <app-input label="Fecha de Venta" type="date" formControlName="fecha"></app-input>
+              <div class="grid grid-cols-2 gap-4">
+                <app-input label="Peso (Kg)" type="number" formControlName="peso" placeholder="0.0"></app-input>
+                <app-input label="Valor Total ($)" type="currency" formControlName="valor_total" placeholder="0"></app-input>
+              </div>
+              <app-input label="Cliente" formControlName="cliente" placeholder="Nombre del comprador"></app-input>
+              <app-input label="Motivo" formControlName="motivo" placeholder="Edad, baja productividad, etc..."></app-input>
+            </div>
+          }
+
+          <!-- Mortalidad -->
+          @if (tipoEvento === 'muerte') {
+            <div class="space-y-4">
+              <div class="p-3 bg-red-900/20 text-red-300 text-sm rounded-lg border border-red-900/30">
+                ☠️ Se registrará la muerte y la cerda será marcada como INACTIVA.
+              </div>
+              <app-input label="Fecha de Muerte" type="date" formControlName="fecha"></app-input>
+              <app-input label="Causa de Muerte" formControlName="causa" placeholder="Enfermedad, accidente, etc..."></app-input>
+              <app-input label="Observaciones" formControlName="observaciones" placeholder="Detalles adicionales..."></app-input>
+            </div>
+          }
+
           <!-- Error Message -->
           @if (error()) {
             <div class="p-3 bg-red-900/20 text-red-400 text-sm rounded-lg border border-red-900/30 flex items-start gap-2">
@@ -131,7 +191,7 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
 })
 export class EventModalComponent {
   @Input({ required: true }) cerda!: CerdaDetalle;
-  @Input({ required: true }) tipoEvento!: 'inseminacion' | 'parto' | 'destete';
+  @Input({ required: true }) tipoEvento!: 'inseminacion' | 'parto' | 'destete' | 'falla' | 'sanidad' | 'venta' | 'muerte';
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
@@ -142,9 +202,22 @@ export class EventModalComponent {
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
   maxLechonesDestete = signal<number | null>(null);
+  insumos = signal<Insumo[]>([]);
 
   ngOnInit() {
     this.initForm();
+    if (this.tipoEvento === 'sanidad') {
+      this.loadInsumos();
+    }
+  }
+
+  async loadInsumos() {
+    try {
+      const data = await this.produccionService.getInsumosMedicos();
+      this.insumos.set(data);
+    } catch (err) {
+      console.error('Error loading insumos', err);
+    }
   }
 
   initForm() {
@@ -165,11 +238,9 @@ export class EventModalComponent {
         observaciones: ['']
       });
     } else if (this.tipoEvento === 'destete') {
-      // Obtener nacidos_vivos del ciclo activo para validación
       const nacidosVivos = this.cerda.cicloActivo?.nacidos_vivos || 0;
       this.maxLechonesDestete.set(nacidosVivos);
 
-      // Validación: cantidad no puede exceder nacidos_vivos
       const validadoresCantidad = [
         Validators.required,
         Validators.min(1),
@@ -186,9 +257,33 @@ export class EventModalComponent {
         observaciones: ['']
       });
 
-      // Escuchar cambios en crear_lote
       this.form.get('crear_lote')?.valueChanges.subscribe(crear => {
         this.updateDesteteValidators(crear);
+      });
+    } else if (this.tipoEvento === 'falla') {
+      this.form = this.fb.group({
+        fecha: [hoy, Validators.required],
+        observaciones: ['', Validators.required]
+      });
+    } else if (this.tipoEvento === 'sanidad') {
+      this.form = this.fb.group({
+        insumo_id: ['', Validators.required],
+        cantidad: [null, [Validators.required, Validators.min(0.1)]],
+        observaciones: ['']
+      });
+    } else if (this.tipoEvento === 'venta') {
+      this.form = this.fb.group({
+        fecha: [hoy, Validators.required],
+        peso: [null, [Validators.required, Validators.min(1)]],
+        valor_total: [null, [Validators.required, Validators.min(0)]],
+        cliente: ['', Validators.required],
+        motivo: ['']
+      });
+    } else if (this.tipoEvento === 'muerte') {
+      this.form = this.fb.group({
+        fecha: [hoy, Validators.required],
+        causa: ['', Validators.required],
+        observaciones: ['']
       });
     }
   }
@@ -212,6 +307,10 @@ export class EventModalComponent {
       case 'inseminacion': return 'Nueva Inseminación';
       case 'parto': return 'Registrar Parto';
       case 'destete': return 'Registrar Destete';
+      case 'falla': return 'Reportar Falla Reproductiva';
+      case 'sanidad': return 'Evento Sanitario';
+      case 'venta': return 'Venta de Descarte';
+      case 'muerte': return 'Registrar Mortalidad';
       default: return 'Evento';
     }
   }
@@ -221,6 +320,10 @@ export class EventModalComponent {
       case 'inseminacion': return 'Guardar Inseminación';
       case 'parto': return 'Guardar Parto';
       case 'destete': return 'Finalizar Lactancia';
+      case 'falla': return 'Reportar Falla';
+      case 'sanidad': return 'Guardar Evento';
+      case 'venta': return 'Registrar Venta';
+      case 'muerte': return 'Confirmar Muerte';
       default: return 'Guardar';
     }
   }
@@ -237,7 +340,7 @@ export class EventModalComponent {
         await this.produccionService.registrarInseminacion(this.cerda.id, val);
       } else if (this.tipoEvento === 'parto') {
         if (!this.cerda.cicloActivo) {
-          this.error.set('Esta cerda no tiene un ciclo reproductivo activo. Primero debe registrar una inseminación.');
+          this.error.set('Esta cerda no tiene un ciclo reproductivo activo.');
           return;
         }
         await this.produccionService.registrarParto(this.cerda.id, this.cerda.cicloActivo.id, val);
@@ -246,13 +349,11 @@ export class EventModalComponent {
           this.error.set('Esta cerda no tiene un ciclo reproductivo activo.');
           return;
         }
-
-        // Validación adicional: verificar que cantidad no exceda nacidos_vivos
         const cantidad = val.cantidad;
         const nacidosVivos = this.cerda.cicloActivo.nacidos_vivos || 0;
 
         if (cantidad > nacidosVivos) {
-          this.error.set(`Error: La cerda solo tiene ${nacidosVivos} lechones vivos registrados. No se pueden destetar más de los que nacieron vivos.`);
+          this.error.set(`Error: La cerda solo tiene ${nacidosVivos} lechones vivos registrados.`);
           this.loading.set(false);
           return;
         }
@@ -266,6 +367,27 @@ export class EventModalComponent {
           valor_venta: val.valor_venta,
           comprador: val.comprador
         });
+      } else if (this.tipoEvento === 'falla') {
+        if (!this.cerda.cicloActivo) {
+          this.error.set('Esta cerda no tiene un ciclo activo para reportar falla.');
+          return;
+        }
+        await this.produccionService.registrarFallaInseminacion(this.cerda.id, this.cerda.cicloActivo.id, val);
+      } else if (this.tipoEvento === 'sanidad') {
+        // Buscar costo unitario del insumo seleccionado
+        const insumo = this.insumos().find(i => i.id == val.insumo_id);
+        const costo = insumo ? insumo.costo_promedio : 0;
+
+        await this.produccionService.registrarSanidadCerda(this.cerda.id, {
+          insumo_id: val.insumo_id,
+          cantidad: val.cantidad,
+          costo_unitario_momento: costo,
+          observaciones: val.observaciones
+        });
+      } else if (this.tipoEvento === 'venta') {
+        await this.produccionService.registrarVentaDescarte(this.cerda.id, val);
+      } else if (this.tipoEvento === 'muerte') {
+        await this.produccionService.registrarMuerteCerda(this.cerda.id, val);
       }
 
       this.saved.emit();

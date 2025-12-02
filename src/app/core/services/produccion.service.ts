@@ -338,6 +338,147 @@ export class ProduccionService {
         }
     }
 
+    async registrarFallaInseminacion(cerdaId: number, cicloId: number, data: { fecha: string; observaciones?: string }) {
+        try {
+            this.error.set(null);
+
+            // 1. Marcar ciclo como fallido
+            const { error: errorCiclo } = await this.supabase
+                .from('ciclos_reproductivos')
+                .update({
+                    estado: 'fallido',
+                    observaciones: data.observaciones ? `FALLA: ${data.observaciones}` : 'Falla reproductiva / Repetición de celo'
+                })
+                .eq('id', cicloId);
+
+            if (errorCiclo) throw errorCiclo;
+
+            // 2. Actualizar estado de cerda a 'vacia'
+            await this.actualizarEstadoCerda(cerdaId, 'vacia');
+
+        } catch (err: any) {
+            console.error('Error registrando falla:', err);
+            this.error.set(err.message);
+            throw err;
+        }
+    }
+
+    async registrarSanidadCerda(cerdaId: number, data: {
+        insumo_id: number;
+        cantidad: number;
+        costo_unitario_momento: number;
+        observaciones?: string
+    }) {
+        try {
+            this.error.set(null);
+
+            // Insertar en salidas_insumos
+            const { error: errorSalida } = await this.supabase
+                .from('salidas_insumos')
+                .insert({
+                    insumo_id: data.insumo_id,
+                    cantidad: data.cantidad,
+                    fecha: new Date().toISOString().split('T')[0],
+                    costo_unitario_momento: data.costo_unitario_momento,
+                    destino_tipo: 'cerda',
+                    cerda_id: cerdaId,
+                    notas: data.observaciones || 'Evento Sanitario Individual'
+                });
+
+            if (errorSalida) throw errorSalida;
+
+        } catch (err: any) {
+            console.error('Error registrando sanidad:', err);
+            this.error.set(err.message);
+            throw err;
+        }
+    }
+
+    async registrarVentaDescarte(cerdaId: number, data: {
+        fecha: string;
+        peso: number;
+        valor_total: number;
+        cliente?: string;
+        motivo?: string
+    }) {
+        try {
+            this.error.set(null);
+
+            const descripcion = `Venta Descarte - Cerda ID ${cerdaId} - ${data.cliente || 'Cliente General'}`;
+
+            // Obtener categoría 'Venta de Cerda Descarte' o fallback
+            const categoriaId = await this.obtenerCategoriaId('Venta de Cerda Descarte', 'operativo');
+
+            if (!categoriaId) {
+                throw new Error('No se encontró categoría financiera para Venta de Descarte');
+            }
+
+            // 1. Registrar Ingreso
+            const { error: errorIngreso } = await this.supabase
+                .from('movimientos_caja')
+                .insert({
+                    fecha: data.fecha,
+                    tipo: 'ingreso',
+                    categoria_id: categoriaId,
+                    monto: data.valor_total,
+                    descripcion: descripcion,
+                    metodo_pago: 'efectivo'
+                });
+
+            if (errorIngreso) throw errorIngreso;
+
+            // 2. Desactivar Cerda
+            const { error: errorCerda } = await this.supabase
+                .from('cerdas')
+                .update({
+                    activa: false,
+                    estado: 'descarte'
+                })
+                .eq('id', cerdaId);
+
+            if (errorCerda) throw errorCerda;
+
+        } catch (err: any) {
+            console.error('Error registrando venta descarte:', err);
+            this.error.set(err.message);
+            throw err;
+        }
+    }
+
+    async registrarMuerteCerda(cerdaId: number, data: {
+        fecha: string;
+        causa: string;
+        observaciones?: string
+    }) {
+        try {
+            this.error.set(null);
+
+            // 1. Registrar Evento Sanitario (Muerte)
+            // Nota: Usamos eventos_sanitarios aunque originalmente era para lotes, 
+            // o podríamos crear una tabla de mortalidad_cerdas. 
+            // Por simplicidad y si la tabla lo permite (lote_id nullable), usamos eventos_sanitarios o solo desactivamos.
+            // Dado el esquema actual, si eventos_sanitarios requiere lote_id, mejor solo desactivamos la cerda 
+            // y guardamos la info en un log o notas. 
+            // Asumiremos que solo desactivamos por ahora para no romper integridad si no hay tabla específica.
+
+            // 2. Desactivar Cerda
+            const { error: errorCerda } = await this.supabase
+                .from('cerdas')
+                .update({
+                    activa: false,
+                    estado: 'muerta'
+                })
+                .eq('id', cerdaId);
+
+            if (errorCerda) throw errorCerda;
+
+        } catch (err: any) {
+            console.error('Error registrando muerte:', err);
+            this.error.set(err.message);
+            throw err;
+        }
+    }
+
     async registrarEventoCerda(ciclo: Partial<CicloReproductivo>) {
         try {
             this.error.set(null);
@@ -435,6 +576,28 @@ export class ProduccionService {
 
             if (error) {
                 console.error('Error cargando alimentos:', error);
+                throw error;
+            }
+
+            return (data || []) as Insumo[];
+        } catch (err: any) {
+            console.error('Error inesperado:', err);
+            throw err;
+        }
+    }
+
+    async getInsumosMedicos(): Promise<Insumo[]> {
+        try {
+            const { data, error } = await this.supabase
+                .from('insumos')
+                .select('*')
+                .eq('tipo', 'medicamento')
+                .gt('stock_actual', 0)
+                .eq('activo', true)
+                .order('nombre');
+
+            if (error) {
+                console.error('Error cargando medicamentos:', error);
                 throw error;
             }
 

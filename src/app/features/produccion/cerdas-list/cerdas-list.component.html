@@ -141,13 +141,79 @@
                     </div>
                 </div>
 
-                <!-- Card Footer -->
-                <div class="bg-slate-900 hover:bg-slate-700 transition-colors cursor-pointer py-3 px-4"
-                    (click)="abrirModalEvento(cerda); $event.stopPropagation()">
-                    <div class="flex items-center justify-center gap-2">
-                        <span class="text-sm font-bold text-emerald-400">Registrar Evento</span>
-                        <lucide-icon name="plus" [size]="16" class="text-emerald-400"></lucide-icon>
+                <!-- Card Footer Actions -->
+                <div class="bg-slate-900 border-t border-slate-700 p-3 flex items-center justify-between relative">
+
+                    <!-- Primary Action (Left) -->
+                    <button
+                        class="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg font-bold text-sm transition-colors mr-2"
+                        [ngClass]="{
+                            'bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30': cerda.estado === 'vacia',
+                            'bg-blue-600/20 text-blue-400 hover:bg-blue-600/30': cerda.estado === 'gestante',
+                            'bg-pink-600/20 text-pink-400 hover:bg-pink-600/30': cerda.estado === 'lactante'
+                        }" (click)="abrirModalEvento(cerda); $event.stopPropagation()">
+
+                        @if (cerda.estado === 'vacia') {
+                        <span>Inseminar</span>
+                        } @else if (cerda.estado === 'gestante') {
+                        <span>Registrar Parto</span>
+                        } @else if (cerda.estado === 'lactante') {
+                        <span>Destetar</span>
+                        }
+                    </button>
+
+                    <!-- Menu Trigger (Right) -->
+                    <button
+                        class="menu-trigger p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                        (click)="toggleMenu(cerda.id, $event)">
+                        <lucide-icon name="more-vertical" [size]="20"></lucide-icon>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    @if (openMenuId() === cerda.id) {
+                    <div
+                        class="menu-dropdown absolute bottom-full right-0 mb-2 w-64 bg-slate-900 rounded-xl shadow-2xl border border-slate-600 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
+
+                        <div class="p-2 space-y-1">
+                            <!-- Header -->
+                            <div
+                                class="px-3 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-700/50 mb-1">
+                                Acciones
+                            </div>
+
+                            <!-- Actions for GESTANTE -->
+                            @if (cerda.estado === 'gestante') {
+                            <button (click)="abrirModalEvento(cerda, 'falla'); $event.stopPropagation()"
+                                class="w-full flex items-center gap-3 px-3 py-2 text-sm text-amber-400 hover:bg-amber-900/20 rounded-lg transition-colors text-left">
+                                <lucide-icon name="alert-triangle" [size]="16"></lucide-icon>
+                                Reportar Falla / Celo
+                            </button>
+                            }
+
+                            <!-- Common Actions (Sanidad) -->
+                            <button (click)="abrirModalEvento(cerda, 'sanidad'); $event.stopPropagation()"
+                                class="w-full flex items-center gap-3 px-3 py-2 text-sm text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors text-left">
+                                <lucide-icon name="stethoscope" [size]="16"></lucide-icon>
+                                Evento Sanitario
+                            </button>
+
+                            <div class="h-px bg-slate-700 my-1"></div>
+
+                            <!-- Destructive Actions -->
+                            <button (click)="abrirModalEvento(cerda, 'venta'); $event.stopPropagation()"
+                                class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 rounded-lg transition-colors text-left">
+                                <lucide-icon name="dollar-sign" [size]="16"></lucide-icon>
+                                Venta Descarte
+                            </button>
+
+                            <button (click)="abrirModalEvento(cerda, 'muerte'); $event.stopPropagation()"
+                                class="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-900/20 rounded-lg transition-colors text-left">
+                                <lucide-icon name="skull" [size]="16"></lucide-icon>
+                                Registrar Muerte
+                            </button>
+                        </div>
                     </div>
+                    }
                 </div>
             </div>
             }
