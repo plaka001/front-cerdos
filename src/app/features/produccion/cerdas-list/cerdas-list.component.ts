@@ -34,6 +34,9 @@ export class CerdasListComponent implements OnInit {
     // Alimentar Cerdas Modal
     alimentarModalOpen = signal<boolean>(false);
 
+    // Accordion state
+    expandedCerdas = signal<Set<number>>(new Set());
+
     async ngOnInit() {
         await this.cargarCerdas();
 
@@ -193,6 +196,24 @@ export class CerdasListComponent implements OnInit {
     async onAlimentacionGuardada() {
         this.cerrarAlimentarModal();
         // No necesitamos recargar cerdas, pero podríamos mostrar un toast
+    }
+
+    // Accordion methods
+    toggleExpand(id: number, event?: Event) {
+        if (event) {
+            event.stopPropagation();
+        }
+        const current = new Set(this.expandedCerdas());
+        if (current.has(id)) {
+            current.delete(id);
+        } else {
+            current.add(id);
+        }
+        this.expandedCerdas.set(current);
+    }
+
+    isExpanded(id: number): boolean {
+        return this.expandedCerdas().has(id);
     }
 
     // Helpers para visualización

@@ -23,16 +23,28 @@ export class InventarioComponent implements OnInit {
 
     // Filtros
     busqueda = signal<string>('');
+    tipoFiltro = signal<string>('todos');
 
     // Inventario filtrado (reactivo)
     inventarioFiltrado = computed(() => {
         const busquedaLower = this.busqueda().toLowerCase().trim();
-        if (!busquedaLower) return this.inventario();
+        const tipo = this.tipoFiltro();
+        let items = this.inventario();
 
-        return this.inventario().filter(item =>
-            item.nombre.toLowerCase().includes(busquedaLower) ||
-            item.tipo.toLowerCase().includes(busquedaLower)
-        );
+        // Filtrar por tipo
+        if (tipo !== 'todos') {
+            items = items.filter(item => item.tipo === tipo);
+        }
+
+        // Filtrar por búsqueda
+        if (busquedaLower) {
+            items = items.filter(item =>
+                item.nombre.toLowerCase().includes(busquedaLower) ||
+                item.tipo.toLowerCase().includes(busquedaLower)
+            );
+        }
+
+        return items;
     });
 
     // Modal de ajuste
@@ -40,6 +52,9 @@ export class InventarioComponent implements OnInit {
     insumoSeleccionado = signal<InventarioItem | null>(null);
     ajusteForm!: FormGroup;
     loadingAjuste = signal<boolean>(false);
+
+    // Accordion state
+    expandedInsumos = signal<Set<number>>(new Set());
 
     ngOnInit() {
         this.initForm();
@@ -127,6 +142,24 @@ export class InventarioComponent implements OnInit {
         }
     }
 
+    // Accordion methods
+    toggleExpand(id: number, event?: Event) {
+        if (event) {
+            event.stopPropagation();
+        }
+        const current = new Set(this.expandedInsumos());
+        if (current.has(id)) {
+            current.delete(id);
+        } else {
+            current.add(id);
+        }
+        this.expandedInsumos.set(current);
+    }
+
+    isExpanded(id: number): boolean {
+        return this.expandedInsumos().has(id);
+    }
+
     // Helpers para UI
     getBadgeColorTipo(tipo: string): string {
         const colores: Record<string, string> = {
@@ -137,6 +170,17 @@ export class InventarioComponent implements OnInit {
             'otro': 'bg-slate-700 text-slate-300'
         };
         return colores[tipo] || colores['otro'];
+    }
+
+    getEmojiTipo(tipo: string): string {
+        const emojis: Record<string, string> = {
+            'alimento': '🌾',
+            'medicamento': '💊',
+            'biologico': '💉',
+            'material': '🔧',
+            'otro': '📦'
+        };
+        return emojis[tipo] || emojis['otro'];
     }
 
     isStockBajo(item: InventarioItem): boolean {

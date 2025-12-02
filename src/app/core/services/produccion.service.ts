@@ -466,7 +466,7 @@ export class ProduccionService {
                 .from('cerdas')
                 .update({
                     activa: false,
-                    estado: 'muerta'
+                    estado: 'descarte'
                 })
                 .eq('id', cerdaId);
 

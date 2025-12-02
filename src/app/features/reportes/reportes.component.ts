@@ -22,6 +22,9 @@ export class ReportesComponent implements OnInit {
     loading = signal<boolean>(true);
     error = signal<string | null>(null);
 
+    // Accordion state
+    expandedLotes = signal<Set<number>>(new Set());
+
     // --- Lógica Flujo de Caja ---
     mesSeleccionado = signal<string>('');
 
@@ -108,6 +111,24 @@ export class ReportesComponent implements OnInit {
         } finally {
             this.loading.set(false);
         }
+    }
+
+    // Accordion methods
+    toggleExpand(index: number, event?: Event) {
+        if (event) {
+            event.stopPropagation();
+        }
+        const current = new Set(this.expandedLotes());
+        if (current.has(index)) {
+            current.delete(index);
+        } else {
+            current.add(index);
+        }
+        this.expandedLotes.set(current);
+    }
+
+    isExpanded(index: number): boolean {
+        return this.expandedLotes().has(index);
     }
 
     getRentabilidadClass(valor: number): string {
