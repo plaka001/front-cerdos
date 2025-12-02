@@ -33,8 +33,56 @@ export class LotesListComponent implements OnInit {
     showDetalleModal = signal<boolean>(false);
     loteSeleccionadoDetalle = signal<LoteDetalle | null>(null);
 
+    // Accordion state
+    expandedLotes = signal<Set<number>>(new Set());
+
+    // Dropdown Menu State
+    openMenuId = signal<number | null>(null);
+
     async ngOnInit() {
         await this.cargarLotes();
+
+        // Close menu on click outside
+        document.addEventListener('click', (event) => {
+            const target = event.target as HTMLElement;
+            if (!target.closest('.menu-trigger') && !target.closest('.menu-dropdown')) {
+                this.openMenuId.set(null);
+            }
+        });
+    }
+
+    // Accordion methods
+    toggleExpand(id: number, event?: Event) {
+        if (event) {
+            event.stopPropagation();
+        }
+
+        const current = new Set(this.expandedLotes());
+
+        // If clicking the already open one, close it
+        if (current.has(id)) {
+            current.clear();
+        } else {
+            // Otherwise, close all others and open this one
+            current.clear();
+            current.add(id);
+        }
+
+        this.expandedLotes.set(current);
+    }
+
+    isExpanded(id: number): boolean {
+        return this.expandedLotes().has(id);
+    }
+
+    // Menu methods
+    toggleMenu(id: number, event: Event) {
+        event.stopPropagation();
+        if (this.openMenuId() === id) {
+            this.openMenuId.set(null);
+        } else {
+            this.openMenuId.set(id);
+        }
     }
 
     async cargarLotes() {

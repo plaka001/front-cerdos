@@ -152,3 +152,8 @@ WHERE NOT EXISTS (SELECT 1 FROM categorias_financieras WHERE nombre = 'Compra Ma
 UPDATE categorias_financieras 
 SET es_automatica = false 
 WHERE nombre = 'Compra Materiales/Insumos';
+
+-- 5. NUEVA CATEGORÍA: Venta de Cerda Descarte
+INSERT INTO categorias_financieras (nombre, tipo_flujo, descripcion, es_automatica)
+SELECT 'Venta de Cerda Descarte', 'operativo', 'Ingreso por venta de cerdas de descarte', true
+WHERE NOT EXISTS (SELECT 1 FROM categorias_financieras WHERE nombre = 'Venta de Cerda Descarte');

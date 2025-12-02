@@ -203,12 +203,18 @@ export class CerdasListComponent implements OnInit {
         if (event) {
             event.stopPropagation();
         }
+
         const current = new Set(this.expandedCerdas());
+
+        // If clicking the already open one, close it
         if (current.has(id)) {
-            current.delete(id);
+            current.clear();
         } else {
+            // Otherwise, close all others and open this one
+            current.clear();
             current.add(id);
         }
+
         this.expandedCerdas.set(current);
     }
 

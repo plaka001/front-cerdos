@@ -57,7 +57,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             @for (cerda of cerdas(); track cerda.id) {
             <div
-                class="bg-slate-800 rounded-xl border border-slate-700 shadow-md overflow-hidden transition-all hover:border-slate-600">
+                class="bg-slate-800 rounded-xl border border-slate-700 shadow-md transition-all hover:border-slate-600">
 
                 <!-- Collapsed Header (Always Visible) -->
                 <div class="p-4 cursor-pointer hover:bg-slate-700/30 transition-colors"
@@ -162,7 +162,8 @@
                     </div>
 
                     <!-- Actions -->
-                    <div class="bg-slate-900 border-t border-slate-700 p-3 flex items-center gap-2 relative">
+                    <div
+                        class="bg-slate-900 border-t border-slate-700 p-3 flex items-center gap-2 relative rounded-b-xl">
                         <!-- Primary Action -->
                         <button
                             class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm transition-colors"
