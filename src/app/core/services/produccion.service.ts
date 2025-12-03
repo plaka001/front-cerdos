@@ -367,28 +367,111 @@ export class ProduccionService {
         insumo_id: number;
         cantidad: number;
         costo_unitario_momento: number;
-        observaciones?: string
+        observaciones?: string; // Ej: "Aplicación Hierro"
+        nombre_producto?: string; // Opcional: para que el historial quede más claro
     }) {
         try {
             this.error.set(null);
+            const hoy = new Date().toISOString().split('T')[0];
 
-            // Insertar en salidas_insumos
+            // Construimos una nota clara para el historial
+            // Ej: "Tratamiento con Ivermectina. Motivo: Parásitos"
+            const detalleHistorial = data.nombre_producto
+                ? `${data.nombre_producto}. ${data.observaciones || ''}`
+                : data.observaciones || 'Aplicación medicamento';
+
+            // ---------------------------------------------------------
+            // PASO 1: Lo Logístico (Bajar inventario y Costo)
+            // ---------------------------------------------------------
             const { error: errorSalida } = await this.supabase
                 .from('salidas_insumos')
                 .insert({
                     insumo_id: data.insumo_id,
                     cantidad: data.cantidad,
-                    fecha: new Date().toISOString().split('T')[0],
+                    fecha: hoy,
                     costo_unitario_momento: data.costo_unitario_momento,
                     destino_tipo: 'cerda',
                     cerda_id: cerdaId,
-                    notas: data.observaciones || 'Evento Sanitario Individual'
+                    notas: detalleHistorial
                 });
 
             if (errorSalida) throw errorSalida;
 
+            // ---------------------------------------------------------
+            // PASO 2: Lo Clínico (Historial Médico de la Cerda)
+            // ---------------------------------------------------------
+
+            const { error: errorEvento } = await this.supabase
+                .from('eventos_sanitarios')
+                .insert({
+                    fecha: hoy,
+                    tipo: 'tratamiento', // O 'enfermedad' según el caso, 'tratamiento' es seguro
+                    cerda_id: cerdaId,
+                    lote_id: null,
+                    cantidad_afectada: 1, // Es individual
+                    observacion: detalleHistorial
+                });
+
+            if (errorEvento) throw errorEvento;
+
         } catch (err: any) {
             console.error('Error registrando sanidad:', err);
+            this.error.set(err.message);
+            throw err;
+        }
+    }
+
+    async registrarSanidadLote(loteId: number, data: {
+        insumo_id: number;
+        cantidad: number;
+        costo_unitario_momento: number;
+        observaciones?: string;
+        nombre_producto?: string;
+    }) {
+        try {
+            this.error.set(null);
+            const hoy = new Date().toISOString().split('T')[0];
+
+            // Construimos una nota clara para el historial
+            const detalleHistorial = data.nombre_producto
+                ? `${data.nombre_producto}. ${data.observaciones || ''}`
+                : data.observaciones || 'Aplicación medicamento';
+
+            // ---------------------------------------------------------
+            // PASO 1: Lo Logístico (Bajar inventario y Costo al Lote)
+            // ---------------------------------------------------------
+            const { error: errorSalida } = await this.supabase
+                .from('salidas_insumos')
+                .insert({
+                    insumo_id: data.insumo_id,
+                    cantidad: data.cantidad,
+                    fecha: hoy,
+                    costo_unitario_momento: data.costo_unitario_momento,
+                    destino_tipo: 'lote',
+                    lote_id: loteId,
+                    notas: detalleHistorial
+                });
+
+            if (errorSalida) throw errorSalida;
+
+            // ---------------------------------------------------------
+            // PASO 2: Lo Clínico (Historial Médico del Lote)
+            // ---------------------------------------------------------
+            const { error: errorEvento } = await this.supabase
+                .from('eventos_sanitarios')
+                .insert({
+                    fecha: hoy,
+                    tipo: 'tratamiento',
+                    cerda_id: null,
+                    lote_id: loteId,
+                    cantidad_afectada: null, // Asumimos que es al lote general o no especificamos cantidad de cerdos
+                    observacion: detalleHistorial
+                });
+
+            if (errorEvento) throw errorEvento;
+
+        } catch (err: any) {
+            console.error('Error registrando sanidad lote:', err);
             this.error.set(err.message);
             throw err;
         }
@@ -441,6 +524,38 @@ export class ProduccionService {
         } catch (err: any) {
             console.error('Error registrando venta descarte:', err);
             this.error.set(err.message);
+            throw err;
+        }
+    }
+
+    async getHistorialCiclos(cerdaId: number): Promise<CicloReproductivo[]> {
+        try {
+            const { data, error } = await this.supabase
+                .from('ciclos_reproductivos')
+                .select('*')
+                .eq('cerda_id', cerdaId)
+                .order('fecha_inseminacion', { ascending: false });
+
+            if (error) throw error;
+            return (data || []) as CicloReproductivo[];
+        } catch (err: any) {
+            console.error('Error cargando historial ciclos:', err);
+            throw err;
+        }
+    }
+
+    async getHistorialSanitarioCerda(cerdaId: number): Promise<EventoSanitario[]> {
+        try {
+            const { data, error } = await this.supabase
+                .from('eventos_sanitarios')
+                .select('*')
+                .eq('cerda_id', cerdaId)
+                .order('fecha', { ascending: false });
+
+            if (error) throw error;
+            return (data || []) as EventoSanitario[];
+        } catch (err: any) {
+            console.error('Error cargando historial sanitario:', err);
             throw err;
         }
     }
@@ -1009,13 +1124,15 @@ export class ProduccionService {
                 .from('salidas_insumos')
                 .select(`
                     *,
-                    insumos (
+                    insumos!inner (
                         nombre,
-                        unidad_medida
+                        unidad_medida,
+                        tipo
                     )
                 `)
                 .eq('lote_id', loteId)
                 .eq('destino_tipo', 'lote')
+                .eq('insumos.tipo', 'alimento')
                 .order('fecha', { ascending: false });
 
             if (error) {

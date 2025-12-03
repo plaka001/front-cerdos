@@ -382,7 +382,8 @@ export class EventModalComponent {
           insumo_id: val.insumo_id,
           cantidad: val.cantidad,
           costo_unitario_momento: costo,
-          observaciones: val.observaciones
+          observaciones: val.observaciones,
+          nombre_producto: insumo?.nombre
         });
       } else if (this.tipoEvento === 'venta') {
         await this.produccionService.registrarVentaDescarte(this.cerda.id, val);

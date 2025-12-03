@@ -8,11 +8,12 @@ import { RegistrarMortalidadModalComponent } from '../components/registrar-morta
 import { RegistrarPesajeModalComponent } from '../components/registrar-pesaje-modal/registrar-pesaje-modal.component';
 import { RegistrarVentaModalComponent } from '../components/registrar-venta-modal/registrar-venta-modal.component';
 import { LoteDetalleModalComponent } from '../components/lote-detalle-modal/lote-detalle-modal.component';
+import { RegistrarSanidadLoteModalComponent } from '../components/registrar-sanidad-lote-modal/registrar-sanidad-lote-modal.component';
 
 @Component({
     selector: 'app-lotes-list',
     standalone: true,
-    imports: [CommonModule, LucideAngularModule, AlimentarLoteModalComponent, RegistrarMortalidadModalComponent, RegistrarPesajeModalComponent, RegistrarVentaModalComponent, LoteDetalleModalComponent],
+    imports: [CommonModule, LucideAngularModule, AlimentarLoteModalComponent, RegistrarMortalidadModalComponent, RegistrarPesajeModalComponent, RegistrarVentaModalComponent, LoteDetalleModalComponent, RegistrarSanidadLoteModalComponent],
     templateUrl: './lotes-list.component.html'
 })
 export class LotesListComponent implements OnInit {
@@ -32,6 +33,8 @@ export class LotesListComponent implements OnInit {
     loteSeleccionadoVenta = signal<LoteDetalle | null>(null);
     showDetalleModal = signal<boolean>(false);
     loteSeleccionadoDetalle = signal<LoteDetalle | null>(null);
+    showSanidadModal = signal<boolean>(false);
+    loteSeleccionadoSanidad = signal<LoteDetalle | null>(null);
 
     // Accordion state
     expandedLotes = signal<Set<number>>(new Set());
@@ -188,5 +191,23 @@ export class LotesListComponent implements OnInit {
     onDetalleClosed() {
         this.showDetalleModal.set(false);
         this.loteSeleccionadoDetalle.set(null);
+    }
+
+    // Sanidad
+    registrarSanidad(lote: LoteDetalle) {
+        this.loteSeleccionadoSanidad.set(lote);
+        this.showSanidadModal.set(true);
+    }
+
+    onSanidadSaved() {
+        this.showSanidadModal.set(false);
+        this.loteSeleccionadoSanidad.set(null);
+        this.showToast('Evento sanitario registrado');
+        this.cargarLotes();
+    }
+
+    onSanidadClosed() {
+        this.showSanidadModal.set(false);
+        this.loteSeleccionadoSanidad.set(null);
     }
 }

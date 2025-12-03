@@ -142,6 +142,12 @@
                                         Registrar Mortalidad
                                     </button>
 
+                                    <button (click)="registrarSanidad(lote); $event.stopPropagation()"
+                                        class="w-full flex items-center gap-3 px-3 py-2 text-sm text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors text-left">
+                                        <lucide-icon name="syringe" [size]="16"></lucide-icon>
+                                        Evento Sanitario
+                                    </button>
+
                                     <button (click)="venderLote(lote); $event.stopPropagation()"
                                         class="w-full flex items-center gap-3 px-3 py-2 text-sm text-amber-400 hover:bg-amber-900/20 rounded-lg transition-colors text-left">
                                         <lucide-icon name="dollar-sign" [size]="16"></lucide-icon>
@@ -211,6 +217,12 @@
     @if (showDetalleModal() && loteSeleccionadoDetalle()) {
     <app-lote-detalle-modal [lote]="loteSeleccionadoDetalle()!" (close)="onDetalleClosed()">
     </app-lote-detalle-modal>
+    }
+
+    @if (showSanidadModal() && loteSeleccionadoSanidad()) {
+    <app-registrar-sanidad-lote-modal [lote]="loteSeleccionadoSanidad()!" (close)="onSanidadClosed()"
+        (saved)="onSanidadSaved()">
+    </app-registrar-sanidad-lote-modal>
     }
 
     <!-- Toast Notification -->

@@ -6,11 +6,12 @@ import { CerdaDetalle } from '../../../core/models';
 import { EventModalComponent } from '../components/event-modal/event-modal.component';
 import { NuevaCerdaModalComponent } from '../components/nueva-cerda-modal/nueva-cerda-modal.component';
 import { AlimentarCerdasModalComponent } from '../components/alimentar-cerdas-modal/alimentar-cerdas-modal.component';
+import { CerdaHistorialModalComponent } from '../components/cerda-historial-modal/cerda-historial-modal.component';
 
 @Component({
     selector: 'app-cerdas-list',
     standalone: true,
-    imports: [CommonModule, LucideAngularModule, EventModalComponent, NuevaCerdaModalComponent, AlimentarCerdasModalComponent],
+    imports: [CommonModule, LucideAngularModule, EventModalComponent, NuevaCerdaModalComponent, AlimentarCerdasModalComponent, CerdaHistorialModalComponent],
     templateUrl: './cerdas-list.component.html'
 })
 export class CerdasListComponent implements OnInit {
@@ -24,6 +25,9 @@ export class CerdasListComponent implements OnInit {
     selectedCerda = signal<CerdaDetalle | null>(null);
     modalOpen = signal<boolean>(false);
     modalType = signal<'inseminacion' | 'parto' | 'destete' | 'falla' | 'sanidad' | 'venta' | 'muerte' | null>(null);
+
+    // Historial Modal
+    historialModalOpen = signal<boolean>(false);
 
     // Dropdown Menu State
     openMenuId = signal<number | null>(null);
@@ -168,6 +172,18 @@ export class CerdasListComponent implements OnInit {
         await this.cargarCerdas();
         // THEN close modal
         this.cerrarModal();
+    }
+
+    // Historial Logic
+    abrirHistorial(cerda: CerdaDetalle) {
+        this.selectedCerda.set(cerda);
+        this.openMenuId.set(null); // Close menu
+        this.historialModalOpen.set(true);
+    }
+
+    cerrarHistorialModal() {
+        this.historialModalOpen.set(false);
+        this.selectedCerda.set(null);
     }
 
     // Nueva Cerda Logic

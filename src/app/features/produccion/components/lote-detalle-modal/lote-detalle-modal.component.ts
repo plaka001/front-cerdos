@@ -26,6 +26,10 @@ export class LoteDetalleModalComponent implements OnInit {
     // Estado de tabs
     tabActivo = signal<'sanidad' | 'alimentacion' | 'crecimiento'>('sanidad');
 
+    // Estado Accordion
+    expandedSanidad = signal<Set<number>>(new Set());
+    expandedAlimentacion = signal<Set<number>>(new Set());
+
     // Datos
     historialSanitario = signal<EventoSanitario[]>([]);
     historialAlimento = signal<SalidaInsumoConNombre[]>([]);
@@ -34,6 +38,28 @@ export class LoteDetalleModalComponent implements OnInit {
 
     ngOnInit() {
         this.cargarDatos();
+    }
+
+    toggleSanidad(id: number) {
+        const current = new Set(this.expandedSanidad());
+        if (current.has(id)) current.delete(id);
+        else current.add(id);
+        this.expandedSanidad.set(current);
+    }
+
+    isSanidadExpanded(id: number): boolean {
+        return this.expandedSanidad().has(id);
+    }
+
+    toggleAlimentacion(id: number) {
+        const current = new Set(this.expandedAlimentacion());
+        if (current.has(id)) current.delete(id);
+        else current.add(id);
+        this.expandedAlimentacion.set(current);
+    }
+
+    isAlimentacionExpanded(id: number): boolean {
+        return this.expandedAlimentacion().has(id);
     }
 
     async cargarDatos() {

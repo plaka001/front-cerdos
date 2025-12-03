@@ -98,24 +98,43 @@
                 <!-- Mobile-First Card Design -->
                 <div class="space-y-3">
                     @for (evento of historialSanitario(); track evento.id) {
-                    <div
-                        class="bg-slate-700/50 rounded-xl p-4 border border-slate-600 hover:border-slate-500 transition-colors">
-                        <div class="flex justify-between items-start mb-3">
-                            <span [class]="'text-sm font-semibold ' + getTipoEventoColor(evento.tipo)">
-                                {{ getTipoEventoLabel(evento.tipo) }}
-                            </span>
-                            <span class="text-xs text-slate-400">
-                                {{ formatearFecha(evento.fecha) }}
-                            </span>
+                    <div class="bg-slate-700/30 rounded-xl border border-slate-600 overflow-hidden">
+                        <!-- Header (Clickable) -->
+                        <div class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-700/50 transition-colors"
+                            (click)="toggleSanidad(evento.id)">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    [class]="'w-2 h-2 rounded-full ' + (evento.tipo === 'muerte' ? 'bg-red-500' : evento.tipo === 'enfermedad' ? 'bg-yellow-500' : 'bg-blue-500')">
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-white">{{ getTipoEventoLabel(evento.tipo) }}</p>
+                                    <p class="text-xs text-slate-400">{{ formatearFecha(evento.fecha) }}</p>
+                                </div>
+                            </div>
+                            <lucide-icon name="chevron-down" [size]="20"
+                                class="text-slate-400 transition-transform duration-200"
+                                [class.rotate-180]="isSanidadExpanded(evento.id)"></lucide-icon>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs text-slate-400">Cantidad afectada</span>
-                            <span class="text-base font-bold text-white">{{ evento.cantidad_afectada }}</span>
-                        </div>
-                        @if (evento.observacion) {
-                        <div class="mt-3 pt-3 border-t border-slate-600">
-                            <p class="text-xs text-slate-400 mb-1">Observación</p>
-                            <p class="text-sm text-slate-300">{{ evento.observacion }}</p>
+
+                        <!-- Body (Collapsible) -->
+                        @if (isSanidadExpanded(evento.id)) {
+                        <div class="px-4 pb-4 pt-0 animate-in slide-in-from-top-2 duration-200">
+                            <div class="pt-3 border-t border-slate-600/50 space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-slate-400">Cantidad afectada</span>
+                                    <span class="text-sm font-medium text-white">{{ evento.cantidad_afectada || 'N/A'
+                                        }}</span>
+                                </div>
+                                @if (evento.observacion) {
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-1">Observación</p>
+                                    <p
+                                        class="text-sm text-slate-300 bg-slate-800/50 p-2 rounded-lg border border-slate-700/50">
+                                        {{ evento.observacion }}
+                                    </p>
+                                </div>
+                                }
+                            </div>
                         </div>
                         }
                     </div>
@@ -141,35 +160,58 @@
                 <!-- Mobile-First Card Design -->
                 <div class="space-y-3">
                     @for (salida of historialAlimento(); track salida.id) {
-                    <div
-                        class="bg-slate-700/50 rounded-xl p-4 border border-slate-600 hover:border-slate-500 transition-colors">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex-1">
-                                <p class="text-sm font-semibold text-white">
-                                    {{ salida.insumos?.nombre || 'N/A' }}
-                                </p>
-                                <p class="text-xs text-slate-400 mt-1">
-                                    {{ salida.insumos?.unidad_medida || 'N/A' }}
-                                </p>
+                    <div class="bg-slate-700/30 rounded-xl border border-slate-600 overflow-hidden">
+                        <!-- Header -->
+                        <div class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-700/50 transition-colors"
+                            (click)="toggleAlimentacion(salida.id)">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-emerald-900/30 flex items-center justify-center text-emerald-400">
+                                    <lucide-icon name="wheat" [size]="16"></lucide-icon>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-white">{{ salida.insumos?.nombre || 'Alimento' }}
+                                    </p>
+                                    <p class="text-xs text-slate-400">{{ formatearFecha(salida.fecha) }}</p>
+                                </div>
                             </div>
-                            <span class="text-xs text-slate-400 ml-4">
-                                {{ formatearFecha(salida.fecha) }}
-                            </span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-600">
-                            <div>
-                                <p class="text-xs text-slate-400 mb-1">Cantidad</p>
-                                <p class="text-sm font-bold text-white">
-                                    {{ salida.cantidad }} {{ salida.insumos?.unidad_medida || '' }}
-                                </p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-xs text-slate-400 mb-1">Costo</p>
-                                <p class="text-sm font-bold text-emerald-400">
-                                    {{ formatearMoneda(salida.costo_total_salida || 0) }}
-                                </p>
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-bold text-emerald-400">{{
+                                    formatearMoneda(salida.costo_total_salida || 0) }}</span>
+                                <lucide-icon name="chevron-down" [size]="20"
+                                    class="text-slate-400 transition-transform duration-200"
+                                    [class.rotate-180]="isAlimentacionExpanded(salida.id)"></lucide-icon>
                             </div>
                         </div>
+
+                        <!-- Body -->
+                        @if (isAlimentacionExpanded(salida.id)) {
+                        <div class="px-4 pb-4 pt-0 animate-in slide-in-from-top-2 duration-200">
+                            <div class="pt-3 border-t border-slate-600/50 grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-1">Cantidad</p>
+                                    <p class="text-sm font-medium text-white">
+                                        {{ salida.cantidad }} {{ salida.insumos?.unidad_medida || '' }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-1">Costo Unitario</p>
+                                    <p class="text-sm font-medium text-white">
+                                        {{ formatearMoneda(salida.costo_unitario_momento) }}
+                                    </p>
+                                </div>
+                                @if (salida.notas) {
+                                <div class="col-span-2">
+                                    <p class="text-xs text-slate-400 mb-1">Notas</p>
+                                    <p
+                                        class="text-sm text-slate-300 bg-slate-800/50 p-2 rounded-lg border border-slate-700/50">
+                                        {{ salida.notas }}
+                                    </p>
+                                </div>
+                                }
+                            </div>
+                        </div>
+                        }
                     </div>
                     }
 

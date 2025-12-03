@@ -211,6 +211,13 @@
                                     </button>
                                     }
 
+                                    <!-- Historial -->
+                                    <button (click)="abrirHistorial(cerda); $event.stopPropagation()"
+                                        class="w-full flex items-center gap-3 px-3 py-2 text-sm text-indigo-400 hover:bg-indigo-900/20 rounded-lg transition-colors text-left">
+                                        <lucide-icon name="eye" [size]="16"></lucide-icon>
+                                        Ver Historial
+                                    </button>
+
                                     <!-- Common Actions (Sanidad) -->
                                     <button (click)="abrirModalEvento(cerda, 'sanidad'); $event.stopPropagation()"
                                         class="w-full flex items-center gap-3 px-3 py-2 text-sm text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors text-left">
@@ -260,5 +267,10 @@
     @if (alimentarModalOpen()) {
     <app-alimentar-cerdas-modal (close)="cerrarAlimentarModal()"
         (saved)="onAlimentacionGuardada()"></app-alimentar-cerdas-modal>
+    }
+
+    <!-- Historial Modal -->
+    @if (historialModalOpen()) {
+    <app-cerda-historial-modal [cerda]="selectedCerda()" (close)="cerrarHistorialModal()"></app-cerda-historial-modal>
     }
 </div>
