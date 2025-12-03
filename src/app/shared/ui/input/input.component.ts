@@ -36,6 +36,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
           (focus)="onFocus()"
           class="appearance-none block w-full h-12 leading-[3rem] md:leading-normal rounded-md border-slate-600 bg-slate-700 text-white shadow-sm focus:border-white focus:ring-white focus:ring-2 sm:text-sm transition-all px-3 placeholder-slate-400"
           [class.pl-7]="type === 'currency'"
+          [class.pr-10]="type === 'date'"
           [class.border-red-500]="error"
           [class.focus:ring-red-500]="error"
           [class.focus:border-red-500]="error"
@@ -77,12 +78,13 @@ export class InputComponent implements ControlValueAccessor {
         return this.type === 'currency' ? 'text' : this.type;
     }
 
+
     onInput(event: Event): void {
         const input = event.target as HTMLInputElement;
         let value = input.value;
 
         if (this.type === 'currency') {
-            // Remove all non-numeric characters except dots and commas
+            // Remove all non-numeric characters
             const numericValue = value.replace(/[^\d]/g, '');
 
             if (numericValue) {
@@ -90,12 +92,14 @@ export class InputComponent implements ControlValueAccessor {
                 this.val = numberValue.toString();
                 this.onChange(numberValue);
 
-                // Update display with formatted value only while typing
-                if (!this.isFocused) {
-                    this.displayValue = this.formatCurrency(numberValue);
-                } else {
-                    this.displayValue = numericValue;
-                }
+                // Always show formatted value while typing
+                this.displayValue = this.formatCurrency(numberValue);
+
+                // Preserve cursor position
+                setTimeout(() => {
+                    const cursorPosition = this.displayValue.length;
+                    input.setSelectionRange(cursorPosition, cursorPosition);
+                }, 0);
             } else {
                 this.val = '';
                 this.displayValue = '';
@@ -108,23 +112,14 @@ export class InputComponent implements ControlValueAccessor {
         }
     }
 
+
     onFocus(): void {
         this.isFocused = true;
-        if (this.type === 'currency' && this.val) {
-            // Show raw number when focused
-            this.displayValue = this.val;
-        }
     }
 
     onBlur(): void {
         this.isFocused = false;
         this.onTouched();
-
-        if (this.type === 'currency' && this.val) {
-            // Format when losing focus
-            const numValue = parseInt(this.val, 10);
-            this.displayValue = this.formatCurrency(numValue);
-        }
     }
 
     formatCurrency(value: number): string {
@@ -139,11 +134,7 @@ export class InputComponent implements ControlValueAccessor {
             this.val = value.toString();
 
             if (this.type === 'currency') {
-                if (!this.isFocused) {
-                    this.displayValue = this.formatCurrency(parseInt(this.val, 10));
-                } else {
-                    this.displayValue = this.val;
-                }
+                this.displayValue = this.formatCurrency(parseInt(this.val, 10));
             } else {
                 this.displayValue = this.val;
             }
