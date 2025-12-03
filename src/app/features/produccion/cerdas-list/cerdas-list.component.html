@@ -211,33 +211,34 @@
                                     </button>
                                     }
 
-                                    <!-- Historial -->
-                                    <button (click)="abrirHistorial(cerda); $event.stopPropagation()"
-                                        class="w-full flex items-center gap-3 px-3 py-2 text-sm text-indigo-400 hover:bg-indigo-900/20 rounded-lg transition-colors text-left">
-                                        <lucide-icon name="eye" [size]="16"></lucide-icon>
-                                        Ver Historial
+                                    <!-- Muerte (primero, como en lotes) -->
+                                    <button (click)="abrirModalEvento(cerda, 'muerte'); $event.stopPropagation()"
+                                        class="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-900/20 rounded-lg transition-colors text-left">
+                                        <lucide-icon name="skull" [size]="16"></lucide-icon>
+                                        Registrar Muerte
                                     </button>
 
-                                    <!-- Common Actions (Sanidad) -->
+                                    <!-- Sanidad (segundo, como en lotes) -->
                                     <button (click)="abrirModalEvento(cerda, 'sanidad'); $event.stopPropagation()"
                                         class="w-full flex items-center gap-3 px-3 py-2 text-sm text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors text-left">
                                         <lucide-icon name="stethoscope" [size]="16"></lucide-icon>
                                         Evento Sanitario
                                     </button>
 
-                                    <div class="h-px bg-slate-700 my-1"></div>
-
-                                    <!-- Destructive Actions -->
+                                    <!-- Venta (tercero, como en lotes) -->
                                     <button (click)="abrirModalEvento(cerda, 'venta'); $event.stopPropagation()"
-                                        class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 rounded-lg transition-colors text-left">
+                                        class="w-full flex items-center gap-3 px-3 py-2 text-sm text-amber-400 hover:bg-amber-900/20 rounded-lg transition-colors text-left">
                                         <lucide-icon name="dollar-sign" [size]="16"></lucide-icon>
                                         Venta Descarte
                                     </button>
 
-                                    <button (click)="abrirModalEvento(cerda, 'muerte'); $event.stopPropagation()"
-                                        class="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-900/20 rounded-lg transition-colors text-left">
-                                        <lucide-icon name="skull" [size]="16"></lucide-icon>
-                                        Registrar Muerte
+                                    <div class="h-px bg-slate-700 my-1"></div>
+
+                                    <!-- Historial (al final, como en lotes) -->
+                                    <button (click)="abrirHistorial(cerda); $event.stopPropagation()"
+                                        class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 rounded-lg transition-colors text-left">
+                                        <lucide-icon name="eye" [size]="16"></lucide-icon>
+                                        Ver Historial
                                     </button>
                                 </div>
                             </div>

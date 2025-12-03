@@ -196,25 +196,17 @@ import { ProduccionService } from '../../../../core/services/produccion.service'
                       [class.rotate-180]="isSanidadExpanded(evento.id)"></lucide-icon>
                 </div>
 
-                <!-- Body (Collapsible) -->
                 @if (isSanidadExpanded(evento.id)) {
                 <div class="px-4 pb-4 pt-0 animate-in slide-in-from-top-2 duration-200">
-                  <div class="pt-3 border-t border-slate-600/50 space-y-3">
-                    @if (evento.cantidad_afectada) {
-                    <div class="flex justify-between items-center">
-                      <span class="text-xs text-slate-400">Cantidad afectada</span>
-                      <span class="text-sm font-medium text-white">{{ evento.cantidad_afectada }}</span>
-                    </div>
-                    }
-                    @if (evento.observacion) {
-                    <div>
-                      <p class="text-xs text-slate-400 mb-1">Observación</p>
-                      <p class="text-sm text-slate-300 bg-slate-800/50 p-2 rounded-lg border border-slate-700/50">
-                        {{ evento.observacion }}
-                      </p>
-                    </div>
-                    }
+                  @if (evento.observacion) {
+                  <div class="pt-3 border-t border-slate-600/50">
+                    <p class="text-sm text-slate-200 leading-relaxed">{{ evento.observacion }}</p>
                   </div>
+                  } @else {
+                  <div class="pt-3 border-t border-slate-600/50">
+                    <p class="text-sm text-slate-400 italic">Sin observaciones registradas</p>
+                  </div>
+                  }
                 </div>
                 }
               </div>
