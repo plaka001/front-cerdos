@@ -8,6 +8,11 @@ import { NuevaCerdaModalComponent } from '../components/nueva-cerda-modal/nueva-
 import { AlimentarCerdasModalComponent } from '../components/alimentar-cerdas-modal/alimentar-cerdas-modal.component';
 import { CerdaHistorialModalComponent } from '../components/cerda-historial-modal/cerda-historial-modal.component';
 
+// Interfaz extendida con propiedades calculadas
+interface CerdaConBadge extends CerdaDetalle {
+    badgeLabel: string;
+}
+
 @Component({
     selector: 'app-cerdas-list',
     standalone: true,
@@ -17,7 +22,7 @@ import { CerdaHistorialModalComponent } from '../components/cerda-historial-moda
 export class CerdasListComponent implements OnInit {
     private produccionService = inject(ProduccionService);
 
-    cerdas = signal<CerdaDetalle[]>([]);
+    cerdas = signal<CerdaConBadge[]>([]);
     loading = signal<boolean>(true);
     error = signal<string | null>(null);
 
@@ -57,8 +62,15 @@ export class CerdasListComponent implements OnInit {
         try {
             this.loading.set(true);
             const data = await this.produccionService.getCerdasConCiclos();
+
+            // Agregar badgeLabel pre-calculado a cada cerda
+            const cerdasConBadge: CerdaConBadge[] = data.map(cerda => ({
+                ...cerda,
+                badgeLabel: this.calcularBadgeLabel(cerda)
+            }));
+
             // Ordenar cerdas por prioridad: críticas primero, luego por estado y urgencia
-            const cerdasOrdenadas = this.ordenarCerdasPorPrioridad(data);
+            const cerdasOrdenadas = this.ordenarCerdasPorPrioridad(cerdasConBadge);
             this.cerdas.set(cerdasOrdenadas);
         } catch (err: any) {
             this.error.set('Error cargando la lista de cerdas');
@@ -77,7 +89,7 @@ export class CerdasListComponent implements OnInit {
      * 6. Resto de cerdas lactantes
      * 7. Cerdas vacías (ordenadas por chapeta)
      */
-    private ordenarCerdasPorPrioridad(cerdas: CerdaDetalle[]): CerdaDetalle[] {
+    private ordenarCerdasPorPrioridad(cerdas: CerdaConBadge[]): CerdaConBadge[] {
         return [...cerdas].sort((a, b) => {
             // Función para obtener prioridad numérica (menor = más prioritario)
             const getPrioridad = (cerda: CerdaDetalle): number => {
@@ -254,7 +266,11 @@ export class CerdasListComponent implements OnInit {
         return esFuturo ? dias : Math.abs(dias);
     }
 
-    getBadgeLabel(cerda: CerdaDetalle): string {
+    /**
+     * Calcula el label del badge para una cerda.
+     * Este método se llama UNA VEZ al cargar los datos, no en el template.
+     */
+    private calcularBadgeLabel(cerda: CerdaDetalle): string {
         switch (cerda.estado) {
             case 'gestante':
                 if (cerda.cicloActivo?.fecha_parto_probable) {

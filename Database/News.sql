@@ -1,0 +1,25 @@
+-- 1. FUNCIÓN PARA CALCULAR LOS 114 DÍAS DE GESTACIÓN
+CREATE OR REPLACE FUNCTION calcular_fecha_parto_probable()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Si ingresan fecha de inseminación pero NO ingresan la probable...
+    IF NEW.fecha_inseminacion IS NOT NULL AND NEW.fecha_parto_probable IS NULL THEN
+        -- Sumamos 114 días automáticamente
+        NEW.fecha_parto_probable := NEW.fecha_inseminacion + INTERVAL '114 days';
+    END IF;
+    return NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 2. ACTIVAR EL GATILLO (TRIGGER)
+DROP TRIGGER IF EXISTS trg_calcular_fecha_parto ON ciclos_reproductivos;
+
+CREATE TRIGGER trg_calcular_fecha_parto
+BEFORE INSERT ON ciclos_reproductivos
+FOR EACH ROW
+EXECUTE FUNCTION calcular_fecha_parto_probable();
+
+-- 3. CORREGIR EL REGISTRO QUE ACABAS DE CREAR (EL ID 9)
+-- UPDATE ciclos_reproductivos
+-- SET fecha_parto_probable = fecha_inseminacion + INTERVAL '114 days'
+-- WHERE id = 9;

@@ -78,20 +78,29 @@
                         <!-- Center: Badge -->
                         <div class="flex-shrink-0">
                             @if (cerda.estado === 'gestante') {
-                            @if (cerda.cicloActivo?.fecha_parto_probable) {
-                            @if (getDiasDiferencia(cerda.cicloActivo?.fecha_parto_probable, true) <= 3) { <span
-                                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-900 text-red-300 whitespace-nowrap">
-                                {{ getBadgeLabel(cerda) }}
+                            @if (cerda.cicloActivo?.fecha_parto_probable || cerda.cicloActivo?.fecha_inseminacion) {
+                            <!-- CRÍTICO: ≤3 días para parto O ≥111 días de gestación -->
+                            @if ((cerda.cicloActivo?.fecha_parto_probable &&
+                            getDiasDiferencia(cerda.cicloActivo!.fecha_parto_probable, true) <= 3) ||
+                                (cerda.cicloActivo?.fecha_inseminacion &&
+                                getDiasDiferencia(cerda.cicloActivo!.fecha_inseminacion, false)>= 111)) {
+                                <span
+                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-900 text-red-300 whitespace-nowrap">
+                                    {{ cerda.badgeLabel }}
                                 </span>
-                                } @else if (getDiasDiferencia(cerda.cicloActivo?.fecha_parto_probable, true) <= 7) {
+                                <!-- ADVERTENCIA: ≤7 días para parto O ≥107 días de gestación -->
+                                } @else if ((cerda.cicloActivo?.fecha_parto_probable &&
+                                getDiasDiferencia(cerda.cicloActivo!.fecha_parto_probable, true) <= 7) ||
+                                    (cerda.cicloActivo?.fecha_inseminacion &&
+                                    getDiasDiferencia(cerda.cicloActivo!.fecha_inseminacion, false)>= 107)) {
                                     <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-900 text-amber-300 whitespace-nowrap">
-                                    {{ getBadgeLabel(cerda) }}
+                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-900 text-amber-300 whitespace-nowrap">
+                                        {{ cerda.badgeLabel }}
                                     </span>
                                     } @else {
                                     <span
                                         class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-900 text-emerald-300 whitespace-nowrap">
-                                        {{ getBadgeLabel(cerda) }}
+                                        {{ cerda.badgeLabel }}
                                     </span>
                                     }
                                     } @else {
@@ -103,7 +112,7 @@
                                     } @else if (cerda.estado === 'lactante') {
                                     <span
                                         class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-pink-900 text-pink-300 whitespace-nowrap">
-                                        {{ getBadgeLabel(cerda) }}
+                                        {{ cerda.badgeLabel }}
                                     </span>
                                     } @else {
                                     <span

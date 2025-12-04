@@ -706,7 +706,7 @@ export class ProduccionService {
             const { data, error } = await this.supabase
                 .from('insumos')
                 .select('*')
-                .eq('tipo', 'medicamento')
+                .or('tipo.eq.medicamento,tipo.eq.biologico')
                 .gt('stock_actual', 0)
                 .eq('activo', true)
                 .order('nombre');
