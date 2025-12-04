@@ -8,12 +8,13 @@ on:
 jobs:
   backup:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Importante: Da permiso explícito para escribir en el repo
     
     steps:
       - name: Checkout del código
         uses: actions/checkout@v3
 
-      # ESTA ES LA PARTE NUEVA PARA CORREGIR EL ERROR DE VERSIÓN
       - name: Instalar Cliente PostgreSQL 17
         run: |
           sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
@@ -26,19 +27,13 @@ jobs:
           DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
           mkdir -p backups
-          # Usamos la ruta completa a la versión 17 por si acaso
           /usr/lib/postgresql/17/bin/pg_dump "$DATABASE_URL" --clean --if-exists --no-owner --no-privileges > backups/backup_latest.sql
 
-      - name: Verificar si hubo cambios
-        id: verify_diff
-        run: |
-          git diff --quiet . || echo "changed=true" >> $GITHUB_OUTPUT
-
-      - name: Commit y Push del Backup
-        if: steps.verify_diff.outputs.changed == 'true'
+      - name: Guardar en el Repositorio
         run: |
           git config --global user.name 'GitHub Actions Backup'
           git config --global user.email 'actions@github.com'
           git add backups/backup_latest.sql
-          git commit -m "Automated backup: $(date -u)"
+          # Intentamos hacer commit. Si no hay cambios, no fallará, solo nos avisará.
+          git commit -m "Automated backup: $(date -u)" || echo "No hubo cambios en la base de datos"
           git push
