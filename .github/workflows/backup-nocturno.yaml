@@ -1,0 +1,48 @@
+name: Backup Nocturno Supabase (Capa 1)
+
+on:
+  schedule:
+    # Se ejecuta a las 4:00 AM UTC todos los días
+    # (Ajusta esto según tu zona horaria. Colombia es UTC-5, así que esto sería las 11:00 PM del día anterior)
+    - cron: '0 4 * * *'
+  workflow_dispatch: # Te permite ejecutarlo manualmente desde la pestaña Actions para probar
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v3
+
+      - name: Instalar Cliente PostgreSQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Realizar Backup (pg_dump)
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          # Crea la carpeta backups si no existe
+          mkdir -p backups
+          
+          # Ejecuta pg_dump. 
+          # --clean: Incluye comandos para borrar las tablas antes de crearlas (útil para restaurar).
+          # --if-exists: Evita errores si la tabla no existe al borrar.
+          # Guardamos en backup_latest.sql para no llenar el repo con miles de archivos.
+          pg_dump "$DATABASE_URL" --clean --if-exists --no-owner --no-privileges > backups/backup_latest.sql
+
+      - name: Verificar si hubo cambios
+        id: verify_diff
+        run: |
+          git diff --quiet . || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit y Push del Backup
+        if: steps.verify_diff.outputs.changed == 'true'
+        run: |
+          git config --global user.name 'GitHub Actions Backup'
+          git config --global user.email 'actions@github.com'
+          git add backups/backup_latest.sql
+          git commit -m "Automated backup: $(date -u)"
+          git push

@@ -34,9 +34,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
           (input)="onInput($event)"
           (blur)="onBlur()"
           (focus)="onFocus()"
-          class="appearance-none block w-full h-12 leading-[3rem] md:leading-normal rounded-md border-slate-600 bg-slate-700 text-white shadow-sm focus:border-white focus:ring-white focus:ring-2 sm:text-sm transition-all px-3 placeholder-slate-400"
+          class="appearance-none block w-full h-12 leading-[3rem] md:leading-normal rounded-md border-slate-600 bg-slate-700 text-white shadow-sm focus:border-white focus:ring-white focus:ring-2 sm:text-sm transition-all px-3 placeholder-slate-400 date-input"
           [class.pl-7]="type === 'currency'"
-          [class.pr-10]="type === 'date'"
           [class.border-red-500]="error"
           [class.focus:ring-red-500]="error"
           [class.focus:border-red-500]="error"
@@ -46,7 +45,44 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
       </div>
       <p *ngIf="error" class="mt-2 text-sm text-red-400">{{ error }}</p>
     </div>
-  `
+  `,
+    styles: [`
+    /* Estilos específicos para inputs de tipo date */
+    input[type="date"].date-input {
+      padding-right: 0.75rem;
+    }
+    
+    /* Control del icono del calendario en WebKit (Chrome, Safari, Edge) */
+    input[type="date"].date-input::-webkit-calendar-picker-indicator {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+      width: 1.25rem;
+      height: 1.25rem;
+      padding: 0;
+      margin: 0;
+    }
+    
+    input[type="date"].date-input::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+    }
+    
+    /* Para Firefox */
+    input[type="date"].date-input::-moz-calendar-picker-indicator {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      opacity: 0.7;
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  `]
 })
 export class InputComponent implements ControlValueAccessor {
     @Input() label = '';
