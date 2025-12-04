@@ -20,6 +20,7 @@ export class ReportesComponent implements OnInit {
 
     activeTab = signal<'lotes' | 'maternidad' | 'flujo'>('lotes');
     loading = signal<boolean>(true);
+    downloading = signal<boolean>(false);
     error = signal<string | null>(null);
 
     // Accordion state
@@ -155,5 +156,21 @@ export class ReportesComponent implements OnInit {
         const max = this.maxEgresoMes();
         if (max === 0) return 0;
         return (monto / max) * 100;
+    }
+
+    async downloadExcel() {
+        const mesStr = this.mesSeleccionado();
+        if (!mesStr) return;
+
+        try {
+            this.downloading.set(true);
+            const [anio, mes] = mesStr.split('-').map(Number);
+            await this.reportesService.descargarReporteExcel(anio, mes);
+        } catch (err) {
+            console.error('Error downloading excel:', err);
+            // Optional: Show toast error
+        } finally {
+            this.downloading.set(false);
+        }
     }
 }
