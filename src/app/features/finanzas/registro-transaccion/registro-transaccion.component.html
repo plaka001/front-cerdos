@@ -1,78 +1,126 @@
-<div class="w-full sm:max-w-md sm:mx-auto px-4 sm:p-4 pb-24">
-    <h2 class="text-2xl font-bold text-white mb-6 pt-6 sm:pt-0">Registrar Movimiento</h2>
+<div class="w-full sm:max-w-md sm:mx-auto px-4 pb-24">
+    <!-- Floating Pill Switch (Top Navigation) -->
+    <div class="flex justify-center pt-6 sm:pt-4 mb-8">
+        <div class="bg-[#0F172A] p-1.5 rounded-full inline-flex gap-1 shadow-xl border border-slate-700/50">
+            <button type="button" (click)="setTipo('ingreso')" [class]="tipo() === 'ingreso' 
+                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50' 
+                : 'text-slate-400 hover:text-white'"
+                class="py-3 px-8 rounded-full text-sm font-bold transition-all duration-300 ease-out">
+                Ingreso
+            </button>
+            <button type="button" (click)="setTipo('egreso')" [class]="tipo() === 'egreso' 
+                ? 'bg-red-500 text-white shadow-lg shadow-red-500/50' 
+                : 'text-slate-400 hover:text-white'"
+                class="py-3 px-8 rounded-full text-sm font-bold transition-all duration-300 ease-out">
+                Gasto
+            </button>
+        </div>
+    </div>
 
-    <!-- Main Container: Dark Elevation -->
-    <div class="bg-slate-800 rounded-xl shadow-2xl p-6 border border-slate-700/50">
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
 
-            <!-- Segmented Control (Toggle) -->
-            <div class="bg-slate-900 p-1 rounded-lg grid grid-cols-2 gap-1">
-                <button type="button" (click)="setTipo('ingreso')" [class]="tipo() === 'ingreso' 
-                ? 'bg-emerald-600 text-white shadow-sm' 
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'"
-                    class="py-2.5 px-4 rounded-md text-sm font-bold transition-all duration-200">
-                    Ingreso
-                </button>
-                <button type="button" (click)="setTipo('egreso')" [class]="tipo() === 'egreso' 
-                ? 'bg-red-600 text-white shadow-sm' 
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'"
-                    class="py-2.5 px-4 rounded-md text-sm font-bold transition-all duration-200">
-                    Gasto
-                </button>
-            </div>
-
-            <!-- Categoría -->
-            <div>
-                <label class="block text-sm font-medium text-slate-300 mb-1.5">Categoría</label>
-                <select formControlName="categoria_id"
-                    class="block w-full h-12 rounded-md border-slate-600 bg-slate-700 text-white shadow-sm focus:border-white focus:ring-white focus:ring-2 sm:text-sm transition-all px-3">
-                    <option [ngValue]="null">Seleccione una categoría</option>
-                    <option *ngFor="let cat of filteredCategorias()" [value]="cat.id">
-                        {{ cat.nombre }}
-                    </option>
-                </select>
-            </div>
-
-            <!-- Campos Comunes -->
-            <div>
-                <app-input label="Monto Total ($)" type="currency" formControlName="monto" placeholder="0"></app-input>
-
-                <!-- Unit Price Widget -->
-                @if (textoPrecioUnitario()) {
-                <div class="flex justify-end mt-1">
-                    <span
-                        class="text-xs font-mono text-emerald-400 flex items-center gap-1 bg-emerald-900/20 px-2 py-0.5 rounded border border-emerald-900/30">
-                        💰 {{ textoPrecioUnitario() }}
-                    </span>
+        <!-- HERO INPUT: Monto (The Most Important) -->
+        <div class="text-center py-8 px-4 overflow-hidden">
+            <label class="block text-xs font-medium text-slate-400 mb-3 uppercase tracking-wider">Monto</label>
+            <div class="flex items-baseline justify-center gap-2 sm:gap-3 flex-wrap">
+                <span class="text-3xl sm:text-4xl font-bold text-slate-400">$</span>
+                <div class="relative min-w-[100px] max-w-full">
+                    <input #montoInput type="text" [value]="montoFormateado()" (input)="onMontoInput($event)"
+                        (focus)="onMontoFocus()" placeholder="0" inputmode="numeric"
+                        [class]="montoFontSize() + ' font-bold text-white text-center bg-transparent border-none w-full focus:outline-none focus:ring-0 placeholder-slate-700 transition-all duration-200'"
+                        style="min-width: 100px;">
                 </div>
-                }
             </div>
 
-            <app-input label="Descripción" formControlName="descripcion"
-                placeholder="Detalle del movimiento"></app-input>
-            <app-input label="Fecha" type="date" formControlName="fecha"></app-input>
+            <!-- Unit Price Widget (Live Feedback) -->
+            @if (textoPrecioUnitario()) {
+            <div class="flex justify-center mt-4">
+                <span
+                    class="text-xs font-mono text-emerald-400 flex items-center gap-1 bg-emerald-900/20 px-3 py-1.5 rounded-full border border-emerald-900/30">
+                    💰 {{ textoPrecioUnitario() }}
+                </span>
+            </div>
+            }
+        </div>
 
-            <!-- Campos Específicos de Insumos -->
-            <div *ngIf="esCompraInsumo()" class="border-t border-slate-700/50 pt-5 mt-2 space-y-5">
-                <h3 class="text-sm font-semibold text-white uppercase tracking-wider opacity-80">Detalles de Compra</h3>
+        <!-- GRID DE DETALLES (2 Columns on desktop, 1 on mobile) -->
+        <div class="bg-slate-800/50 rounded-xl p-4 sm:p-5 space-y-4 border border-slate-700/30">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Categoría -->
+                <div class="w-full min-w-0">
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Categoría</label>
+                    <select formControlName="categoria_id"
+                        class="block w-full h-11 rounded-lg border-slate-600 bg-slate-700 text-white text-sm shadow-sm focus:border-white focus:ring-white focus:ring-1 transition-all px-3 truncate">
+                        <option [ngValue]="null">Seleccionar</option>
+                        <option *ngFor="let cat of filteredCategorias()" [value]="cat.id">
+                            {{ cat.nombre }}
+                        </option>
+                    </select>
+                </div>
 
+                <!-- Fecha -->
+                <div class="w-full min-w-0">
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Fecha</label>
+                    <div class="relative w-full">
+                        <input type="date" formControlName="fecha"
+                            class="block w-full h-11 rounded-lg border-slate-600 bg-slate-700 text-white text-sm shadow-sm focus:border-white focus:ring-white focus:ring-1 transition-all pl-3 pr-10 appearance-none min-w-0 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Descripción (Full Width) -->
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1.5">Descripción</label>
+                <input type="text" formControlName="descripcion" placeholder="Detalle del movimiento"
+                    class="block w-full h-11 rounded-lg border-slate-600 bg-slate-700 text-white text-sm shadow-sm focus:border-white focus:ring-white focus:ring-1 transition-all px-3 placeholder-slate-500">
+            </div>
+        </div>
+
+        <!-- SECCIÓN INTELIGENTE DE INVENTARIO (Conditional UI) -->
+        @if (esCompraInsumo()) {
+        <div class="space-y-4">
+            <!-- Switch Row -->
+            <div class="flex items-center justify-between bg-slate-800/30 rounded-lg p-4 border border-slate-700/30">
+                <span class="text-sm font-medium text-white">¿Afecta Inventario?</span>
+                <button type="button" (click)="afectaInventario.set(!afectaInventario())"
+                    [class]="afectaInventario() ? 'bg-emerald-500' : 'bg-slate-600'"
+                    class="relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900">
+                    <span [class]="afectaInventario() ? 'translate-x-6' : 'translate-x-1'"
+                        class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-200 ease-in-out shadow-lg">
+                    </span>
+                </button>
+            </div>
+
+            <!-- CONTENEDOR DE INVENTARIO (Expandible) -->
+            @if (afectaInventario()) {
+            <div
+                class="bg-slate-800 rounded-xl p-5 border border-slate-700/50 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Detalles de Inventario</h3>
+
+                <!-- Insumo -->
                 <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Insumo</label>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Insumo</label>
                     <select formControlName="insumo_id"
-                        class="block w-full h-12 rounded-md border-slate-600 bg-slate-700 text-white shadow-sm focus:border-white focus:ring-white focus:ring-2 sm:text-sm transition-all px-3">
+                        class="block w-full h-11 rounded-lg border-slate-600 bg-slate-700 text-white text-sm shadow-sm focus:border-white focus:ring-white focus:ring-1 transition-all px-3">
                         <option [ngValue]="null">Seleccione Insumo</option>
                         <option *ngFor="let insumo of filteredInsumos()" [ngValue]="insumo.id">
                             {{ insumo.nombre }}
                         </option>
                     </select>
 
-                    <!-- ✅ NUEVO: Mensaje cuando no hay insumos -->
+                    <!-- Mensaje cuando no hay insumos -->
                     @if (filteredInsumos().length === 0 && categoriaId()) {
                     <div
                         class="mt-3 bg-yellow-900/20 border-l-4 border-yellow-500 p-3 rounded-r-md flex items-start gap-3">
                         <span class="text-lg">⚠️</span>
-                        <p class="text-sm text-yellow-200 font-medium">No hay insumos de este tipo registrados. Primero
-                            debes crear el insumo en Inventario.</p>
+                        <p class="text-xs text-yellow-200 font-medium">No hay insumos de este tipo. Créalos primero en
+                            Inventario.</p>
                     </div>
                     }
 
@@ -81,66 +129,82 @@
                     <div
                         class="mt-3 bg-slate-700/50 border-l-4 border-slate-500 p-3 rounded-r-md flex items-start gap-3">
                         <span class="text-lg">📦</span>
-                        <p class="text-sm text-slate-300 font-medium">{{ textoPresentacion() }}</p>
+                        <p class="text-xs text-slate-300 font-medium">{{ textoPresentacion() }}</p>
                     </div>
                     }
                 </div>
 
+                <!-- Cantidad -->
                 <div>
-                    <app-input label="Cantidad (Bultos/Unidades)" type="tel" formControlName="cantidad_comprada"
-                        placeholder="0"></app-input>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Cantidad (Bultos/Unidades)</label>
+                    <input type="number" formControlName="cantidad_comprada" placeholder="0"
+                        class="block w-full h-11 rounded-lg border-slate-600 bg-slate-700 text-white text-sm shadow-sm focus:border-white focus:ring-white focus:ring-1 transition-all px-3 placeholder-slate-500">
 
                     <!-- Calculation Alert -->
                     @if (textoTotalInventario()) {
                     <div class="mt-3 bg-blue-900/30 border-l-4 border-blue-500 p-3 rounded-r-md flex items-start gap-3">
                         <span class="text-lg">📥</span>
-                        <p class="text-sm text-white font-medium">{{ textoTotalInventario() }}</p>
+                        <p class="text-xs text-white font-medium">{{ textoTotalInventario() }}</p>
                     </div>
                     }
                 </div>
 
-                <app-input label="Proveedor" formControlName="proveedor" placeholder="Nombre del proveedor"></app-input>
-            </div>
-
-            <!-- File Upload -->
-            <div class="pt-2">
-                <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*,.pdf" hidden>
-
-                @if (!selectedFile()) {
-                <button type="button" (click)="fileInput.click()"
-                    class="w-full py-3 px-4 rounded-lg border-2 border-dashed border-slate-600 text-slate-400 hover:text-white hover:border-slate-400 hover:bg-slate-700/30 transition-all flex items-center justify-center gap-2">
-                    <span class="text-xl">📎</span>
-                    <span class="font-medium">Adjuntar Comprobante</span>
-                </button>
-                } @else {
-                <div
-                    class="w-full py-3 px-4 rounded-lg bg-slate-700/50 border border-slate-600 flex items-center justify-between group">
-                    <div class="flex items-center gap-3 overflow-hidden">
-                        <span class="text-xl flex-shrink-0">📄</span>
-                        <span class="text-sm text-slate-200 truncate font-medium">{{ selectedFile()?.name }}</span>
-                    </div>
-                    <button type="button" (click)="removeFile()"
-                        class="p-1.5 rounded-full text-slate-400 hover:text-red-400 hover:bg-red-900/20 transition-colors"
-                        title="Eliminar archivo">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </button>
+                <!-- Proveedor -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Proveedor</label>
+                    <input type="text" formControlName="proveedor" placeholder="Nombre del proveedor"
+                        class="block w-full h-11 rounded-lg border-slate-600 bg-slate-700 text-white text-sm shadow-sm focus:border-white focus:ring-white focus:ring-1 transition-all px-3 placeholder-slate-500">
                 </div>
-                }
             </div>
+            }
+        </div>
+        }
 
-            <div class="pt-2">
-                <app-button type="submit" [disabled]="form.invalid || loading()" [fullWidth]="true"
-                    [variant]="tipo() === 'ingreso' ? 'primary' : 'danger'">
-                    {{ loading() ? 'Guardando...' : 'Guardar Movimiento' }}
-                </app-button>
+        <!-- ZONA DE COMPROBANTE (Compact) -->
+        <div>
+            <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*,.pdf" hidden>
+
+            @if (!selectedFile()) {
+            <button type="button" (click)="fileInput.click()"
+                class="w-full py-3.5 px-4 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:text-white hover:border-slate-500 hover:bg-slate-800 transition-all flex items-center justify-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+                <span class="text-sm font-medium">Adjuntar recibo/foto</span>
+            </button>
+            } @else {
+            <div
+                class="w-full py-3 px-4 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-between">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <span class="text-xl flex-shrink-0">📄</span>
+                    <span class="text-sm text-slate-200 truncate font-medium">{{ selectedFile()?.name }}</span>
+                </div>
+                <button type="button" (click)="removeFile()"
+                    class="p-1.5 rounded-full text-slate-400 hover:text-red-400 hover:bg-red-900/20 transition-colors"
+                    title="Eliminar archivo">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </button>
             </div>
+            }
+        </div>
 
-        </form>
-    </div>
+        <!-- STICKY FOOTER BUTTON -->
+        <div class="sticky bottom-4 pt-4">
+            <button type="submit" [disabled]="form.invalid || loading()" [class]="tipo() === 'ingreso' 
+                    ? 'bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/50 disabled:bg-emerald-500/50' 
+                    : 'bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/50 disabled:bg-red-500/50'"
+                class="w-full py-4 px-6 rounded-xl text-white text-base font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none">
+                {{ loading() ? 'Guardando...' : 'Guardar Transacción' }}
+            </button>
+        </div>
+
+    </form>
 </div>
 
 <!-- Toast Notification -->

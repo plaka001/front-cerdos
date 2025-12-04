@@ -1,20 +1,17 @@
-import { Component, inject, signal, computed, effect } from '@angular/core';
+import { Component, inject, signal, computed, effect, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { FinanzasService } from '../../../core/services/finanzas.service';
 import { StorageService } from '../../../core/services/storage.service';
-import { ButtonComponent } from '../../../shared/ui/button/button.component';
-import { InputComponent } from '../../../shared/ui/input/input.component';
-import { CardComponent } from '../../../shared/ui/card/card.component';
 import { CategoriaFinanciera, Insumo, TipoMovimientoCaja } from '../../../core/models';
 
 @Component({
   selector: 'app-registro-transaccion',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, ButtonComponent, InputComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './registro-transaccion.component.html'
 })
-export class RegistroTransaccionComponent {
+export class RegistroTransaccionComponent implements AfterViewInit {
   private fb = inject(FormBuilder);
   private finanzasService = inject(FinanzasService);
   private storageService = inject(StorageService);
@@ -23,12 +20,25 @@ export class RegistroTransaccionComponent {
   loading = signal(false);
   tipo = signal<TipoMovimientoCaja>('egreso');
   selectedFile = signal<File | null>(null);
+  afectaInventario = signal<boolean>(false);
+
+  @ViewChild('montoInput') montoInput?: ElementRef;
 
   // Signals para inputs reactivos
   insumoId = signal<number | null>(null);
   cantidad = signal<number>(0);
   monto = signal<number>(0);
   categoriaId = signal<number | null>(null);
+  montoFormateado = signal<string>('');
+
+  // Dynamic font size for amount input
+  montoFontSize = computed(() => {
+    const len = this.montoFormateado().length;
+    if (len > 12) return 'text-3xl';
+    if (len > 9) return 'text-4xl';
+    if (len > 6) return 'text-5xl';
+    return 'text-6xl';
+  });
 
   categorias = this.finanzasService.categorias;
   insumos = this.finanzasService.insumos;
@@ -48,6 +58,13 @@ export class RegistroTransaccionComponent {
   ngOnInit(): void {
     this.finanzasService.loadInsumos();
     this.finanzasService.loadCategorias();
+  }
+
+  ngAfterViewInit(): void {
+    // Auto-focus on amount input for immediate keyboard activation
+    setTimeout(() => {
+      this.montoInput?.nativeElement.focus();
+    }, 300);
   }
 
   // ✅ REFACTORED: Filtrado reactivo mejorado de insumos
@@ -151,6 +168,31 @@ export class RegistroTransaccionComponent {
     }, { allowSignalWrites: true }); // ✅ FIX: Permitir escritura en signals dentro del effect
   }
 
+  onMontoInput(event: any) {
+    const input = event.target.value;
+    // Remover todo excepto números
+    const numeros = input.replace(/\D/g, '');
+    const numero = parseInt(numeros) || 0;
+
+    // Actualizar el valor del formulario
+    this.form.get('monto')?.setValue(numero, { emitEvent: false });
+    this.monto.set(numero);
+
+    // Formatear para mostrar
+    if (numero === 0) {
+      this.montoFormateado.set('');
+    } else {
+      this.montoFormateado.set(numero.toLocaleString('es-CO'));
+    }
+  }
+
+  onMontoFocus() {
+    // Seleccionar todo el texto al hacer foco para fácil edición
+    setTimeout(() => {
+      this.montoInput?.nativeElement.select();
+    }, 0);
+  }
+
   setTipo(t: TipoMovimientoCaja) {
     this.tipo.set(t);
     this.form.get('categoria_id')?.setValue(null);
@@ -178,10 +220,12 @@ export class RegistroTransaccionComponent {
 
   updateValidators(catId: number) {
     const esInsumo = this.esCompraInsumo();
+    const afecta = this.afectaInventario();
     const insumoCtrl = this.form.get('insumo_id');
     const cantCtrl = this.form.get('cantidad_comprada');
 
-    if (esInsumo) {
+    // Only require inventory fields if toggle is ON
+    if (esInsumo && afecta) {
       insumoCtrl?.setValidators(Validators.required);
       cantCtrl?.setValidators([Validators.required, Validators.min(0)]);
     } else {
@@ -243,8 +287,8 @@ export class RegistroTransaccionComponent {
 
       let compra = undefined;
 
-      // Escenario B: Compra de Insumo (Impacta Inventario) - Solo para Gastos
-      if (tipoActual === 'egreso' && this.esCompraInsumo()) {
+      // Escenario B: Compra de Insumo (Impacta Inventario) - Solo para Gastos y si toggle está ON
+      if (tipoActual === 'egreso' && this.esCompraInsumo() && this.afectaInventario()) {
         compra = {
           fecha: val.fecha,
           insumo_id: val.insumo_id,
@@ -272,6 +316,7 @@ export class RegistroTransaccionComponent {
       this.insumoId.set(null);
       this.cantidad.set(0);
       this.monto.set(0);
+      this.afectaInventario.set(false);
 
     } catch (error) {
       console.error(error);
