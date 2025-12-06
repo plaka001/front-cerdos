@@ -35,8 +35,43 @@
 
         <!-- Lotes Grid -->
         @else {
+
+        <!-- Filtros Tab Bar -->
+        <div class="mb-6 overflow-x-auto no-scrollbar">
+            <div class="flex gap-2">
+                <button (click)="filtroEstado.set('activo')" [class.bg-emerald-600]="filtroEstado() === 'activo'"
+                    [class.text-white]="filtroEstado() === 'activo'" [class.bg-slate-800]="filtroEstado() !== 'activo'"
+                    [class.text-slate-400]="filtroEstado() !== 'activo'"
+                    class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all border border-slate-700 hover:border-emerald-500/50 flex items-center gap-2">
+                    <span>🟢</span> Activos
+                    <span
+                        class="bg-slate-900/50 px-2 py-0.5 rounded-full text-xs opacity-70 min-w-[20px] text-center">{{
+                        conteoActivos() }}</span>
+                </button>
+
+                <button (click)="filtroEstado.set('cerrado')" [class.bg-emerald-600]="filtroEstado() === 'cerrado'"
+                    [class.text-white]="filtroEstado() === 'cerrado'"
+                    [class.bg-slate-800]="filtroEstado() !== 'cerrado'"
+                    [class.text-slate-400]="filtroEstado() !== 'cerrado'"
+                    class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all border border-slate-700 hover:border-emerald-500/50 flex items-center gap-2">
+                    <span>🔒</span> Cerrados
+                    <span
+                        class="bg-slate-900/50 px-2 py-0.5 rounded-full text-xs opacity-70 min-w-[20px] text-center">{{
+                        conteoCerrados() }}</span>
+                </button>
+
+                <button (click)="filtroEstado.set('todos')" [class.bg-emerald-600]="filtroEstado() === 'todos'"
+                    [class.text-white]="filtroEstado() === 'todos'" [class.bg-slate-800]="filtroEstado() !== 'todos'"
+                    [class.text-slate-400]="filtroEstado() !== 'todos'"
+                    class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all border border-slate-700 hover:border-emerald-500/50">
+                    Todos
+                </button>
+            </div>
+        </div>
+
+        <!-- LISTA LOTES -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
-            @for (lote of lotes(); track lote.id) {
+            @for (lote of lotesFiltrados(); track lote.id) {
             <div class="bg-slate-800 rounded-xl border border-slate-700 shadow-md transition-all hover:border-slate-600"
                 [class.opacity-75]="isLoteCerrado(lote)">
 

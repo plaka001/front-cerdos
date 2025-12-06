@@ -152,6 +152,7 @@ import { RegistrarSanidadLoteModalComponent } from '../produccion/components/reg
             <app-event-modal 
                 [cerda]="selectedCerda()!" 
                 [tipoEvento]="'sanidad'"
+                [nombreTarea]="selectedTarea()?.nombre_tarea"
                 (close)="cerrarModales()"
                 (saved)="onTareaCompletada()">
             </app-event-modal>
@@ -160,6 +161,7 @@ import { RegistrarSanidadLoteModalComponent } from '../produccion/components/reg
         @if (selectedLote()) {
             <app-registrar-sanidad-lote-modal
                 [lote]="selectedLote()!"
+                [nombreTarea]="selectedTarea()?.nombre_tarea"
                 (close)="cerrarModales()"
                 (saved)="onTareaCompletada()">
             </app-registrar-sanidad-lote-modal>
@@ -181,6 +183,7 @@ export class SanidadComponent implements OnInit {
     // State for modals
     selectedCerda = signal<CerdaDetalle | null>(null);
     selectedLote = signal<LoteDetalle | null>(null);
+    selectedTarea = signal<TareaSanitaria | null>(null);
 
     // Helper for template
     Math = Math;
@@ -220,6 +223,7 @@ export class SanidadComponent implements OnInit {
     async abrirModalAplicar(tarea: TareaSanitaria) {
         try {
             this.loading.set(true);
+            this.selectedTarea.set(tarea);
 
             if (tarea.tipo_aplicacion === 'lote') {
                 // Fetch full Lote details
@@ -245,6 +249,7 @@ export class SanidadComponent implements OnInit {
     cerrarModales() {
         this.selectedCerda.set(null);
         this.selectedLote.set(null);
+        this.selectedTarea.set(null);
     }
 
     async onTareaCompletada() {

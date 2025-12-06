@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { LoteDetalle } from '../../../core/models';
@@ -41,6 +41,25 @@ export class LotesListComponent implements OnInit {
 
     // Dropdown Menu State
     openMenuId = signal<number | null>(null);
+
+    // Filters
+    filtroEstado = signal<'activo' | 'cerrado' | 'todos'>('activo');
+
+    lotesFiltrados = computed(() => {
+        const lotes = this.lotes();
+        const filtro = this.filtroEstado();
+
+        if (filtro === 'activo') {
+            return lotes.filter(l => l.estado === 'activo');
+        } else if (filtro === 'cerrado') {
+            return lotes.filter(l => l.estado === 'cerrado_vendido');
+        }
+        return lotes;
+    });
+
+    // Computed counts for tabs
+    conteoActivos = computed(() => this.lotes().filter(l => l.estado === 'activo').length);
+    conteoCerrados = computed(() => this.lotes().filter(l => l.estado === 'cerrado_vendido').length);
 
     async ngOnInit() {
         await this.cargarLotes();

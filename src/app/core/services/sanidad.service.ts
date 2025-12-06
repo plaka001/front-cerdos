@@ -61,14 +61,25 @@ export class SanidadService {
 
         if (errCerdas) throw errCerdas;
 
+        // 4. Fetch Today's Sanitary Events for Filtering
+        const hoyString = hoy.toISOString().split('T')[0];
+        const { data: eventosHoy, error: errEventos } = await this.supabase.client
+            .from('eventos_sanitarios')
+            .select('*')
+            .eq('fecha', hoyString);
+
+        if (errEventos) {
+            console.error('Error fetching daily events:', errEventos);
+            // Optionally throw or continue without filtering
+        }
+
         const tareas: TareaSanitaria[] = [];
 
-        // 4. Calculate Tasks
+        // 5. Calculate Tasks
 
         // A. Lote Tasks
         for (const lote of lotes) {
             const fechaInicio = new Date(lote.fecha_inicio);
-
             const reglasLote = reglas.filter(r => r.tipo_aplicacion === 'lote' && r.evento_origen === 'inicio_lote');
 
             for (const regla of reglasLote) {
@@ -76,7 +87,6 @@ export class SanidadService {
                 fechaTarea.setDate(fechaTarea.getDate() + regla.dias_target);
                 fechaTarea.setHours(0, 0, 0, 0);
 
-                // Filter logic
                 if (fechaTarea <= limiteProximo) {
                     tareas.push(this.crearTarea(
                         lote.id,
@@ -92,10 +102,9 @@ export class SanidadService {
 
         // B. Cerda/Camada Tasks
         for (const cerda of cerdas) {
-            const ciclo = cerda.ciclos_reproductivos?.[0]; // Assuming array is returned, even if size 1
+            const ciclo = cerda.ciclos_reproductivos?.[0];
             if (!ciclo) continue;
 
-            // Rules based on 'servicio' (Insemination)
             const reglasServicio = reglas.filter(r => r.evento_origen === 'servicio');
             if (ciclo.fecha_inseminacion) {
                 const fechaInsem = new Date(ciclo.fecha_inseminacion);
@@ -110,9 +119,8 @@ export class SanidadService {
                 }
             }
 
-            // Rules based on 'parto'
             const reglasParto = reglas.filter(r => r.evento_origen === 'parto');
-            if (ciclo.fecha_parto_real) { // Use fecha_parto_real for actual events
+            if (ciclo.fecha_parto_real) {
                 const fechaParto = new Date(ciclo.fecha_parto_real);
                 for (const regla of reglasParto) {
                     const fechaTarea = new Date(fechaParto);
@@ -125,7 +133,6 @@ export class SanidadService {
                 }
             }
 
-            // Rules based on 'destete' (Assuming date is set when weaned)
             const reglasDestete = reglas.filter(r => r.evento_origen === 'destete');
             if (ciclo.fecha_destete) {
                 const fechaDestete = new Date(ciclo.fecha_destete);
@@ -141,8 +148,24 @@ export class SanidadService {
             }
         }
 
-        // 5. Sort filters
-        return tareas.sort((a, b) => a.fecha_programada.getTime() - b.fecha_programada.getTime());
+        // 6. Filter Completed Tasks Logic
+        // Remove task if an event exists today for the same reference ID and containing task name in observations
+        const tareasFiltradas = tareas.filter(t => {
+            const yaRealizada = eventosHoy?.some(e => {
+                const mismoDestino = (t.tipo_aplicacion === 'lote' && e.lote_id === t.id_referencia) ||
+                    (t.tipo_aplicacion !== 'lote' && e.cerda_id === t.id_referencia);
+
+                // Flexible matching: check if observation includes the task name
+                const coincidenciaTema = e.observacion && e.observacion.toLowerCase().includes(t.nombre_tarea.toLowerCase());
+
+                return mismoDestino && coincidenciaTema;
+            });
+
+            return !yaRealizada; // Keep only if not realized
+        });
+
+        // 7. Sort
+        return tareasFiltradas.sort((a, b) => a.fecha_programada.getTime() - b.fecha_programada.getTime());
     }
 
     private crearTarea(id: number, codigo: string, tipo: 'camada' | 'lote' | 'madre', nombre: string, fecha: Date, hoy: Date): TareaSanitaria {

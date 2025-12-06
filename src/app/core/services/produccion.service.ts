@@ -89,12 +89,12 @@ export class ProduccionService {
         }
     }
 
-    async getCerdasConCiclos(): Promise<CerdaDetalle[]> {
+    async getCerdasConCiclos(soloActivas: boolean = true): Promise<CerdaDetalle[]> {
         try {
             this.loading.set(true);
             this.error.set(null);
 
-            const { data, error } = await this.supabase
+            let query = this.supabase
                 .from('cerdas')
                 .select(`
                     *,
@@ -109,8 +109,13 @@ export class ProduccionService {
                         estado
                     )
                 `)
-                .eq('activa', true)
                 .order('chapeta');
+
+            if (soloActivas) {
+                query = query.eq('activa', true);
+            }
+
+            const { data, error } = await query;
 
             if (error) {
                 console.error('Error cargando cerdas con ciclos:', error);
@@ -422,98 +427,126 @@ export class ProduccionService {
     }
 
     async registrarSanidadCerda(cerdaId: number, data: {
-        insumo_id: number;
-        cantidad: number;
-        costo_unitario_momento: number;
-        observaciones?: string; // Ej: "Aplicación Hierro"
-        nombre_producto?: string; // Opcional: para que el historial quede más claro
+        insumos: {
+            insumo_id: number;
+            cantidad: number;
+            costo_unitario_momento: number;
+            nombre_producto?: string;
+        }[];
+        observaciones?: string;
+        nombre_tarea?: string;
     }) {
         try {
             this.error.set(null);
             const hoy = new Date().toISOString().split('T')[0];
 
-            // Construimos una nota clara para el historial
-            // Ej: "Tratamiento con Ivermectina. Motivo: Parásitos"
-            const detalleHistorial = data.nombre_producto
-                ? `${data.nombre_producto}. ${data.observaciones || ''}`
-                : data.observaciones || 'Aplicación medicamento';
+            // 1. Construir la observación del evento
+            let detalleEvento = data.nombre_tarea || data.observaciones;
+
+            if (!detalleEvento) {
+                const nombresProductos = data.insumos.map(i => i.nombre_producto).join(' + ');
+                detalleEvento = `Aplicación: ${nombresProductos}`;
+            }
+
+            if (data.nombre_tarea && data.observaciones && data.nombre_tarea !== data.observaciones) {
+                detalleEvento += `. ${data.observaciones}`;
+            }
 
             // ---------------------------------------------------------
-            // PASO 1: Lo Logístico (Bajar inventario y Costo)
+            // PASO 1: Iterar Salidas de Insumos (Inventario)
             // ---------------------------------------------------------
-            const { error: errorSalida } = await this.supabase
-                .from('salidas_insumos')
-                .insert({
-                    insumo_id: data.insumo_id,
-                    cantidad: data.cantidad,
-                    fecha: hoy,
-                    costo_unitario_momento: data.costo_unitario_momento,
-                    destino_tipo: 'cerda',
-                    cerda_id: cerdaId,
-                    notas: detalleHistorial
-                });
+            for (const insumo of data.insumos) {
+                const notasSalida = `Sanidad Cerda ${cerdaId}. ${detalleEvento}`;
 
-            if (errorSalida) throw errorSalida;
+                const { error: errorSalida } = await this.supabase
+                    .from('salidas_insumos')
+                    .insert({
+                        insumo_id: insumo.insumo_id,
+                        cantidad: insumo.cantidad,
+                        fecha: hoy,
+                        costo_unitario_momento: insumo.costo_unitario_momento,
+                        destino_tipo: 'cerda',
+                        cerda_id: cerdaId,
+                        notas: notasSalida
+                    });
+
+                if (errorSalida) throw errorSalida;
+            }
 
             // ---------------------------------------------------------
-            // PASO 2: Lo Clínico (Historial Médico de la Cerda)
+            // PASO 2: Un Solo Evento Clínico
             // ---------------------------------------------------------
-
             const { error: errorEvento } = await this.supabase
                 .from('eventos_sanitarios')
                 .insert({
                     fecha: hoy,
-                    tipo: 'tratamiento', // O 'enfermedad' según el caso, 'tratamiento' es seguro
+                    tipo: 'tratamiento',
                     cerda_id: cerdaId,
                     lote_id: null,
-                    cantidad_afectada: 1, // Es individual
-                    observacion: detalleHistorial
+                    cantidad_afectada: 1,
+                    observacion: detalleEvento
                 });
 
             if (errorEvento) throw errorEvento;
 
         } catch (err: any) {
-            console.error('Error registrando sanidad:', err);
+            console.error('Error registrando sanidad cerda:', err);
             this.error.set(err.message);
             throw err;
         }
     }
 
     async registrarSanidadLote(loteId: number, data: {
-        insumo_id: number;
-        cantidad: number;
-        costo_unitario_momento: number;
+        insumos: {
+            insumo_id: number;
+            cantidad: number;
+            costo_unitario_momento: number;
+            nombre_producto?: string;
+        }[];
         observaciones?: string;
-        nombre_producto?: string;
+        nombre_tarea?: string;
     }) {
         try {
             this.error.set(null);
             const hoy = new Date().toISOString().split('T')[0];
 
-            // Construimos una nota clara para el historial
-            const detalleHistorial = data.nombre_producto
-                ? `${data.nombre_producto}. ${data.observaciones || ''}`
-                : data.observaciones || 'Aplicación medicamento';
+            // 1. Construir la observación del evento
+            // Si hay nombre_tarea (ej: "Hierro + Anticoccidial"), usarlo. Si no, listar productos.
+            let detalleEvento = data.nombre_tarea || data.observaciones;
+
+            if (!detalleEvento) {
+                const nombresProductos = data.insumos.map(i => i.nombre_producto).join(' + ');
+                detalleEvento = `Aplicación: ${nombresProductos}`;
+            }
+
+            // Si hay observaciones adicionales y ya usamos el nombre de tarea, las agregamos
+            if (data.nombre_tarea && data.observaciones && data.nombre_tarea !== data.observaciones) {
+                detalleEvento += `. ${data.observaciones}`;
+            }
 
             // ---------------------------------------------------------
-            // PASO 1: Lo Logístico (Bajar inventario y Costo al Lote)
+            // PASO 1: Iterar Salidas de Insumos (Inventario)
             // ---------------------------------------------------------
-            const { error: errorSalida } = await this.supabase
-                .from('salidas_insumos')
-                .insert({
-                    insumo_id: data.insumo_id,
-                    cantidad: data.cantidad,
-                    fecha: hoy,
-                    costo_unitario_momento: data.costo_unitario_momento,
-                    destino_tipo: 'lote',
-                    lote_id: loteId,
-                    notas: detalleHistorial
-                });
+            for (const insumo of data.insumos) {
+                const notasSalida = `Sanidad Lote. ${detalleEvento}`;
 
-            if (errorSalida) throw errorSalida;
+                const { error: errorSalida } = await this.supabase
+                    .from('salidas_insumos')
+                    .insert({
+                        insumo_id: insumo.insumo_id,
+                        cantidad: insumo.cantidad,
+                        fecha: hoy,
+                        costo_unitario_momento: insumo.costo_unitario_momento,
+                        destino_tipo: 'lote',
+                        lote_id: loteId,
+                        notas: notasSalida
+                    });
+
+                if (errorSalida) throw errorSalida;
+            }
 
             // ---------------------------------------------------------
-            // PASO 2: Lo Clínico (Historial Médico del Lote)
+            // PASO 2: Un Solo Evento Clínico
             // ---------------------------------------------------------
             const { error: errorEvento } = await this.supabase
                 .from('eventos_sanitarios')
@@ -522,8 +555,8 @@ export class ProduccionService {
                     tipo: 'tratamiento',
                     cerda_id: null,
                     lote_id: loteId,
-                    cantidad_afectada: null, // Asumimos que es al lote general o no especificamos cantidad de cerdos
-                    observacion: detalleHistorial
+                    cantidad_afectada: null, // General al lote
+                    observacion: detalleEvento // CRÍTICO: Debe coincidir con nombre_tarea para el filtro
                 });
 
             if (errorEvento) throw errorEvento;

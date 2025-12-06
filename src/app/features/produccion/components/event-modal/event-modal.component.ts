@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { ProduccionService } from '../../../../core/services/produccion.service';
 import { CerdaDetalle, Insumo } from '../../../../core/models';
@@ -116,21 +116,57 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
           <!-- Evento Sanitario -->
           @if (tipoEvento === 'sanidad') {
             <div class="space-y-4">
-              <div class="grid grid-cols-1 gap-4">
-                <div class="space-y-1">
-                  <label class="block text-sm font-medium text-slate-300">Medicamento / Insumo</label>
-                  <select formControlName="insumo_id" 
-                          class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all">
-                    <option value="" disabled>Seleccionar...</option>
-                    @for (item of insumos(); track item.id) {
-                      <option [value]="item.id">{{ item.nombre }} ({{ item.unidad_medida }})</option>
-                    }
-                  </select>
+              <div formArrayName="insumos" class="space-y-3">
+                <div *ngFor="let control of insumosArray.controls; let i = index" [formGroupName]="i" 
+                     class="flex flex-col sm:flex-row gap-3 items-start sm:items-end animate-in fade-in slide-in-from-right-4 bg-slate-700/30 p-3 rounded-xl border border-slate-700 sm:border-0 sm:bg-transparent sm:p-0">
+                    
+                    <!-- Selector -->
+                    <div class="w-full sm:flex-1 space-y-1">
+                        <label *ngIf="i === 0" class="block text-xs font-medium text-slate-400 mb-1 pl-1">Medicamento</label>
+                        <label *ngIf="i > 0" class="sm:hidden block text-xs font-medium text-slate-400">Medicamento</label>
+                        <select formControlName="insumo_id" 
+                                class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-emerald-500 outline-none h-[42px]">
+                            <option value="" disabled>Seleccionar...</option>
+                            @for (item of insumosFiltrados(); track item.id) {
+                            <option [value]="item.id">
+                                {{ item.nombre }} (Stock: {{ item.stock_actual }} {{ item.unidad_medida }})
+                            </option>
+                            }
+                        </select>
+                         <!-- Stock Warning -->
+                         @if (getError(i, 'max')) {
+                            <p class="text-[10px] text-red-400 mt-1 absolute sm:relative">{{ getError(i, 'msg') }}</p>
+                        }
+                    </div>
+
+                    <!-- Cantidad -->
+                    <div class="w-full sm:w-32 space-y-1">
+                         <label *ngIf="i === 0" class="block text-xs font-medium text-slate-400 mb-1 pl-1">Dosis</label>
+                         <label *ngIf="i > 0" class="sm:hidden block text-xs font-medium text-slate-400">Dosis</label>
+                         <input type="number" formControlName="cantidad" placeholder="Cant." 
+                                class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-emerald-500 outline-none h-[42px]">
+                    </div>
+
+                    <!-- Remove Button -->
+                    <div class="flex items-center h-[42px]">
+                        <button type="button" (click)="eliminarInsumo(i)" 
+                                [class.invisible]="insumosArray.length === 1"
+                                class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
+                                title="Eliminar">
+                            <lucide-icon name="x" [size]="20"></lucide-icon>
+                        </button>
+                    </div>
                 </div>
-                
-                <app-input label="Dosis / Cantidad" type="number" formControlName="cantidad" placeholder="0.0"></app-input>
-                <app-input label="Observaciones" formControlName="observaciones" placeholder="Motivo de aplicación..."></app-input>
               </div>
+              
+              <!-- Add Button -->
+              <button type="button" (click)="agregarInsumo()" 
+                      class="w-full py-3 border border-dashed border-emerald-500/30 bg-emerald-500/5 rounded-xl text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 hover:border-emerald-500/60 transition-all flex items-center justify-center gap-2 text-sm font-bold mt-2">
+                  <lucide-icon name="plus" [size]="18"></lucide-icon>
+                  Agregar otro producto
+              </button>
+
+              <app-input label="Observaciones" formControlName="observaciones" placeholder="Motivo de aplicación..."></app-input>
             </div>
           }
 
@@ -192,6 +228,7 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
 export class EventModalComponent {
   @Input({ required: true }) cerda!: CerdaDetalle;
   @Input({ required: true }) tipoEvento!: 'inseminacion' | 'parto' | 'destete' | 'falla' | 'sanidad' | 'venta' | 'muerte';
+  @Input() nombreTarea?: string; // Tarea que viene de la agenda
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
@@ -203,6 +240,7 @@ export class EventModalComponent {
   error = signal<string | null>(null);
   maxLechonesDestete = signal<number | null>(null);
   insumos = signal<Insumo[]>([]);
+  insumosFiltrados = signal<Insumo[]>([]);
 
   ngOnInit() {
     this.initForm();
@@ -211,10 +249,16 @@ export class EventModalComponent {
     }
   }
 
+  get insumosArray() {
+    return this.form.get('insumos') as FormArray;
+  }
+
   async loadInsumos() {
     try {
       const data = await this.produccionService.getInsumosMedicos();
+      const disponibles = data.filter(i => i.stock_actual > 0);
       this.insumos.set(data);
+      this.insumosFiltrados.set(disponibles);
     } catch (err) {
       console.error('Error loading insumos', err);
     }
@@ -266,11 +310,14 @@ export class EventModalComponent {
         observaciones: ['', Validators.required]
       });
     } else if (this.tipoEvento === 'sanidad') {
+      // ✅ Multi-producto
       this.form = this.fb.group({
-        insumo_id: ['', Validators.required],
-        cantidad: [null, [Validators.required, Validators.min(0.1)]],
-        observaciones: ['']
+        insumos: this.fb.array([]), // FormArray
+        observaciones: [this.nombreTarea || '']
       });
+      // Agregar el primero por defecto
+      this.agregarInsumo();
+
     } else if (this.tipoEvento === 'venta') {
       this.form = this.fb.group({
         fecha: [hoy, Validators.required],
@@ -286,6 +333,59 @@ export class EventModalComponent {
         observaciones: ['']
       });
     }
+  }
+
+  // Métodos para FormArray
+  crearInsumoGroup(): FormGroup {
+    const group = this.fb.group({
+      insumo_id: ['', Validators.required],
+      cantidad: [null, [Validators.required, Validators.min(0.01)]]
+    });
+
+    // Validación dinámica de stock
+    group.get('cantidad')?.valueChanges.subscribe(val => {
+      const insumoId = group.get('insumo_id')?.value;
+      this.validarStock(group, insumoId, val);
+    });
+
+    group.get('insumo_id')?.valueChanges.subscribe(id => {
+      const cantidad = group.get('cantidad')?.value;
+      this.validarStock(group, id, cantidad);
+    });
+
+    return group;
+  }
+
+  validarStock(group: FormGroup, insumoId: any, cantidad: any) {
+    if (insumoId && cantidad) {
+      const insumo = this.insumos().find(i => i.id == insumoId);
+      if (insumo && cantidad > insumo.stock_actual) {
+        group.get('cantidad')?.setErrors({ max: true });
+        group.setErrors({ stock_insuficiente: `Max: ${insumo.stock_actual}` });
+      } else {
+        group.get('cantidad')?.setErrors(null);
+        group.setErrors(null);
+      }
+    }
+  }
+
+  agregarInsumo() {
+    this.insumosArray.push(this.crearInsumoGroup());
+  }
+
+  eliminarInsumo(index: number) {
+    this.insumosArray.removeAt(index);
+  }
+
+  getError(index: number, type: string): any {
+    const group = this.insumosArray.at(index) as FormGroup;
+    if (type === 'max') {
+      return group.hasError('stock_insuficiente');
+    }
+    if (type === 'msg') {
+      return group.getError('stock_insuficiente');
+    }
+    return null;
   }
 
   updateDesteteValidators(crearLote: boolean) {
@@ -374,16 +474,29 @@ export class EventModalComponent {
         }
         await this.produccionService.registrarFallaInseminacion(this.cerda.id, this.cerda.cicloActivo.id, val);
       } else if (this.tipoEvento === 'sanidad') {
-        // Buscar costo unitario del insumo seleccionado
-        const insumo = this.insumos().find(i => i.id == val.insumo_id);
-        const costo = insumo ? insumo.costo_promedio : 0;
+        // Prepare multi-product payload
+        const insumosProcessor = [];
+        const formVal = this.form.value;
+
+        for (const item of formVal.insumos) {
+          const insumoReal = this.insumos().find(i => i.id == item.insumo_id);
+          if (!insumoReal) throw new Error('Insumo inválido');
+          if (item.cantidad > insumoReal.stock_actual) {
+            throw new Error(`Stock insuficiente para ${insumoReal.nombre}`);
+          }
+
+          insumosProcessor.push({
+            insumo_id: Number(item.insumo_id),
+            cantidad: Number(item.cantidad),
+            costo_unitario_momento: insumoReal.costo_promedio,
+            nombre_producto: insumoReal.nombre
+          });
+        }
 
         await this.produccionService.registrarSanidadCerda(this.cerda.id, {
-          insumo_id: val.insumo_id,
-          cantidad: val.cantidad,
-          costo_unitario_momento: costo,
-          observaciones: val.observaciones,
-          nombre_producto: insumo?.nombre
+          insumos: insumosProcessor,
+          observaciones: formVal.observaciones,
+          nombre_tarea: this.nombreTarea
         });
       } else if (this.tipoEvento === 'venta') {
         await this.produccionService.registrarVentaDescarte(this.cerda.id, val);

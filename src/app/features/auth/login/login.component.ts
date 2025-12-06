@@ -20,7 +20,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-600 rounded-2xl shadow-lg mb-4">
             <span class="text-5xl">🐷</span>
           </div>
-          <h1 class="text-3xl font-bold text-white mb-2">CerdosApp</h1>
+          <h1 class="text-3xl font-bold text-white mb-2">PorcinosCano</h1>
           <p class="text-slate-400">Sistema de Gestión Porcina</p>
         </div>
 

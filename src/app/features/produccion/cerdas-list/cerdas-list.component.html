@@ -54,8 +54,52 @@
 
         <!-- Cerdas Grid -->
         @else {
+
+        <!-- Filtros Tab Bar -->
+        <div class="flex flex-wrap gap-2 mb-6">
+            <button (click)="filtroEstado.set('todos')" [class.bg-emerald-600]="filtroEstado() === 'todos'"
+                [class.text-white]="filtroEstado() === 'todos'" [class.bg-slate-800]="filtroEstado() !== 'todos'"
+                [class.text-slate-400]="filtroEstado() !== 'todos'"
+                class="flex-1 min-w-[100px] sm:flex-none sm:w-auto rounded-lg py-2.5 px-3 text-sm font-medium transition-all border border-slate-700 shadow-sm flex items-center justify-center gap-2 hover:border-emerald-500/50">
+                Todas
+            </button>
+
+            <button (click)="filtroEstado.set('gestante')" [class.bg-emerald-600]="filtroEstado() === 'gestante'"
+                [class.text-white]="filtroEstado() === 'gestante'" [class.bg-slate-800]="filtroEstado() !== 'gestante'"
+                [class.text-slate-400]="filtroEstado() !== 'gestante'"
+                class="flex-1 min-w-[100px] sm:flex-none sm:w-auto rounded-lg py-2.5 px-3 text-sm font-medium transition-all border border-slate-700 shadow-sm flex items-center justify-center gap-2 hover:border-emerald-500/50">
+                <span>🤰</span> <span class="hidden xs:inline">Gestantes</span><span class="xs:hidden">Gest</span>
+                <span class="bg-slate-900/50 px-2 py-0.5 rounded-full text-xs opacity-70">{{ conteoGestantes() }}</span>
+            </button>
+
+            <button (click)="filtroEstado.set('lactante')" [class.bg-emerald-600]="filtroEstado() === 'lactante'"
+                [class.text-white]="filtroEstado() === 'lactante'" [class.bg-slate-800]="filtroEstado() !== 'lactante'"
+                [class.text-slate-400]="filtroEstado() !== 'lactante'"
+                class="flex-1 min-w-[100px] sm:flex-none sm:w-auto rounded-lg py-2.5 px-3 text-sm font-medium transition-all border border-slate-700 shadow-sm flex items-center justify-center gap-2 hover:border-emerald-500/50">
+                <span>🍼</span> <span class="hidden xs:inline">Lactantes</span><span class="xs:hidden">Lact</span>
+                <span class="bg-slate-900/50 px-2 py-0.5 rounded-full text-xs opacity-70">{{ conteoLactantes() }}</span>
+            </button>
+
+            <button (click)="filtroEstado.set('vacia')" [class.bg-emerald-600]="filtroEstado() === 'vacia'"
+                [class.text-white]="filtroEstado() === 'vacia'" [class.bg-slate-800]="filtroEstado() !== 'vacia'"
+                [class.text-slate-400]="filtroEstado() !== 'vacia'"
+                class="flex-1 min-w-[100px] sm:flex-none sm:w-auto rounded-lg py-2.5 px-3 text-sm font-medium transition-all border border-slate-700 shadow-sm flex items-center justify-center gap-2 hover:border-emerald-500/50">
+                <span>⭕</span> Vacías
+                <span class="bg-slate-900/50 px-2 py-0.5 rounded-full text-xs opacity-70">{{ conteoVacias() }}</span>
+            </button>
+
+            <button (click)="filtroEstado.set('descarte')" [class.bg-red-600]="filtroEstado() === 'descarte'"
+                [class.text-white]="filtroEstado() === 'descarte'" [class.bg-slate-800]="filtroEstado() !== 'descarte'"
+                [class.text-slate-400]="filtroEstado() !== 'descarte'"
+                class="flex-1 min-w-[100px] sm:flex-none sm:w-auto rounded-lg py-2.5 px-3 text-sm font-medium transition-all border border-slate-700 shadow-sm flex items-center justify-center gap-2 hover:border-red-500/50">
+                <span>🚫</span> Descarte
+                <span class="bg-slate-900/50 px-2 py-0.5 rounded-full text-xs opacity-70">{{ conteoDescarte() }}</span>
+            </button>
+        </div>
+
+        <!-- LISTA CERDAS -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
-            @for (cerda of cerdas(); track cerda.id) {
+            @for (cerda of cerdasFiltradas(); track cerda.id) {
             <div
                 class="bg-slate-800 rounded-xl border border-slate-700 shadow-md transition-all hover:border-slate-600">
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { ProduccionService } from '../../../core/services/produccion.service';
@@ -61,7 +61,8 @@ export class CerdasListComponent implements OnInit {
     async cargarCerdas() {
         try {
             this.loading.set(true);
-            const data = await this.produccionService.getCerdasConCiclos();
+            // Fetch ALL (including inactive) to support 'descarte' filter
+            const data = await this.produccionService.getCerdasConCiclos(false);
 
             // Agregar badgeLabel pre-calculado a cada cerda
             const cerdasConBadge: CerdaConBadge[] = data.map(cerda => ({
@@ -69,7 +70,7 @@ export class CerdasListComponent implements OnInit {
                 badgeLabel: this.calcularBadgeLabel(cerda)
             }));
 
-            // Ordenar cerdas por prioridad: críticas primero, luego por estado y urgencia
+            // Ordenar cerdas por prioridad
             const cerdasOrdenadas = this.ordenarCerdasPorPrioridad(cerdasConBadge);
             this.cerdas.set(cerdasOrdenadas);
         } catch (err: any) {
@@ -78,6 +79,31 @@ export class CerdasListComponent implements OnInit {
             this.loading.set(false);
         }
     }
+
+    // Filters
+    filtroEstado = signal<'todos' | 'gestante' | 'lactante' | 'vacia' | 'descarte'>('todos');
+
+    cerdasFiltradas = computed(() => {
+        const cerdas = this.cerdas();
+        const filtro = this.filtroEstado();
+
+        if (filtro === 'todos') {
+            // 'todos' means ALL ACTIVE pigs
+            return cerdas.filter(c => c.activa);
+        } else if (filtro === 'descarte') {
+            // 'descarte' means INACTIVE pigs
+            return cerdas.filter(c => !c.activa);
+        } else {
+            // Specific active state
+            return cerdas.filter(c => c.activa && c.estado === filtro);
+        }
+    });
+
+    // Computed counts
+    conteoGestantes = computed(() => this.cerdas().filter(c => c.activa && c.estado === 'gestante').length);
+    conteoLactantes = computed(() => this.cerdas().filter(c => c.activa && c.estado === 'lactante').length);
+    conteoVacias = computed(() => this.cerdas().filter(c => c.activa && c.estado === 'vacia').length);
+    conteoDescarte = computed(() => this.cerdas().filter(c => !c.activa).length);
 
     /**
      * Ordena las cerdas por prioridad:
