@@ -157,3 +157,21 @@ WHERE nombre = 'Compra Materiales/Insumos';
 INSERT INTO categorias_financieras (nombre, tipo_flujo, descripcion, es_automatica)
 SELECT 'Venta de Cerda Descarte', 'operativo', 'Ingreso por venta de cerdas de descarte', true
 WHERE NOT EXISTS (SELECT 1 FROM categorias_financieras WHERE nombre = 'Venta de Cerda Descarte');
+
+
+
+-- 2. INSERTAR EL PLAN SANITARIO (Configuración Colombia)
+INSERT INTO reglas_sanitarias (nombre_tarea, dias_target, evento_origen, tipo_aplicacion) VALUES
+-- LECHONES (El origen es el 'parto' de la mamá)
+('Aplicar Hierro + Anticoccidial', 3, 'parto', 'camada'),
+('Vacuna Mycoplasma (Dosis 1)', 7, 'parto', 'camada'),
+('Vacuna Circovirus + Myco (D2)', 21, 'parto', 'camada'),
+
+-- CERDAS (Madres)
+('Vacuna E.Coli + Purga', 100, 'servicio', 'madre'), -- A los 100 días de preñez
+('Vitaminas AD3E Post-Lactancia', 1, 'destete', 'madre'),
+
+-- ENGORDE (Lotes - El origen es 'inicio_lote')
+('Choque Vitamínico Llegada', 1, 'inicio_lote', 'lote'),
+('Purga General (Vermífugo)', 15, 'inicio_lote', 'lote'),
+('Vacuna Peste Porcina (PPC)', 50, 'inicio_lote', 'lote'); -- Aprox a los 50 días de entrar (o 70 de vida)

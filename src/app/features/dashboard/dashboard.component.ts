@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardService } from '../../core/services/dashboard.service';
+import { SanidadService } from '../../core/services/sanidad.service'; // NEW
 import { AuthService } from '../../core/services/auth.service';
 import { DashboardData, AlertaInsumo, AlertaParto } from '../../core/models/dashboard.model';
 
@@ -14,6 +15,7 @@ import { DashboardData, AlertaInsumo, AlertaParto } from '../../core/models/dash
 })
 export class DashboardComponent implements OnInit {
   private dashboardService = inject(DashboardService);
+  private sanidadService = inject(SanidadService); // NEW
   private router = inject(Router);
   private authService = inject(AuthService);
 
@@ -22,6 +24,7 @@ export class DashboardComponent implements OnInit {
 
   // Signals para estado reactivo
   dashboardData = signal<DashboardData | null>(null);
+  tareasPendientesCount = signal<number>(0); // NEW
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
 
@@ -46,8 +49,18 @@ export class DashboardComponent implements OnInit {
       this.loading.set(true);
       this.error.set(null);
 
-      const data = await this.dashboardService.getDashboardData();
-      this.dashboardData.set(data);
+      // Parallel Fetch
+      const [dashboardData, agendaSanitaria] = await Promise.all([
+        this.dashboardService.getDashboardData(),
+        this.sanidadService.getAgendaSanitaria()
+      ]);
+
+      this.dashboardData.set(dashboardData);
+
+      // Calcular pendientes (Atrasados + Hoy)
+      const pendientes = agendaSanitaria.filter(t => t.estado === 'atrasado' || t.estado === 'hoy');
+      this.tareasPendientesCount.set(pendientes.length);
+
     } catch (err: any) {
       console.error('Error cargando dashboard:', err);
       this.error.set('No se pudo cargar el dashboard. Por favor, intenta de nuevo.');

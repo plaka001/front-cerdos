@@ -190,60 +190,59 @@
     </div>
     }
 
-    <!-- ========== KPI INDICATORS - CLICKEABLE ========== -->
+    <!-- ========== MAIN ACTIONS GRID (2x2) ========== -->
     <div>
-      <h2 class="text-h2 mb-4">Indicadores</h2>
+      <h2 class="text-h2 mb-4">Módulos Principales</h2>
       <div class="grid grid-cols-2 gap-4">
 
-        <!-- Pie de Cría - CLICKEABLE -->
-        <div (click)="navegarA('/produccion')" class="card p-4 cursor-pointer transition-all hover:shadow-md">
-          <div class="flex items-center justify-between mb-3">
-            <lucide-icon name="piggy-bank" [size]="28" style="color: var(--color-primary);"></lucide-icon>
-            <lucide-icon name="chevron-right" [size]="18" style="color: var(--color-text-label);"></lucide-icon>
-          </div>
-          <p class="text-4xl font-bold mb-1" style="color: var(--color-text-primary);">
+        <!-- 1. Pie de Cría -->
+        <div (click)="navegarA('/produccion')" 
+             class="card p-4 cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex flex-col items-center justify-center text-center h-32 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <lucide-icon name="piggy-bank" [size]="32" class="text-pink-400 mb-2"></lucide-icon>
+          <p class="text-2xl font-bold text-white leading-none">
             {{ dashboardData()!.kpis.totalCerdas }}
           </p>
-          <p class="text-label">Pie de Cría</p>
+          <p class="text-xs text-slate-400 mt-1">Madres Activas</p>
         </div>
 
-        <!-- En Engorde - CLICKEABLE -->
-        <div (click)="navegarA('/lotes')" class="card p-4 cursor-pointer transition-all hover:shadow-md">
-          <div class="flex items-center justify-between mb-3">
-            <lucide-icon name="trending-up" [size]="28" style="color: var(--color-info);"></lucide-icon>
-            <lucide-icon name="chevron-right" [size]="18" style="color: var(--color-text-label);"></lucide-icon>
-          </div>
-          <p class="text-4xl font-bold mb-1" style="color: var(--color-text-primary);">
+        <!-- 2. Engorde -->
+        <div (click)="navegarA('/lotes')" 
+             class="card p-4 cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex flex-col items-center justify-center text-center h-32 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <lucide-icon name="wheat" [size]="32" class="text-amber-400 mb-2"></lucide-icon>
+          <p class="text-2xl font-bold text-white leading-none">
             {{ dashboardData()!.kpis.totalEngorde }}
           </p>
-          <p class="text-label">En Engorde</p>
+          <p class="text-xs text-slate-400 mt-1">En Ceba</p>
         </div>
 
-        <!-- Lotes Activos - CLICKEABLE -->
-        <div (click)="navegarA('/lotes')" class="card p-4 cursor-pointer transition-all hover:shadow-md">
-          <div class="flex items-center justify-between mb-3">
-            <lucide-icon name="wheat" [size]="28" style="color: #D97706;"></lucide-icon>
-            <lucide-icon name="chevron-right" [size]="18" style="color: var(--color-text-label);"></lucide-icon>
-          </div>
-          <p class="text-4xl font-bold mb-1" style="color: var(--color-text-primary);">
-            {{ dashboardData()!.kpis.lotesActivos }}
+        <!-- 3. Inventario -->
+        <div (click)="navegarA('/inventario')" 
+             class="card p-4 cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex flex-col items-center justify-center text-center h-32 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <lucide-icon name="package" [size]="32" class="text-blue-400 mb-2"></lucide-icon>
+          <p class="text-lg font-bold text-white leading-none mb-1">
+             Inventario
           </p>
-          <p class="text-label">Lotes Activos</p>
+          <p class="text-xs text-slate-400">Ver Stock</p>
         </div>
 
-        <!-- Mortalidad Mes - CLICKEABLE -->
-        <div (click)="navegarA('/produccion')" class="card p-4 cursor-pointer transition-all hover:shadow-md">
-          <div class="flex items-center justify-between mb-3">
-            <lucide-icon name="alert-triangle" [size]="28"
-              [style.color]="dashboardData()!.kpis.tasaMortalidad > 2.5 ? 'var(--color-critical)' : '#10B981'">
-            </lucide-icon>
-            <lucide-icon name="chevron-right" [size]="18" style="color: var(--color-text-label);"></lucide-icon>
-          </div>
-          <p class="text-4xl font-bold mb-1"
-            [style.color]="dashboardData()!.kpis.tasaMortalidad > 2.5 ? 'var(--color-critical)' : '#10B981'">
-            {{ dashboardData()!.kpis.tasaMortalidad }}%
-          </p>
-          <p class="text-label">Mortalidad Mes</p>
+        <!-- 4. Sanidad (NUEVO) -->
+        <div (click)="navegarA('/sanidad')" 
+             class="card p-4 cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex flex-col items-center justify-center text-center h-32 relative overflow-hidden group bg-slate-800 border-emerald-500/30">
+          <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          
+          <!-- Badge de Tareas Pendientes -->
+          @if (tareasPendientesCount() > 0) {
+            <div class="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow-lg animate-pulse">
+              {{ tareasPendientesCount() }}
+            </div>
+          }
+
+          <lucide-icon name="stethoscope" [size]="32" class="text-emerald-400 mb-2"></lucide-icon>
+          <p class="text-lg font-bold text-white leading-none mb-1">Sanidad</p>
+          <p class="text-xs text-slate-400">Veterinario</p>
         </div>
 
       </div>

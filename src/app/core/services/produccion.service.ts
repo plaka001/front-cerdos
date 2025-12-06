@@ -155,6 +155,64 @@ export class ProduccionService {
         }
     }
 
+    async getCerdaById(id: number): Promise<CerdaDetalle | null> {
+        try {
+            const { data, error } = await this.supabase
+                .from('cerdas')
+                .select(`
+                    *,
+                    ciclos_reproductivos (
+                        id,
+                        fecha_inseminacion,
+                        fecha_parto_probable,
+                        fecha_parto_real,
+                        fecha_destete,
+                        nacidos_vivos,
+                        nacidos_muertos,
+                        estado
+                    )
+                `)
+                .eq('id', id)
+                .single();
+
+            if (error) {
+                console.error('Error cargando cerda por ID:', error);
+                return null;
+            }
+
+            if (!data) return null;
+
+            const hoy = new Date();
+            const item = data as any;
+            const cicloActivo = item.ciclos_reproductivos?.find((c: any) => c.estado === 'abierto');
+
+            const cerda: CerdaDetalle = {
+                ...item,
+                cicloActivo: cicloActivo || undefined
+            };
+
+            if (cerda.cicloActivo) {
+                const fechaInseminacion = new Date(cerda.cicloActivo.fecha_inseminacion);
+
+                if (cerda.estado === 'gestante' && cerda.cicloActivo.fecha_parto_probable) {
+                    const fechaParto = new Date(cerda.cicloActivo.fecha_parto_probable);
+                    cerda.diasParaParto = Math.ceil((fechaParto.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+                    cerda.diasGestacion = Math.abs(Math.ceil((hoy.getTime() - fechaInseminacion.getTime()) / (1000 * 60 * 60 * 24)));
+                }
+
+                if (cerda.estado === 'lactante' && cerda.cicloActivo.fecha_parto_real) {
+                    const fechaParto = new Date(cerda.cicloActivo.fecha_parto_real);
+                    cerda.diasLactancia = Math.abs(Math.ceil((hoy.getTime() - fechaParto.getTime()) / (1000 * 60 * 60 * 24)));
+                }
+            }
+
+            return cerda;
+        } catch (err) {
+            console.error('Error fetching cerda:', err);
+            return null;
+        }
+    }
+
     async loadLotes() {
         try {
             this.loading.set(true);
@@ -1144,6 +1202,35 @@ export class ProduccionService {
         } catch (err: any) {
             console.error('Error inesperado cargando historial de alimento:', err);
             throw err;
+        }
+    }
+
+    async getLoteById(id: number): Promise<LoteDetalle | null> {
+        try {
+            const { data, error } = await this.supabase
+                .from('lotes')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) {
+                console.error('Error cargando lote por ID:', error);
+                return null;
+            }
+
+            if (!data) return null;
+
+            const hoy = new Date();
+            const fechaInicio = new Date(data.fecha_inicio);
+            const diasEnGranja = Math.floor((hoy.getTime() - fechaInicio.getTime()) / (1000 * 60 * 60 * 24));
+
+            return {
+                ...data,
+                diasEnGranja
+            } as LoteDetalle;
+        } catch (err) {
+            console.error('Error fetching lote:', err);
+            return null;
         }
     }
 
