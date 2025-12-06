@@ -14,10 +14,6 @@ import { AuthService } from '../../../core/services/auth.service';
           <span class="text-2xl">🏠</span>
           <span class="text-xs mt-1">Inicio</span>
         </a>
-        <a routerLink="/produccion" routerLinkActive="active-nav-link" class="nav-link flex flex-col items-center justify-center w-full h-full">
-          <span class="text-2xl">🐷</span>
-          <span class="text-xs mt-1">Prod</span>
-        </a>
         <a routerLink="/finanzas" routerLinkActive="active-nav-link" class="nav-link flex flex-col items-center justify-center w-full h-full">
           <span class="text-2xl">💰</span>
           <span class="text-xs mt-1">Finanzas</span>
@@ -25,10 +21,6 @@ import { AuthService } from '../../../core/services/auth.service';
         <a routerLink="/reportes" routerLinkActive="active-nav-link" class="nav-link flex flex-col items-center justify-center w-full h-full">
           <span class="text-2xl">📊</span>
           <span class="text-xs mt-1">Reportes</span>
-        </a>
-        <a routerLink="/inventario" routerLinkActive="active-nav-link" class="nav-link flex flex-col items-center justify-center w-full h-full">
-          <span class="text-2xl">📦</span>
-          <span class="text-xs mt-1">Inventario</span>
         </a>
       </div>
     </nav>
