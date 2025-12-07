@@ -105,19 +105,6 @@ WHERE NOT EXISTS (SELECT 1 FROM categorias_financieras WHERE nombre = 'Venta de 
 
 INSERT INTO categorias_financieras (nombre, tipo_flujo, descripcion, es_automatica)
 SELECT 'Prestamos / Aportes', 'operativo', 'Dinero externo o socios', false
-WHERE NOT EXISTS (SELECT 1 FROM categorias_financieras WHERE nombre = 'Prestamos / Aportes');
-
--- ============================================================================
--- 2. INSUMOS MAESTROS (PERSONALIZADO A TU GRANJA)
--- ============================================================================
-
--- A. ALIMENTOS (Tus referencias específicas - Sacos de 40kg)
--- ============================================================================
-
-INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Gestación', 'alimento', 'kg', 40, 200
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Gestación');
-
 INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
 SELECT 'Lactancia', 'alimento', 'kg', 40, 150
 WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Lactancia');
@@ -211,27 +198,27 @@ SELECT 'Aplicar Hierro + Anticoccidial', 3, 'parto', 'camada', true, true
 WHERE NOT EXISTS (SELECT 1 FROM reglas_sanitarias WHERE nombre_tarea = 'Aplicar Hierro + Anticoccidial' AND evento_origen = 'parto');
 
 INSERT INTO reglas_sanitarias (nombre_tarea, dias_target, evento_origen, tipo_aplicacion, obligatorio, activo)
-SELECT 'Vacuna Mycoplasma (Dosis 1)', 7, 'parto', 'camada', true, true
-WHERE NOT EXISTS (SELECT 1 FROM reglas_sanitarias WHERE nombre_tarea = 'Vacuna Mycoplasma (Dosis 1)' AND evento_origen = 'parto');
+SELECT 'Vacuna Circovirus + Mycoplasma (Dosis 1)', 7, 'parto', 'camada', true, true
+WHERE NOT EXISTS (SELECT 1 FROM reglas_sanitarias WHERE nombre_tarea = 'Vacuna Circovirus + Mycoplasma (Dosis 1)' AND evento_origen = 'parto');
 
 INSERT INTO reglas_sanitarias (nombre_tarea, dias_target, evento_origen, tipo_aplicacion, obligatorio, activo)
-SELECT 'Vacuna Circovirus + Myco (D2)', 21, 'parto', 'camada', true, true
-WHERE NOT EXISTS (SELECT 1 FROM reglas_sanitarias WHERE nombre_tarea = 'Vacuna Circovirus + Myco (D2)' AND evento_origen = 'parto');
+SELECT 'Vacuna Circovirus + Mycoplasma (Dosis 2)', 21, 'parto', 'camada', true, true
+WHERE NOT EXISTS (SELECT 1 FROM reglas_sanitarias WHERE nombre_tarea = 'Vacuna Circovirus + Mycoplasma (Dosis 2)' AND evento_origen = 'parto');
 
 -- B. PLAN PARA REEMPLAZOS (Origen: 'nacimiento' - basado en edad del animal)
 -- ============================================================================
 
 INSERT INTO reglas_sanitarias (nombre_tarea, dias_target, evento_origen, tipo_aplicacion, obligatorio, activo)
-SELECT 'Reemplazo: Vacuna Circovirus (145 días)', 145, 'nacimiento', 'madre', true, true
-WHERE NOT EXISTS (SELECT 1 FROM reglas_sanitarias WHERE nombre_tarea = 'Reemplazo: Vacuna Circovirus (145 días)' AND evento_origen = 'nacimiento');
+SELECT 'Reemplazo: Vacuna Circovirus + Mycoplasma (145 días)', 145, 'nacimiento', 'madre', true, true
+WHERE NOT EXISTS (SELECT 1 FROM reglas_sanitarias WHERE nombre_tarea = 'Reemplazo: Vacuna Circovirus + Mycoplasma (145 días)' AND evento_origen = 'nacimiento');
 
 INSERT INTO reglas_sanitarias (nombre_tarea, dias_target, evento_origen, tipo_aplicacion, obligatorio, activo)
-SELECT 'Reemplazo: Vacuna Parvo/Lepto (155 días)', 155, 'nacimiento', 'madre', true, true
-WHERE NOT EXISTS (SELECT 1 FROM reglas_sanitarias WHERE nombre_tarea = 'Reemplazo: Vacuna Parvo/Lepto (155 días)' AND evento_origen = 'nacimiento');
+SELECT 'Reemplazo: Vacuna Eri-Parvo-Lepto (155 días)', 155, 'nacimiento', 'madre', true, true
+WHERE NOT EXISTS (SELECT 1 FROM reglas_sanitarias WHERE nombre_tarea = 'Reemplazo: Vacuna Eri-Parvo-Lepto (155 días)' AND evento_origen = 'nacimiento');
 
 INSERT INTO reglas_sanitarias (nombre_tarea, dias_target, evento_origen, tipo_aplicacion, obligatorio, activo)
-SELECT 'Reemplazo: Refuerzo Parvo/Lepto (175 días)', 175, 'nacimiento', 'madre', true, true
-WHERE NOT EXISTS (SELECT 1 FROM reglas_sanitarias WHERE nombre_tarea = 'Reemplazo: Refuerzo Parvo/Lepto (175 días)' AND evento_origen = 'nacimiento');
+SELECT 'Reemplazo: Refuerzo Eri-Parvo-Lepto (175 días)', 175, 'nacimiento', 'madre', true, true
+WHERE NOT EXISTS (SELECT 1 FROM reglas_sanitarias WHERE nombre_tarea = 'Reemplazo: Refuerzo Eri-Parvo-Lepto (175 días)' AND evento_origen = 'nacimiento');
 
 -- C. PLAN PARA MADRES PRIMERIZAS (Origen: 'servicio' - desde inseminación)
 -- ============================================================================
