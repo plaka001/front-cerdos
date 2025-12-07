@@ -64,39 +64,45 @@
             </div>
         </div>
 
-        <!-- Filtros por Tipo -->
-        <div class="flex flex-wrap gap-2">
-            <button (click)="tipoFiltro.set('todos')" [class.bg-emerald-600]="tipoFiltro() === 'todos'"
-                [class.text-white]="tipoFiltro() === 'todos'" [class.bg-slate-800]="tipoFiltro() !== 'todos'"
-                [class.text-slate-400]="tipoFiltro() !== 'todos'"
-                class="flex-1 min-w-[100px] md:flex-none md:w-32 rounded-lg py-2.5 px-3 text-sm font-medium transition-all border border-slate-700 shadow-sm flex items-center justify-center gap-2">
-                <span>📦</span><span>Todos</span>
-            </button>
-            <button (click)="tipoFiltro.set('alimento')" [class.bg-emerald-600]="tipoFiltro() === 'alimento'"
-                [class.text-white]="tipoFiltro() === 'alimento'" [class.bg-slate-800]="tipoFiltro() !== 'alimento'"
-                [class.text-slate-400]="tipoFiltro() !== 'alimento'"
-                class="flex-1 min-w-[100px] md:flex-none md:w-32 rounded-lg py-2.5 px-3 text-sm font-medium transition-all border border-slate-700 shadow-sm flex items-center justify-center gap-2">
-                <span>🌾</span><span>Alimento</span>
-            </button>
-            <button (click)="tipoFiltro.set('medicamento')" [class.bg-emerald-600]="tipoFiltro() === 'medicamento'"
-                [class.text-white]="tipoFiltro() === 'medicamento'"
-                [class.bg-slate-800]="tipoFiltro() !== 'medicamento'"
-                [class.text-slate-400]="tipoFiltro() !== 'medicamento'"
-                class="flex-1 min-w-[100px] md:flex-none md:w-32 rounded-lg py-2.5 px-3 text-sm font-medium transition-all border border-slate-700 shadow-sm flex items-center justify-center gap-2">
-                <span>💊</span><span>Medicamento</span>
-            </button>
-            <button (click)="tipoFiltro.set('biologico')" [class.bg-emerald-600]="tipoFiltro() === 'biologico'"
-                [class.text-white]="tipoFiltro() === 'biologico'" [class.bg-slate-800]="tipoFiltro() !== 'biologico'"
-                [class.text-slate-400]="tipoFiltro() !== 'biologico'"
-                class="flex-1 min-w-[100px] md:flex-none md:w-32 rounded-lg py-2.5 px-3 text-sm font-medium transition-all border border-slate-700 shadow-sm flex items-center justify-center gap-2">
-                <span>💉</span><span>Biológico</span>
-            </button>
-            <button (click)="tipoFiltro.set('material')" [class.bg-emerald-600]="tipoFiltro() === 'material'"
-                [class.text-white]="tipoFiltro() === 'material'" [class.bg-slate-800]="tipoFiltro() !== 'material'"
-                [class.text-slate-400]="tipoFiltro() !== 'material'"
-                class="flex-1 min-w-[100px] md:flex-none md:w-32 rounded-lg py-2.5 px-3 text-sm font-medium transition-all border border-slate-700 shadow-sm flex items-center justify-center gap-2">
-                <span>🔧</span><span>Material</span>
-            </button>
+        <!-- Filtros por Tipo (Variant 2: Segmented Control - Wrappable) -->
+        <div class="mb-6">
+            <div class="bg-slate-900 p-1 rounded-lg inline-flex flex-wrap gap-1 border border-slate-800">
+                <button (click)="tipoFiltro.set('todos')" [class]="tipoFiltro() === 'todos'
+                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
+                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
+                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
+                    <lucide-icon name="layers" [size]="16"></lucide-icon>
+                    Todos
+                </button>
+                <button (click)="tipoFiltro.set('alimento')" [class]="tipoFiltro() === 'alimento'
+                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
+                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
+                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
+                    <lucide-icon name="wheat" [size]="16"></lucide-icon>
+                    Alimento
+                </button>
+                <button (click)="tipoFiltro.set('medicamento')" [class]="tipoFiltro() === 'medicamento'
+                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
+                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
+                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
+                    <lucide-icon name="pill" [size]="16"></lucide-icon>
+                    Medicamento
+                </button>
+                <button (click)="tipoFiltro.set('biologico')" [class]="tipoFiltro() === 'biologico'
+                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
+                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
+                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
+                    <lucide-icon name="syringe" [size]="16"></lucide-icon>
+                    Biológico
+                </button>
+                <button (click)="tipoFiltro.set('material')" [class]="tipoFiltro() === 'material'
+                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
+                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
+                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
+                    <lucide-icon name="package" [size]="16"></lucide-icon>
+                    Material
+                </button>
+            </div>
         </div>
 
         <!-- Lista de Insumos -->

@@ -14,23 +14,24 @@
     </div>
 
     <!-- Tabs -->
+    <!-- Tabs (Variant 1: Main Navigation) -->
     <div class="flex flex-wrap gap-2 mb-6 w-full">
-        <button (click)="activeTab.set('lotes')" [class.bg-emerald-600]="activeTab() === 'lotes'"
-            [class.text-white]="activeTab() === 'lotes'" [class.bg-slate-800]="activeTab() !== 'lotes'"
-            [class.text-slate-400]="activeTab() !== 'lotes'"
-            class="flex-1 min-w-[140px] md:flex-none md:w-48 rounded-lg py-2.5 text-sm font-medium transition-all border border-slate-700 shadow-sm">
+        <button (click)="activeTab.set('lotes')" [class]="activeTab() === 'lotes' 
+                ? 'bg-emerald-500 text-white font-bold shadow-md border-0' 
+                : 'bg-transparent text-slate-400 border border-slate-700 hover:bg-slate-800'"
+            class="flex-1 min-w-[140px] md:flex-none md:w-48 rounded-lg py-2.5 text-sm transition-all">
             Rentabilidad Lotes
         </button>
-        <button (click)="activeTab.set('maternidad')" [class.bg-emerald-600]="activeTab() === 'maternidad'"
-            [class.text-white]="activeTab() === 'maternidad'" [class.bg-slate-800]="activeTab() !== 'maternidad'"
-            [class.text-slate-400]="activeTab() !== 'maternidad'"
-            class="flex-1 min-w-[140px] md:flex-none md:w-48 rounded-lg py-2.5 text-sm font-medium transition-all border border-slate-700 shadow-sm">
+        <button (click)="activeTab.set('maternidad')" [class]="activeTab() === 'maternidad' 
+                ? 'bg-emerald-500 text-white font-bold shadow-md border-0' 
+                : 'bg-transparent text-slate-400 border border-slate-700 hover:bg-slate-800'"
+            class="flex-1 min-w-[140px] md:flex-none md:w-48 rounded-lg py-2.5 text-sm transition-all">
             Costos Maternidad
         </button>
-        <button (click)="activeTab.set('flujo')" [class.bg-emerald-600]="activeTab() === 'flujo'"
-            [class.text-white]="activeTab() === 'flujo'" [class.bg-slate-800]="activeTab() !== 'flujo'"
-            [class.text-slate-400]="activeTab() !== 'flujo'"
-            class="flex-1 min-w-[140px] md:flex-none md:w-48 rounded-lg py-2.5 text-sm font-medium transition-all border border-slate-700 shadow-sm">
+        <button (click)="activeTab.set('flujo')" [class]="activeTab() === 'flujo' 
+                ? 'bg-emerald-500 text-white font-bold shadow-md border-0' 
+                : 'bg-transparent text-slate-400 border border-slate-700 hover:bg-slate-800'"
+            class="flex-1 min-w-[140px] md:flex-none md:w-48 rounded-lg py-2.5 text-sm transition-all">
             Flujo de Caja
         </button>
     </div>
@@ -57,141 +58,178 @@
     <!-- TAB: RENTABILIDAD LOTES -->
     @if (activeTab() === 'lotes') {
 
-    <!-- Status Filters -->
-    <div class="flex flex-wrap gap-2 mb-4">
-        <button (click)="filtroEstado.set('activo')"
-            [class]="filtroEstado() === 'activo' ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700'"
-            class="px-4 py-2 rounded-lg text-sm font-medium border transition-all shadow-sm flex items-center gap-2">
-            <lucide-icon name="activity" [size]="16"></lucide-icon>
-            Activos
-        </button>
-        <button (click)="filtroEstado.set('cerrado')"
-            [class]="filtroEstado() === 'cerrado' ? 'bg-purple-600 text-white border-purple-500' : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700'"
-            class="px-4 py-2 rounded-lg text-sm font-medium border transition-all shadow-sm flex items-center gap-2">
-            <lucide-icon name="archive" [size]="16"></lucide-icon>
-            Cerrados / Vendidos
-        </button>
-        <button (click)="filtroEstado.set('todos')"
-            [class]="filtroEstado() === 'todos' ? 'bg-slate-600 text-white border-slate-500' : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700'"
-            class="px-4 py-2 rounded-lg text-sm font-medium border transition-all shadow-sm flex items-center gap-2">
-            <lucide-icon name="layers" [size]="16"></lucide-icon>
-            Todos
-        </button>
+    <!-- Status Filters (Variant 2: Segmented Control - Wrappable) -->
+    <div class="mb-6">
+        <div class="bg-slate-900 p-1 rounded-lg inline-flex flex-wrap gap-1 border border-slate-800">
+            <button (click)="filtroEstado.set('activo')" [class]="filtroEstado() === 'activo'
+                ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
+                : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
+                class="px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2">
+                <lucide-icon name="activity" [size]="16"></lucide-icon>
+                Activos
+            </button>
+            <button (click)="filtroEstado.set('cerrado')" [class]="filtroEstado() === 'cerrado'
+                ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
+                : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
+                class="px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2">
+                <lucide-icon name="archive" [size]="16"></lucide-icon>
+                Cerrados / Vendidos
+            </button>
+            <button (click)="filtroEstado.set('todos')" [class]="filtroEstado() === 'todos'
+                ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
+                : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
+                class="px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2">
+                <lucide-icon name="layers" [size]="16"></lucide-icon>
+                Todos
+            </button>
+        </div>
     </div>
 
     <!-- Lotes List with Accordion -->
     <div class="space-y-3">
         @for (item of reportesFiltrados(); track $index) {
         <div
-            class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg transition-all duration-300 hover:shadow-emerald-900/10 hover:border-slate-600">
+            class="bg-slate-800 rounded-2xl border border-slate-700/50 overflow-hidden shadow-xl transition-all duration-300 hover:border-slate-600 group">
 
             <!-- Card Header (Always Visible) -->
             <div (click)="toggleExpand($index)"
-                class="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer bg-gradient-to-r from-slate-800 to-slate-800/50 hover:from-slate-750 hover:to-slate-800">
+                class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer hover:bg-slate-700/20 transition-colors">
 
                 <div class="flex items-center gap-4">
-                    <div class="p-3 rounded-full bg-slate-700/50 text-slate-300">
+                    <div class="p-3 rounded-full bg-slate-900 border border-slate-700 text-emerald-500">
                         <lucide-icon name="box" [size]="24"></lucide-icon>
                     </div>
                     <div>
-                        <div class="flex items-center gap-2">
-                            <h3 class="text-lg font-bold text-white">{{ item.codigo }}</h3>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
-                                [ngClass]="{
-                                'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': item.estado === 'activo',
-                                'bg-purple-500/10 text-purple-400 border border-purple-500/20': item.estado !== 'activo'
-                            }">
-                                {{ item.estado === 'activo' ? 'En Engorde' : 'Finalizado' }}
+                        <div class="flex items-center gap-3 mb-1">
+                            <h3 class="text-xl font-bold text-white tracking-tight">{{ item.codigo }}</h3>
+                            <span *ngIf="item.estado === 'activo'" class="relative flex h-2.5 w-2.5">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                             </span>
                         </div>
-                        <p class="text-sm text-slate-400 flex items-center gap-1">
-                            <span>{{ item.cantidad_actual }} cerdos</span>
-                            <span class="text-slate-600">•</span>
-                            <span>Iniciado: {{ item.cantidad_inicial }}</span>
+                        <p class="text-sm text-slate-400 flex items-center gap-2 font-medium">
+                            <span class="text-slate-300">{{ item.cantidad_actual }}</span> cerdos
+                            <span class="text-slate-600">|</span>
+                            Iniciado: {{ item.cantidad_inicial }}
                         </p>
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between w-full sm:w-auto gap-6 pl-14 sm:pl-0">
+                <div class="flex items-center justify-between w-full sm:w-auto gap-8 pl-16 sm:pl-0">
                     <div class="text-right">
-                        <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Ganancia Neta</p>
-                        <p class="text-xl font-bold" [ngClass]="getRentabilidadClass(item.ganancia_neta)">
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-0.5">Ganancia
+                            Neta
+                        </p>
+                        <p class="text-2xl sm:text-3xl font-bold tracking-tight"
+                            [class.text-emerald-500]="item.ganancia_neta > 0"
+                            [class.text-red-500]="item.ganancia_neta < 0"
+                            [class.text-slate-400]="item.ganancia_neta === 0">
                             {{ item.ganancia_neta | currency:'COP':'symbol-narrow':'1.0-0' }}
                         </p>
                     </div>
-                    <lucide-icon [name]="isExpanded($index) ? 'chevron-up' : 'chevron-down'"
-                        class="text-slate-400 transition-transform duration-300"
-                        [class.rotate-180]="isExpanded($index)">
+                    <lucide-icon name="chevron-down"
+                        class="text-slate-600 transition-transform duration-300 group-hover:text-slate-400"
+                        [class.rotate-180]="isExpanded($index)" [size]="20">
                     </lucide-icon>
                 </div>
             </div>
 
             <!-- Card Body (Expandable) -->
             @if (isExpanded($index)) {
-            <div class="border-t border-slate-700/50 bg-slate-900/30 animate-in slide-in-from-top-2 duration-200">
-                <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="border-t border-slate-700/30 animate-in slide-in-from-top-2 duration-300">
+                <div class="p-6">
 
-                    <!-- Metric: ROI / Margin -->
-                    <div
-                        class="sm:col-span-2 bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex items-center justify-around">
+                    <!-- Metrics Section (Clean, No Box) -->
+                    <div class="grid grid-cols-2 gap-8 mb-8 relative">
+                        <!-- Divider -->
+                        <div class="absolute left-1/2 top-1 bottom-1 w-px bg-slate-700/50 transform -translate-x-1/2">
+                        </div>
+
                         <div class="text-center">
-                            <p class="text-sm text-slate-400 mb-1">Margen de Ganancia</p>
-                            <div class="text-2xl font-bold" [class.text-emerald-400]="item.ganancia_neta > 0"
-                                [class.text-red-400]="item.ganancia_neta < 0">
-                                {{ getMargenPorcentaje(item.costo_total_acumulado, item.ganancia_neta) | number:'1.0-1'
+                            <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">Margen</p>
+                            <div class="text-2xl font-bold text-white flex items-center justify-center gap-1">
+                                {{ getMargenPorcentaje(item.costo_total_acumulado, item.ganancia_neta) |
+                                number:'1.0-1'
                                 }}%
+                                <lucide-icon *ngIf="item.ganancia_neta > 0" name="trending-up" [size]="16"
+                                    class="text-emerald-500"></lucide-icon>
+                                <lucide-icon *ngIf="item.ganancia_neta < 0" name="trending-down" [size]="16"
+                                    class="text-red-500"></lucide-icon>
                             </div>
                         </div>
-                        <div class="w-px h-10 bg-slate-700"></div>
                         <div class="text-center">
-                            <p class="text-sm text-slate-400 mb-1">Inversión Total</p>
+                            <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">Inversión</p>
                             <div class="text-2xl font-bold text-white">
                                 {{ item.costo_total_acumulado | currency:'COP':'symbol-narrow':'1.0-0' }}
                             </div>
                         </div>
                     </div>
 
-                    <!-- Breakdown -->
-                    <div class="space-y-3">
-                        <h4 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                            <lucide-icon name="arrow-up-circle" [size]="16" class="text-emerald-500"></lucide-icon>
-                            Ingresos
-                        </h4>
-                        <div
-                            class="flex justify-between items-center p-3 rounded-lg bg-emerald-900/10 border border-emerald-900/20">
-                            <span class="text-slate-300">Venta de Cerdos</span>
-                            <span class="font-bold text-emerald-400">{{ item.total_ventas |
-                                currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                        </div>
-                    </div>
+                    <!-- Layout Grid for Details -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
 
-                    <div class="space-y-3">
-                        <h4 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                            <lucide-icon name="arrow-down-circle" [size]="16" class="text-red-500"></lucide-icon>
-                            Egresos (Costos)
-                        </h4>
-                        <div
-                            class="flex justify-between items-center p-3 rounded-lg bg-red-900/10 border border-red-900/20">
-                            <span class="text-slate-300">Alimentación y Sanidad</span>
-                            <span class="font-bold text-red-400">{{ item.costo_total_acumulado |
-                                currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Visual Bar -->
-                    <div class="sm:col-span-2 pt-2">
-                        <div class="flex justify-between text-xs text-slate-400 mb-1">
-                            <span>Costos ({{ (item.costo_total_acumulado / (item.costo_total_acumulado +
-                                item.ganancia_neta || 1)) * 100 | number:'1.0-0' }}%)</span>
-                            <span>Márgen</span>
-                        </div>
-                        <div class="h-3 w-full bg-slate-700 rounded-full overflow-hidden flex">
-                            <div class="h-full bg-slate-500" style="width: 100%"></div>
-                            @if (item.ganancia_neta > 0) {
-                            <div class="h-full bg-emerald-500"
-                                [style.width.%]="getMargenPorcentaje(item.costo_total_acumulado, item.ganancia_neta)">
+                        <!-- Col 1: Financial Breakdown -->
+                        <div class="space-y-4">
+                            <!-- Income Row -->
+                            <div
+                                class="flex items-center justify-between py-3 border-b border-slate-700/30 hover:bg-white/5 px-2 rounded transition-colors group/row">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="p-1.5 rounded bg-emerald-500/10 text-emerald-500 group-hover/row:bg-emerald-500/20 transition-colors">
+                                        <lucide-icon name="arrow-up-circle" [size]="18"></lucide-icon>
+                                    </div>
+                                    <span class="text-slate-200 font-medium">Venta de Cerdos</span>
+                                </div>
+                                <span class="text-emerald-400 font-bold text-lg">
+                                    +{{ item.total_ventas | currency:'COP':'symbol-narrow':'1.0-0' }}
+                                </span>
                             </div>
-                            }
+
+                            <!-- Expense Row -->
+                            <div
+                                class="flex items-center justify-between py-3 border-b border-slate-700/30 hover:bg-white/5 px-2 rounded transition-colors group/row">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="p-1.5 rounded bg-red-500/10 text-red-500 group-hover/row:bg-red-500/20 transition-colors">
+                                        <lucide-icon name="arrow-down-circle" [size]="18"></lucide-icon>
+                                    </div>
+                                    <span class="text-slate-200 font-medium">Alimentación y Sanidad</span>
+                                </div>
+                                <span class="text-red-400 font-bold text-lg">
+                                    -{{ item.costo_total_acumulado | currency:'COP':'symbol-narrow':'1.0-0' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Col 2: Progress Bar & Status -->
+                        <div class="flex flex-col justify-center space-y-4">
+                            <div class="flex justify-between items-end mb-2">
+                                <div>
+                                    <p class="text-xs text-slate-500 uppercase tracking-wider font-bold">Eficiencia
+                                        Financiera</p>
+                                    <p class="text-white text-sm mt-1">
+                                        Retorno sobre Costo:
+                                        <span [class]="item.ganancia_neta > 0 ? 'text-emerald-400' : 'text-red-400'">
+                                            {{ (item.ganancia_neta / (item.costo_total_acumulado || 1)) * 100 |
+                                            number:'1.0-1' }}%
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Enhanced Progress Bar -->
+                            <div class="h-4 w-full bg-slate-700 rounded-full overflow-hidden p-0.5 shadow-inner">
+                                <div class="h-full rounded-full transition-all duration-700 ease-out flex items-center justify-end pr-2"
+                                    [class]="item.ganancia_neta > 0 ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' : 'bg-gradient-to-r from-red-600 to-red-400'"
+                                    [style.width.%]="item.ganancia_neta > 0 ? getMargenPorcentaje(item.costo_total_acumulado, item.ganancia_neta) : 100">
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between text-[10px] text-slate-500 font-mono mt-1">
+                                <span>COSTO BASE</span>
+                                <span>MARGEN NETO</span>
+                            </div>
                         </div>
                     </div>
 
@@ -203,9 +241,10 @@
 
         @if (reportesFiltrados().length === 0) {
         <div
-            class="text-center py-20 bg-slate-800/50 rounded-2xl border border-slate-700 border-dashed animate-in fade-in zoom-in-95">
+            class="text-center py-20 bg-slate-800/20 rounded-2xl border border-slate-700 border-dashed animate-in fade-in zoom-in-95">
             <lucide-icon name="search-x" [size]="48" class="mx-auto text-slate-600 mb-4"></lucide-icon>
-            <h3 class="text-xl font-bold text-white">No hay lotes {{ filtroEstado() }}{{ filtroEstado() === 'activo' ||
+            <h3 class="text-xl font-bold text-white">No hay lotes {{ filtroEstado() }}{{ filtroEstado() === 'activo'
+                ||
                 filtroEstado() === 'cerrado' ? 's' : '' }}</h3>
             <p class="text-slate-400 mt-2">Intenta cambiar el filtro para ver más resultados.</p>
         </div>
@@ -264,7 +303,8 @@
             <div class="space-y-3">
                 <div class="flex justify-between items-center text-sm">
                     <span class="text-slate-400">Gasto Madres</span>
-                    <span class="text-slate-200">{{ item.total_gastos_madres | currency:'COP':'symbol-narrow':'1.0-0'
+                    <span class="text-slate-200">{{ item.total_gastos_madres |
+                        currency:'COP':'symbol-narrow':'1.0-0'
                         }}</span>
                 </div>
                 <div class="pt-3 border-t border-slate-700 flex justify-between items-center">

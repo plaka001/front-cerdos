@@ -36,34 +36,40 @@
         <!-- Lotes Grid -->
         @else {
 
-        <!-- Filtros Tab Bar -->
-        <div class="mb-6 overflow-x-auto no-scrollbar">
-            <div class="flex gap-2">
-                <button (click)="filtroEstado.set('activo')" [class.bg-emerald-600]="filtroEstado() === 'activo'"
-                    [class.text-white]="filtroEstado() === 'activo'" [class.bg-slate-800]="filtroEstado() !== 'activo'"
-                    [class.text-slate-400]="filtroEstado() !== 'activo'"
-                    class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all border border-slate-700 hover:border-emerald-500/50 flex items-center gap-2">
-                    <span>🟢</span> Activos
-                    <span
-                        class="bg-slate-900/50 px-2 py-0.5 rounded-full text-xs opacity-70 min-w-[20px] text-center">{{
-                        conteoActivos() }}</span>
+        <!-- Filtros Tab Bar (Variant 2: Segmented Control - Wrappable) -->
+        <div class="mb-6">
+            <div class="bg-slate-900 p-1 rounded-lg inline-flex flex-wrap gap-1 border border-slate-800">
+                <button (click)="filtroEstado.set('activo')" [class]="filtroEstado() === 'activo'
+                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
+                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
+                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2">
+                    <lucide-icon name="activity" [size]="16"></lucide-icon>
+                    Activos
+                    <span class="bg-slate-800 px-1.5 py-0.5 rounded text-[10px] font-bold opacity-80"
+                        [class.text-white]="filtroEstado() === 'activo'"
+                        [class.text-slate-400]="filtroEstado() !== 'activo'">
+                        {{ conteoActivos() }}
+                    </span>
                 </button>
 
-                <button (click)="filtroEstado.set('cerrado')" [class.bg-emerald-600]="filtroEstado() === 'cerrado'"
-                    [class.text-white]="filtroEstado() === 'cerrado'"
-                    [class.bg-slate-800]="filtroEstado() !== 'cerrado'"
-                    [class.text-slate-400]="filtroEstado() !== 'cerrado'"
-                    class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all border border-slate-700 hover:border-emerald-500/50 flex items-center gap-2">
-                    <span>🔒</span> Cerrados
-                    <span
-                        class="bg-slate-900/50 px-2 py-0.5 rounded-full text-xs opacity-70 min-w-[20px] text-center">{{
-                        conteoCerrados() }}</span>
+                <button (click)="filtroEstado.set('cerrado')" [class]="filtroEstado() === 'cerrado'
+                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
+                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
+                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2">
+                    <lucide-icon name="archive" [size]="16"></lucide-icon>
+                    Cerrados
+                    <span class="bg-slate-800 px-1.5 py-0.5 rounded text-[10px] font-bold opacity-80"
+                        [class.text-white]="filtroEstado() === 'cerrado'"
+                        [class.text-slate-400]="filtroEstado() !== 'cerrado'">
+                        {{ conteoCerrados() }}
+                    </span>
                 </button>
 
-                <button (click)="filtroEstado.set('todos')" [class.bg-emerald-600]="filtroEstado() === 'todos'"
-                    [class.text-white]="filtroEstado() === 'todos'" [class.bg-slate-800]="filtroEstado() !== 'todos'"
-                    [class.text-slate-400]="filtroEstado() !== 'todos'"
-                    class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all border border-slate-700 hover:border-emerald-500/50">
+                <button (click)="filtroEstado.set('todos')" [class]="filtroEstado() === 'todos'
+                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
+                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
+                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2">
+                    <lucide-icon name="layers" [size]="16"></lucide-icon>
                     Todos
                 </button>
             </div>
