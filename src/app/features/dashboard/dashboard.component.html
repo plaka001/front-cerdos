@@ -190,68 +190,95 @@
     </div>
     }
 
-    <!-- ========== MAIN ACTIONS GRID (2x2) ========== -->
+    <!-- ========== KPI CARDS GRID (DATA FIRST) ========== -->
     <div>
-      <h2 class="text-h2 mb-4">Módulos Principales</h2>
+      <h2 class="text-h2 mb-4">Indicadores Clave</h2>
       <div class="grid grid-cols-2 gap-4">
 
-        <!-- 1. Pie de Cría -->
+        <!-- 1. Pie de Cría (KPI: Total Cerdas) -->
         <div (click)="navegarA('/produccion')"
-          class="card p-4 cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex flex-col items-center justify-center text-center h-32 relative overflow-hidden group">
-          <div
-            class="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          class="bg-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:ring-1 hover:ring-pink-500/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-pink-900/10 active:scale-95">
+          <!-- Watermark Icon -->
+          <lucide-icon name="piggy-bank" [size]="80"
+            class="absolute -bottom-4 -right-4 text-pink-500 opacity-[0.08] group-hover:opacity-20 transition-all duration-500 transform -rotate-12"></lucide-icon>
+
+          <!-- Content -->
+          <div class="relative z-10">
+            <div
+              class="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center mb-3 group-hover:bg-pink-500/20 transition-colors">
+              <lucide-icon name="piggy-bank" [size]="18" class="text-pink-400"></lucide-icon>
+            </div>
+            <p class="text-4xl font-extrabold text-white tracking-tight">
+              {{ dashboardData()!.kpis.totalCerdas }}
+            </p>
+            <p class="text-sm font-medium text-slate-400 mt-1">Madres Activas</p>
           </div>
-          <lucide-icon name="piggy-bank" [size]="32" class="text-pink-400 mb-2"></lucide-icon>
-          <p class="text-2xl font-bold text-white leading-none">
-            {{ dashboardData()!.kpis.totalCerdas }}
-          </p>
-          <p class="text-xs text-slate-400 mt-1">Madres Activas</p>
         </div>
 
-        <!-- 2. Engorde -->
+        <!-- 2. Engorde (KPI: Total Engorde) -->
         <div (click)="navegarA('/lotes')"
-          class="card p-4 cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex flex-col items-center justify-center text-center h-32 relative overflow-hidden group">
-          <div
-            class="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          class="bg-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:ring-1 hover:ring-amber-500/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-amber-900/10 active:scale-95">
+          <!-- Watermark Icon -->
+          <lucide-icon name="wheat" [size]="80"
+            class="absolute -bottom-4 -right-4 text-amber-500 opacity-[0.08] group-hover:opacity-20 transition-all duration-500 transform -rotate-12"></lucide-icon>
+
+          <!-- Content -->
+          <div class="relative z-10">
+            <div
+              class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3 group-hover:bg-amber-500/20 transition-colors">
+              <lucide-icon name="wheat" [size]="18" class="text-amber-400"></lucide-icon>
+            </div>
+            <p class="text-4xl font-extrabold text-white tracking-tight">
+              {{ dashboardData()!.kpis.totalEngorde }}
+            </p>
+            <p class="text-sm font-medium text-slate-400 mt-1">En Ceba</p>
           </div>
-          <lucide-icon name="wheat" [size]="32" class="text-amber-400 mb-2"></lucide-icon>
-          <p class="text-2xl font-bold text-white leading-none">
-            {{ dashboardData()!.kpis.totalEngorde }}
-          </p>
-          <p class="text-xs text-slate-400 mt-1">En Ceba</p>
         </div>
 
-        <!-- 3. Inventario -->
+        <!-- 3. Inventario (KPI: Alertas) -->
         <div (click)="navegarA('/inventario')"
-          class="card p-4 cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex flex-col items-center justify-center text-center h-32 relative overflow-hidden group">
-          <div
-            class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          class="bg-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:ring-1 hover:ring-blue-500/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-blue-900/10 active:scale-95">
+          <!-- Watermark Icon -->
+          <lucide-icon name="package" [size]="80"
+            class="absolute -bottom-4 -right-4 text-blue-500 opacity-[0.08] group-hover:opacity-20 transition-all duration-500 transform -rotate-12"></lucide-icon>
+
+          <!-- Content -->
+          <div class="relative z-10">
+            <div
+              class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center mb-3 group-hover:bg-blue-500/20 transition-colors">
+              <lucide-icon name="package" [size]="18" class="text-blue-400"></lucide-icon>
+            </div>
+            @if (dashboardData()!.alertasInsumos.length > 0) {
+            <p class="text-4xl font-extrabold text-yellow-400 tracking-tight">
+              {{ dashboardData()!.alertasInsumos.length }}
+            </p>
+            <p class="text-sm font-medium text-slate-400 mt-1">Alertas Stock</p>
+            } @else {
+            <p class="text-3xl font-extrabold text-emerald-400 tracking-tight">OK</p>
+            <p class="text-sm font-medium text-slate-400 mt-1">Stock Sano</p>
+            }
           </div>
-          <lucide-icon name="package" [size]="32" class="text-blue-400 mb-2"></lucide-icon>
-          <p class="text-lg font-bold text-white leading-none mb-1">
-            Inventario
-          </p>
-          <p class="text-xs text-slate-400">Ver Stock</p>
         </div>
 
-        <!-- 4. Sanidad (NUEVO) -->
+        <!-- 4. Sanidad (KPI: Pendientes) -->
         <div (click)="navegarA('/sanidad')"
-          class="card p-4 cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex flex-col items-center justify-center text-center h-32 relative overflow-hidden group bg-slate-800 border-emerald-500/30">
-          <div
-            class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-          </div>
+          class="bg-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:ring-1 hover:ring-emerald-500/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-emerald-900/10 active:scale-95">
+          <!-- Watermark Icon -->
+          <lucide-icon name="syringe" [size]="80"
+            class="absolute -bottom-4 -right-4 text-emerald-500 opacity-[0.08] group-hover:opacity-20 transition-all duration-500 transform -rotate-12"></lucide-icon>
 
-          <!-- Badge de Tareas Pendientes -->
-          @if (tareasPendientesCount() > 0) {
-          <div
-            class="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow-lg animate-pulse">
-            {{ tareasPendientesCount() }}
+          <!-- Content -->
+          <div class="relative z-10">
+            <div
+              class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3 group-hover:bg-emerald-500/20 transition-colors">
+              <lucide-icon name="syringe" [size]="18" class="text-emerald-400"></lucide-icon>
+            </div>
+            <p class="text-4xl font-extrabold text-white tracking-tight"
+              [class.text-red-400]="tareasPendientesCount() > 0">
+              {{ tareasPendientesCount() }}
+            </p>
+            <p class="text-sm font-medium text-slate-400 mt-1">Pendientes</p>
           </div>
-          }
-
-          <lucide-icon name="syringe" [size]="32" class="text-emerald-400 mb-2"></lucide-icon>
-          <p class="text-lg font-bold text-white leading-none mb-1">Sanidad</p>
-          <p class="text-xs text-slate-400">Veterinario</p>
         </div>
 
       </div>
