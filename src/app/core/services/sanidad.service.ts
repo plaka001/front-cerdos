@@ -33,6 +33,9 @@ export class SanidadService {
         hoy.setHours(0, 0, 0, 0);
         limiteProximo.setHours(23, 59, 59, 999);
 
+        // Maximum days overdue to consider a task relevant (strict for initial launch)
+        const MAX_DIAS_ATRASO = 7;
+
         // 1. Fetch Active Rules
         const { data: reglas, error: errReglas } = await this.supabase.client
             .from('reglas_sanitarias')
@@ -83,7 +86,12 @@ export class SanidadService {
                 fechaTarea.setDate(fechaTarea.getDate() + regla.dias_target);
                 fechaTarea.setHours(0, 0, 0, 0);
 
-                if (fechaTarea <= limiteProximo) {
+                // Calculate days difference for temporal filter
+                const diffTime = fechaTarea.getTime() - hoy.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                // Only add if within time window (not too old, not too far in future)
+                if (fechaTarea <= limiteProximo && diffDays >= -MAX_DIAS_ATRASO) {
                     tareas.push(this.crearTarea(
                         lote.id,
                         lote.codigo,
@@ -124,7 +132,12 @@ export class SanidadService {
                     fechaTarea.setDate(fechaTarea.getDate() + regla.dias_target);
                     fechaTarea.setHours(0, 0, 0, 0);
 
-                    if (fechaTarea <= limiteProximo) {
+                    // Calculate days difference for temporal filter
+                    const diffTime = fechaTarea.getTime() - hoy.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    // Only add if within time window (not too old, not too far in future)
+                    if (fechaTarea <= limiteProximo && diffDays >= -MAX_DIAS_ATRASO) {
                         tareas.push(this.crearTarea(cerda.id, cerda.chapeta, regla.tipo_aplicacion, regla.nombre_tarea, fechaTarea, hoy));
                     }
                 }
@@ -149,7 +162,12 @@ export class SanidadService {
                     fechaTarea.setDate(fechaTarea.getDate() + regla.dias_target);
                     fechaTarea.setHours(0, 0, 0, 0);
 
-                    if (fechaTarea <= limiteProximo) {
+                    // Calculate days difference for temporal filter
+                    const diffTime = fechaTarea.getTime() - hoy.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    // Only add if within time window
+                    if (fechaTarea <= limiteProximo && diffDays >= -MAX_DIAS_ATRASO) {
                         tareas.push(this.crearTarea(cerda.id, cerda.chapeta, regla.tipo_aplicacion, regla.nombre_tarea, fechaTarea, hoy));
                     }
                 }
@@ -171,7 +189,12 @@ export class SanidadService {
                     fechaTarea.setDate(fechaTarea.getDate() + regla.dias_target);
                     fechaTarea.setHours(0, 0, 0, 0);
 
-                    if (fechaTarea <= limiteProximo) {
+                    // Calculate days difference for temporal filter
+                    const diffTime = fechaTarea.getTime() - hoy.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    // Only add if within time window
+                    if (fechaTarea <= limiteProximo && diffDays >= -MAX_DIAS_ATRASO) {
                         tareas.push(this.crearTarea(cerda.id, cerda.chapeta, regla.tipo_aplicacion, regla.nombre_tarea, fechaTarea, hoy));
                     }
                 }
@@ -193,7 +216,12 @@ export class SanidadService {
                     fechaTarea.setDate(fechaTarea.getDate() + regla.dias_target);
                     fechaTarea.setHours(0, 0, 0, 0);
 
-                    if (fechaTarea <= limiteProximo) {
+                    // Calculate days difference for temporal filter
+                    const diffTime = fechaTarea.getTime() - hoy.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    // Only add if within time window
+                    if (fechaTarea <= limiteProximo && diffDays >= -MAX_DIAS_ATRASO) {
                         tareas.push(this.crearTarea(cerda.id, cerda.chapeta, regla.tipo_aplicacion, regla.nombre_tarea, fechaTarea, hoy));
                     }
                 }
@@ -202,6 +230,8 @@ export class SanidadService {
 
         // 6. Filter Completed Tasks Logic
         // Remove task if an event exists today for the same reference ID and containing task name in observations
+        console.log('Tareas generadas (antes de filtrar):', tareas);
+
         const tareasFiltradas = tareas.filter(t => {
             const yaRealizada = eventosHoy?.some(e => {
                 const mismoDestino = (t.tipo_aplicacion === 'lote' && e.lote_id === t.id_referencia) ||
