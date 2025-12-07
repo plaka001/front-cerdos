@@ -58,30 +58,40 @@
     <!-- TAB: RENTABILIDAD LOTES -->
     @if (activeTab() === 'lotes') {
 
-    <!-- Status Filters (Variant 2: Segmented Control - Wrappable) -->
-    <div class="mb-6">
-        <div class="bg-slate-900 p-1 rounded-lg inline-flex flex-wrap gap-1 border border-slate-800">
+    <!-- Filtros Tab Bar (Sticky Horizontal Scroll) -->
+    <div class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-sm -mx-5 px-5 py-3 border-b border-slate-800/50 mb-6">
+        <div class="flex overflow-x-auto gap-3 scrollbar-hide pb-1">
+
+            <!-- Activos -->
             <button (click)="filtroEstado.set('activo')" [class]="filtroEstado() === 'activo'
-                ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
-                : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
-                class="px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2">
-                <lucide-icon name="activity" [size]="16"></lucide-icon>
+                    ? 'bg-blue-500/10 border-blue-500 text-white' 
+                    : 'bg-transparent border-slate-700 text-slate-400'"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-medium whitespace-nowrap transition-all active:scale-95">
+                <lucide-icon name="activity" [size]="16"
+                    [class]="filtroEstado() === 'activo' ? 'text-blue-400' : 'text-slate-500'"></lucide-icon>
                 Activos
             </button>
+
+            <!-- Cerrados / Vendidos -->
             <button (click)="filtroEstado.set('cerrado')" [class]="filtroEstado() === 'cerrado'
-                ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
-                : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
-                class="px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2">
-                <lucide-icon name="archive" [size]="16"></lucide-icon>
+                    ? 'bg-slate-700 text-white border-slate-500' 
+                    : 'bg-transparent border-slate-700 text-slate-400'"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-medium whitespace-nowrap transition-all active:scale-95">
+                <lucide-icon name="archive" [size]="16"
+                    [class]="filtroEstado() === 'cerrado' ? 'text-slate-300' : 'text-slate-500'"></lucide-icon>
                 Cerrados / Vendidos
             </button>
+
+            <!-- Todos -->
             <button (click)="filtroEstado.set('todos')" [class]="filtroEstado() === 'todos'
-                ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
-                : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
-                class="px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2">
-                <lucide-icon name="layers" [size]="16"></lucide-icon>
+                    ? 'bg-emerald-500/10 border-emerald-500 text-white' 
+                    : 'bg-transparent border-slate-700 text-slate-400'"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-medium whitespace-nowrap transition-all active:scale-95">
+                <lucide-icon name="layers" [size]="16"
+                    [class]="filtroEstado() === 'todos' ? 'text-emerald-400' : 'text-slate-500'"></lucide-icon>
                 Todos
             </button>
+
         </div>
     </div>
 

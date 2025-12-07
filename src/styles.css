@@ -382,3 +382,15 @@ input[type="time"]::-moz-calendar-picker-indicator {
   height: 1.25rem;
 }
 
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}

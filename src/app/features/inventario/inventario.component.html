@@ -64,44 +64,61 @@
             </div>
         </div>
 
-        <!-- Filtros por Tipo (Variant 2: Segmented Control - Wrappable) -->
-        <div class="mb-6">
-            <div class="bg-slate-900 p-1 rounded-lg inline-flex flex-wrap gap-1 border border-slate-800">
+        <!-- Filtros Tab Bar (Sticky Horizontal Scroll) -->
+        <div
+            class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-sm -mx-5 px-5 py-3 border-b border-slate-800/50 mb-6">
+            <div class="flex overflow-x-auto gap-3 scrollbar-hide pb-1">
+
+                <!-- Todos -->
                 <button (click)="tipoFiltro.set('todos')" [class]="tipoFiltro() === 'todos'
-                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
-                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
-                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
-                    <lucide-icon name="layers" [size]="16"></lucide-icon>
+                        ? 'bg-emerald-500/10 border-emerald-500 text-white' 
+                        : 'bg-transparent border-slate-700 text-slate-400'"
+                    class="flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-medium whitespace-nowrap transition-all active:scale-95">
+                    <lucide-icon name="layers" [size]="16"
+                        [class]="tipoFiltro() === 'todos' ? 'text-emerald-400' : 'text-slate-500'"></lucide-icon>
                     Todos
                 </button>
+
+                <!-- Alimento -->
                 <button (click)="tipoFiltro.set('alimento')" [class]="tipoFiltro() === 'alimento'
-                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
-                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
-                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
-                    <lucide-icon name="wheat" [size]="16"></lucide-icon>
+                        ? 'bg-amber-500/10 border-amber-500 text-white' 
+                        : 'bg-transparent border-slate-700 text-slate-400'"
+                    class="flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-medium whitespace-nowrap transition-all active:scale-95">
+                    <lucide-icon name="wheat" [size]="16"
+                        [class]="tipoFiltro() === 'alimento' ? 'text-amber-400' : 'text-slate-500'"></lucide-icon>
                     Alimento
                 </button>
+
+                <!-- Medicamento -->
                 <button (click)="tipoFiltro.set('medicamento')" [class]="tipoFiltro() === 'medicamento'
-                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
-                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
-                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
-                    <lucide-icon name="pill" [size]="16"></lucide-icon>
+                        ? 'bg-blue-500/10 border-blue-500 text-white' 
+                        : 'bg-transparent border-slate-700 text-slate-400'"
+                    class="flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-medium whitespace-nowrap transition-all active:scale-95">
+                    <lucide-icon name="pill" [size]="16"
+                        [class]="tipoFiltro() === 'medicamento' ? 'text-blue-400' : 'text-slate-500'"></lucide-icon>
                     Medicamento
                 </button>
+
+                <!-- Biológico -->
                 <button (click)="tipoFiltro.set('biologico')" [class]="tipoFiltro() === 'biologico'
-                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
-                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
-                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
-                    <lucide-icon name="syringe" [size]="16"></lucide-icon>
+                        ? 'bg-pink-500/10 border-pink-500 text-white' 
+                        : 'bg-transparent border-slate-700 text-slate-400'"
+                    class="flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-medium whitespace-nowrap transition-all active:scale-95">
+                    <lucide-icon name="syringe" [size]="16"
+                        [class]="tipoFiltro() === 'biologico' ? 'text-pink-400' : 'text-slate-500'"></lucide-icon>
                     Biológico
                 </button>
+
+                <!-- Material -->
                 <button (click)="tipoFiltro.set('material')" [class]="tipoFiltro() === 'material'
-                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
-                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
-                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
-                    <lucide-icon name="package" [size]="16"></lucide-icon>
+                        ? 'bg-slate-700 text-white border-slate-500' 
+                        : 'bg-transparent border-slate-700 text-slate-400'"
+                    class="flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-medium whitespace-nowrap transition-all active:scale-95">
+                    <lucide-icon name="package" [size]="16"
+                        [class]="tipoFiltro() === 'material' ? 'text-slate-300' : 'text-slate-500'"></lucide-icon>
                     Material
                 </button>
+
             </div>
         </div>
 
