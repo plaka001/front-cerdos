@@ -23,6 +23,21 @@ export class ReportesComponent implements OnInit {
     downloading = signal<boolean>(false);
     error = signal<string | null>(null);
 
+    // Filters
+    filtroEstado = signal<'activo' | 'cerrado' | 'todos'>('activo');
+
+    reportesFiltrados = computed(() => {
+        const lotes = this.reportes();
+        const filtro = this.filtroEstado();
+
+        if (filtro === 'activo') {
+            return lotes.filter(l => l.estado === 'activo');
+        } else if (filtro === 'cerrado') {
+            return lotes.filter(l => l.estado !== 'activo');
+        }
+        return lotes;
+    });
+
     // Accordion state
     expandedLotes = signal<Set<number>>(new Set());
 

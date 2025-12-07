@@ -175,3 +175,11 @@ INSERT INTO reglas_sanitarias (nombre_tarea, dias_target, evento_origen, tipo_ap
 ('Choque Vitamínico Llegada', 1, 'inicio_lote', 'lote'),
 ('Purga General (Vermífugo)', 15, 'inicio_lote', 'lote'),
 ('Vacuna Peste Porcina (PPC)', 50, 'inicio_lote', 'lote'); -- Aprox a los 50 días de entrar (o 70 de vida)
+
+
+
+
+-- 1. CREAR CATEGORÍA FINANCIERA
+INSERT INTO categorias_financieras (nombre, tipo_flujo, descripcion, es_automatica)
+SELECT 'Compra de Semen/Genética', 'operativo', 'Pago por pajillas o servicios de monta', false
+WHERE NOT EXISTS (SELECT 1 FROM categorias_financieras WHERE nombre = 'Compra de Semen/Genética');

@@ -33,6 +33,7 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
             <div class="space-y-4">
               <app-input label="Fecha de Inseminación" type="date" formControlName="fecha"></app-input>
               <app-input label="Macho / Semen" formControlName="macho" placeholder="Ej: Duroc 05"></app-input>
+              <app-input label="Costo del Servicio / Semen ($)" type="currency" formControlName="costo" placeholder="Ej: 30000"></app-input>
               <app-input label="Observaciones (opcional)" formControlName="observaciones" placeholder="Notas adicionales..."></app-input>
             </div>
           }
@@ -271,6 +272,7 @@ export class EventModalComponent {
       this.form = this.fb.group({
         fecha: [hoy, Validators.required],
         macho: ['', Validators.required],
+        costo: [0, [Validators.min(0)]],
         observaciones: ['']
       });
     } else if (this.tipoEvento === 'parto') {

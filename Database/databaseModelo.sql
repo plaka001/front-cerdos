@@ -496,12 +496,18 @@ CREATE TABLE public.salidas_insumos (
 --
 
 CREATE VIEW public.reporte_costos_maternidad AS
- WITH gastos_mensuales AS (
+ WITH gastos_insumos AS (
          SELECT to_char((salidas_insumos.fecha)::timestamp with time zone, 'YYYY-MM'::text) AS mes,
-            COALESCE(sum(salidas_insumos.costo_total_salida), (0)::numeric) AS total_gastos
+            COALESCE(sum(salidas_insumos.costo_total_salida), (0)::numeric) AS total
            FROM public.salidas_insumos
           WHERE (salidas_insumos.destino_tipo = 'cerda'::text)
           GROUP BY (to_char((salidas_insumos.fecha)::timestamp with time zone, 'YYYY-MM'::text))
+        ), gastos_semen AS (
+         SELECT to_char((ciclos_reproductivos.fecha_inseminacion)::timestamp with time zone, 'YYYY-MM'::text) AS mes,
+            COALESCE(sum(ciclos_reproductivos.costo_servicio), (0)::numeric) AS total
+           FROM public.ciclos_reproductivos
+          WHERE (ciclos_reproductivos.fecha_inseminacion IS NOT NULL)
+          GROUP BY (to_char((ciclos_reproductivos.fecha_inseminacion)::timestamp with time zone, 'YYYY-MM'::text))
         ), produccion_mensual AS (
          SELECT to_char((ciclos_reproductivos.fecha_destete)::timestamp with time zone, 'YYYY-MM'::text) AS mes,
             COALESCE(sum(ciclos_reproductivos.lechones_destetados), (0)::bigint) AS total_lechones
@@ -509,16 +515,17 @@ CREATE VIEW public.reporte_costos_maternidad AS
           WHERE (ciclos_reproductivos.fecha_destete IS NOT NULL)
           GROUP BY (to_char((ciclos_reproductivos.fecha_destete)::timestamp with time zone, 'YYYY-MM'::text))
         )
- SELECT COALESCE(g.mes, p.mes) AS mes,
-    COALESCE(g.total_gastos, (0)::numeric) AS total_gastos_madres,
+ SELECT COALESCE(g.mes, s.mes, p.mes) AS mes,
+    (COALESCE(g.total, (0)::numeric) + COALESCE(s.total, (0)::numeric)) AS total_gastos_madres,
     COALESCE(p.total_lechones, (0)::bigint) AS total_lechones_producidos,
         CASE
-            WHEN (COALESCE(p.total_lechones, (0)::bigint) > 0) THEN (COALESCE(g.total_gastos, (0)::numeric) / (p.total_lechones)::numeric)
+            WHEN (COALESCE(p.total_lechones, (0)::bigint) > 0) THEN ((COALESCE(g.total, (0)::numeric) + COALESCE(s.total, (0)::numeric)) / (p.total_lechones)::numeric)
             ELSE (0)::numeric
         END AS costo_por_lechon
-   FROM (gastos_mensuales g
-     FULL JOIN produccion_mensual p ON ((g.mes = p.mes)))
-  ORDER BY COALESCE(g.mes, p.mes) DESC;
+   FROM ((gastos_insumos g
+     FULL JOIN gastos_semen s ON ((g.mes = s.mes)))
+     FULL JOIN produccion_mensual p ON ((COALESCE(g.mes, s.mes) = p.mes)))
+  ORDER BY COALESCE(g.mes, s.mes, p.mes) DESC;
 
 
 --
