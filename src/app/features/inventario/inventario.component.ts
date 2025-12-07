@@ -172,15 +172,15 @@ export class InventarioComponent implements OnInit {
         return colores[tipo] || colores['otro'];
     }
 
-    getEmojiTipo(tipo: string): string {
-        const emojis: Record<string, string> = {
-            'alimento': '🌾',
-            'medicamento': '💊',
-            'biologico': '💉',
-            'material': '🔧',
-            'otro': '📦'
+    getIconoTipo(tipo: string): string {
+        const iconos: Record<string, string> = {
+            'alimento': 'wheat',
+            'medicamento': 'pill',
+            'biologico': 'syringe',
+            'material': 'wrench',
+            'otro': 'package-open'
         };
-        return emojis[tipo] || emojis['otro'];
+        return iconos[tipo] || iconos['otro'];
     }
 
     isStockBajo(item: InventarioItem): boolean {

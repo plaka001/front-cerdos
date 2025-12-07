@@ -13,14 +13,14 @@
                 <!-- Alimentar Button -->
                 <button (click)="abrirAlimentarModal()"
                     class="h-12 w-12 sm:w-auto flex items-center justify-center gap-2 px-0 sm:px-4 bg-emerald-600 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-500 transition-all border border-emerald-500/20 active:scale-95">
-                    <span class="text-xl leading-none">🍽️</span>
+                    <lucide-icon name="package" [size]="20"></lucide-icon>
                     <span class="hidden sm:inline">Alimentar</span>
                 </button>
 
                 <!-- Nueva Cerda Button -->
                 <button (click)="abrirNuevaCerdaModal()"
                     class="h-12 w-12 sm:w-auto flex items-center justify-center gap-2 px-0 sm:px-4 bg-emerald-600 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-500 transition-all border border-emerald-500/20 active:scale-95">
-                    <lucide-icon name="plus" [size]="24"></lucide-icon>
+                    <lucide-icon name="plus-circle" [size]="20"></lucide-icon>
                     <span class="hidden sm:inline">Nueva Cerda</span>
                 </button>
             </div>
@@ -67,10 +67,11 @@
                 </button>
 
                 <button (click)="filtroEstado.set('gestante')" [class]="filtroEstado() === 'gestante'
-                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
+                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-amber-500' 
                         : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
                     class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
-                    <lucide-icon name="baby" [size]="16"></lucide-icon>
+                    <lucide-icon name="activity" [size]="16"
+                        [class]="filtroEstado() === 'gestante' ? 'text-amber-400' : 'text-slate-400'"></lucide-icon>
                     <span>Gestantes</span>
                     <span class="bg-slate-800 px-1.5 py-0.5 rounded text-[10px] font-bold opacity-80 text-slate-300">
                         {{ conteoGestantes() }}
@@ -78,10 +79,11 @@
                 </button>
 
                 <button (click)="filtroEstado.set('lactante')" [class]="filtroEstado() === 'lactante'
-                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
+                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-pink-500' 
                         : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
                     class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
-                    <lucide-icon name="milk" [size]="16"></lucide-icon>
+                    <lucide-icon name="droplet" [size]="16"
+                        [class]="filtroEstado() === 'lactante' ? 'text-pink-400' : 'text-slate-400'"></lucide-icon>
                     <span>Lactantes</span>
                     <span class="bg-slate-800 px-1.5 py-0.5 rounded text-[10px] font-bold opacity-80 text-slate-300">
                         {{ conteoLactantes() }}
@@ -89,10 +91,10 @@
                 </button>
 
                 <button (click)="filtroEstado.set('vacia')" [class]="filtroEstado() === 'vacia'
-                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
+                        ? 'bg-slate-700 text-white shadow-sm border-b-2 border-slate-500' 
                         : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
                     class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
-                    <lucide-icon name="circle" [size]="16"></lucide-icon>
+                    <lucide-icon name="circle-dashed" [size]="16"></lucide-icon>
                     Vacías
                     <span class="bg-slate-800 px-1.5 py-0.5 rounded text-[10px] font-bold opacity-80 text-slate-300">
                         {{ conteoVacias() }}
@@ -126,7 +128,7 @@
                         <div class="flex items-center gap-3 flex-1 min-w-0">
                             <div
                                 class="flex items-center justify-center w-12 h-12 rounded-full bg-slate-700 flex-shrink-0">
-                                <lucide-icon name="piggy-bank" [size]="20" class="text-emerald-400"></lucide-icon>
+                                <lucide-icon name="dna" [size]="20" class="text-emerald-400"></lucide-icon>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h3 class="text-lg font-bold text-white truncate">{{ cerda.chapeta }}</h3>
@@ -285,7 +287,7 @@
                                     <!-- Sanidad (segundo, como en lotes) -->
                                     <button (click)="abrirModalEvento(cerda, 'sanidad'); $event.stopPropagation()"
                                         class="w-full flex items-center gap-3 px-3 py-2 text-sm text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors text-left">
-                                        <lucide-icon name="stethoscope" [size]="16"></lucide-icon>
+                                        <lucide-icon name="syringe" [size]="16"></lucide-icon>
                                         Evento Sanitario
                                     </button>
 

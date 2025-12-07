@@ -88,8 +88,8 @@
                         <!-- Left: Icon + Code -->
                         <div class="flex items-center gap-3 flex-1 min-w-0">
                             <div
-                                class="flex items-center justify-center w-12 h-12 rounded-full bg-slate-700 flex-shrink-0 text-xl">
-                                📦
+                                class="flex items-center justify-center w-12 h-12 rounded-full bg-slate-700 flex-shrink-0 text-emerald-400">
+                                <lucide-icon name="package" [size]="24"></lucide-icon>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h3 class="text-lg font-bold text-white truncate">{{ lote.codigo }}</h3>
@@ -149,12 +149,12 @@
                         <!-- Primary Actions -->
                         <button (click)="alimentarLote(lote); $event.stopPropagation()"
                             class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 transition-colors">
-                            <span>🍽️</span> Alimentar
+                            <lucide-icon name="wheat" [size]="18"></lucide-icon> Alimentar
                         </button>
 
                         <button (click)="pesarLote(lote); $event.stopPropagation()"
                             class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors">
-                            <span>⚖️</span> Pesar
+                            <lucide-icon name="scale" [size]="18"></lucide-icon> Pesar
                         </button>
 
                         <!-- Menu Trigger (Relative Container) -->
@@ -224,7 +224,9 @@
         <!-- Empty State -->
         @if (lotes().length === 0 && !loading()) {
         <div class="bg-slate-800 rounded-xl border border-slate-700 p-10 text-center">
-            <div style="font-size: 64px; margin-bottom: 16px;">📦</div>
+            <div class="mb-4 flex justify-center text-slate-600">
+                <lucide-icon name="package-open" [size]="64"></lucide-icon>
+            </div>
             <h3 class="text-2xl font-bold text-white mb-2">No hay lotes registrados</h3>
             <p class="text-slate-400">Los lotes se crean automáticamente al destetar lechones</p>
         </div>

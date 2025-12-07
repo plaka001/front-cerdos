@@ -1,25 +1,26 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-bottom-nav',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, LucideAngularModule],
   template: `
     <nav class="fixed bottom-0 left-0 right-0 pb-safe z-50" style="background-color: var(--color-bg); border-top: 1px solid var(--color-border);">
       <div class="flex justify-around items-center h-16">
         <a routerLink="/dashboard" routerLinkActive="active-nav-link" class="nav-link flex flex-col items-center justify-center w-full h-full">
-          <span class="text-2xl">🏠</span>
+          <lucide-icon name="home" [size]="24"></lucide-icon>
           <span class="text-xs mt-1">Inicio</span>
         </a>
         <a routerLink="/finanzas" routerLinkActive="active-nav-link" class="nav-link flex flex-col items-center justify-center w-full h-full">
-          <span class="text-2xl">💰</span>
+          <lucide-icon name="dollar-sign" [size]="24"></lucide-icon>
           <span class="text-xs mt-1">Finanzas</span>
         </a>
         <a routerLink="/reportes" routerLinkActive="active-nav-link" class="nav-link flex flex-col items-center justify-center w-full h-full">
-          <span class="text-2xl">📊</span>
+          <lucide-icon name="bar-chart-2" [size]="24"></lucide-icon>
           <span class="text-xs mt-1">Reportes</span>
         </a>
       </div>
@@ -31,7 +32,7 @@ import { AuthService } from '../../../core/services/auth.service';
         <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-700 p-6 animate-in zoom-in-95 duration-200" (click)="$event.stopPropagation()">
           <div class="flex items-start gap-4">
             <div class="flex-shrink-0 w-12 h-12 bg-red-900/20 rounded-full flex items-center justify-center">
-              <span class="text-2xl">🚪</span>
+              <lucide-icon name="log-out" [size]="24" class="text-red-400"></lucide-icon>
             </div>
             <div class="flex-1">
               <h3 class="text-lg font-bold text-white mb-2">Cerrar Sesión</h3>
