@@ -108,27 +108,11 @@ SELECT 'Prestamos / Aportes', 'operativo', 'Dinero externo o socios', false
 WHERE NOT EXISTS (SELECT 1 FROM categorias_financieras WHERE nombre = 'Prestamos / Aportes');
 
 -- ============================================================================
--- 2. INSUMOS MAESTROS (CATÁLOGO BASE)
+-- 2. INSUMOS MAESTROS (PERSONALIZADO A TU GRANJA)
 -- ============================================================================
 
--- A. ALIMENTOS (Estándar colombiano - Sacos de 40kg)
+-- A. ALIMENTOS (Tus referencias específicas - Sacos de 40kg)
 -- ============================================================================
-
-INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Pre-Iniciador', 'alimento', 'kg', 40, 100
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Pre-Iniciador');
-
-INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Iniciación', 'alimento', 'kg', 40, 200
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Iniciación');
-
-INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Levante', 'alimento', 'kg', 40, 300
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Levante');
-
-INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Engorde', 'alimento', 'kg', 40, 500
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Engorde');
 
 INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
 SELECT 'Gestación', 'alimento', 'kg', 40, 200
@@ -138,70 +122,80 @@ INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_min
 SELECT 'Lactancia', 'alimento', 'kg', 40, 150
 WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Lactancia');
 
--- B. MEDICAMENTOS Y VACUNAS (Plan sanitario completo)
+INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
+SELECT 'Pre-Inicio Fase 1', 'alimento', 'kg', 40, 100
+WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Pre-Inicio Fase 1');
+
+INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
+SELECT 'Pre-Inicio', 'alimento', 'kg', 40, 100
+WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Pre-Inicio');
+
+INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
+SELECT 'Inicio', 'alimento', 'kg', 40, 200
+WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Inicio');
+
+INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
+SELECT 'Lechón Transición', 'alimento', 'kg', 40, 200
+WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Lechón Transición');
+
+INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
+SELECT 'Lechón 337', 'alimento', 'kg', 40, 300
+WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Lechón 337');
+
+INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
+SELECT 'Finalizador 337', 'alimento', 'kg', 40, 500
+WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Finalizador 337');
+
+-- B. MEDICAMENTOS Y VACUNAS (Alineados con tu Plan Sanitario)
 -- ============================================================================
 
--- Vacunas para Lechones
+-- Hierro y Anticoccidial (Para lechones día 3)
 INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Hierro Dextrano 200mg', 'medicamento', 'ml', 100, 20
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Hierro Dextrano 200mg');
+SELECT 'Hierro Dextrano', 'medicamento', 'ml', 100, 50
+WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Hierro Dextrano');
 
 INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Anticoccidial (Baycox)', 'medicamento', 'ml', 250, 30
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Anticoccidial (Baycox)');
+SELECT 'Baycox (Toltrazuril)', 'medicamento', 'ml', 250, 20
+WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Baycox (Toltrazuril)');
+
+-- Vacunas (Para cumplir las alertas de Reemplazo, Madres y Lotes)
+INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
+SELECT 'Vacuna Circovirus + Mycoplasma', 'biologico', 'dosis', 50, 10
+WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Vacuna Circovirus + Mycoplasma');
 
 INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Vacuna Mycoplasma', 'medicamento', 'dosis', 50, 10
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Vacuna Mycoplasma');
+SELECT 'Vacuna E. Coli', 'biologico', 'dosis', 25, 10
+WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Vacuna E. Coli');
 
 INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Vacuna Circovirus', 'medicamento', 'dosis', 50, 10
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Vacuna Circovirus');
-
--- Vacunas para Reemplazos (Cerdas Jóvenes)
-INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Vacuna Parvo/Lepto', 'medicamento', 'dosis', 50, 10
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Vacuna Parvo/Lepto');
-
--- Vacunas para Madres
-INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Vacuna E.Coli (Primeriza)', 'medicamento', 'dosis', 50, 10
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Vacuna E.Coli (Primeriza)');
+SELECT 'Vacuna Eri-Parvo-Lepto', 'biologico', 'dosis', 50, 10
+WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Vacuna Eri-Parvo-Lepto');
 
 INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Vacuna E.Coli (Multípara)', 'medicamento', 'dosis', 50, 10
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Vacuna E.Coli (Multípara)');
-
--- Vacunas para Engorde
-INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Vacuna Peste Porcina (PPC)', 'medicamento', 'dosis', 100, 20
+SELECT 'Vacuna Peste Porcina (PPC)', 'biologico', 'dosis', 50, 10
 WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Vacuna Peste Porcina (PPC)');
 
--- Antiparasitarios y Vitaminas
+-- Purgas y Vitaminas
 INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
 SELECT 'Ivermectina 1%', 'medicamento', 'ml', 500, 50
 WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Ivermectina 1%');
 
 INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Vitaminas AD3E', 'medicamento', 'ml', 100, 20
+SELECT 'Purgante Oral (Fenbendazol)', 'medicamento', 'ml', 1000, 100
+WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Purgante Oral (Fenbendazol)');
+
+INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
+SELECT 'Vitaminas AD3E', 'medicamento', 'ml', 250, 20
 WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Vitaminas AD3E');
 
+-- Materiales
 INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Complejo B', 'medicamento', 'ml', 100, 20
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Complejo B');
-
--- Desinfectantes y Materiales
-INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Yodo Povidona', 'medicamento', 'ml', 1000, 200
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Yodo Povidona');
+SELECT 'Agujas', 'material', 'unidad', 100, 50
+WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Agujas');
 
 INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Agujas 18G', 'material', 'unidad', 100, 50
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Agujas 18G');
-
-INSERT INTO insumos (nombre, tipo, unidad_medida, presentacion_compra, stock_minimo)
-SELECT 'Jeringas 5ml', 'material', 'unidad', 100, 50
-WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Jeringas 5ml');
+SELECT 'Yodo', 'material', 'ml', 1000, 200
+WHERE NOT EXISTS (SELECT 1 FROM insumos WHERE nombre = 'Yodo');
 
 -- ============================================================================
 -- 3. REGLAS SANITARIAS (PLAN DE VACUNACIÓN COMPLETO)
