@@ -1,4 +1,4 @@
-name: Backup Nocturno Supabase (Capa 1)
+name: Backup Datos Supabase (Solo Data)
 
 on:
   schedule:
@@ -9,7 +9,7 @@ jobs:
   backup:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Importante: Da permiso explícito para escribir en el repo
+      contents: write
     
     steps:
       - name: Checkout del código
@@ -22,18 +22,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client-17
 
-      - name: Realizar Backup (pg_dump)
+      - name: Realizar Backup (SOLO DATA)
         env:
           DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
           mkdir -p backups
-          /usr/lib/postgresql/17/bin/pg_dump "$DATABASE_URL" --clean --if-exists --no-owner --no-privileges > backups/backup_latest.sql
+          
+          # EXPLICACIÓN DE BANDERAS:
+          # -n public    -> Solo mira tu esquema 'public' (evita auth/storage).
+          # --data-only  -> (o -a) Solo descarga los datos. NO descarga la creación de tablas.
+          
+          /usr/lib/postgresql/17/bin/pg_dump "$DATABASE_URL" --data-only -n public > backups/backup_data.sql
 
       - name: Guardar en el Repositorio
         run: |
           git config --global user.name 'GitHub Actions Backup'
           git config --global user.email 'actions@github.com'
-          git add backups/backup_latest.sql
-          # Intentamos hacer commit. Si no hay cambios, no fallará, solo nos avisará.
-          git commit -m "Automated backup: $(date -u)" || echo "No hubo cambios en la base de datos"
+          git add backups/backup_data.sql
+          git commit -m "Data Backup: $(date -u)" || echo "Sin cambios en la data"
           git push
