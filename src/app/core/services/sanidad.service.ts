@@ -5,7 +5,7 @@ export interface ReglaSanitaria {
     id: number;
     nombre_tarea: string;
     dias_target: number;
-    evento_origen: 'parto' | 'inicio_lote' | 'destete' | 'servicio';
+    evento_origen: 'parto' | 'inicio_lote' | 'destete' | 'servicio' | 'nacimiento';
     tipo_aplicacion: 'camada' | 'lote' | 'madre';
     obligatorio: boolean;
 }
@@ -49,15 +49,11 @@ export class SanidadService {
 
         if (errLotes) throw errLotes;
 
-        // 3. Fetch Active Cerdas with Cycles
+        // 3. Fetch ALL Active Cerdas (including those without cycles for replacement vaccinations)
         const { data: cerdas, error: errCerdas } = await this.supabase.client
             .from('cerdas')
             .select('*, ciclos_reproductivos(*)')
-            .eq('activa', true)
-            // Fix: 'activo' does not exist, use 'estado' = 'abierto' (or filtering in application if inner join behavior is tricky)
-            // However, Supabase inner join filtering works if column exists. 
-            // We'll filter for active cycles.
-            .eq('ciclos_reproductivos.estado', 'abierto');
+            .eq('activa', true);
 
         if (errCerdas) throw errCerdas;
 
@@ -103,12 +99,52 @@ export class SanidadService {
         // B. Cerda/Camada Tasks
         for (const cerda of cerdas) {
             const ciclo = cerda.ciclos_reproductivos?.[0];
+            const esReemplazo = cerda.partos_acumulados === 0 && cerda.estado === 'vacia';
+            const esPrimeriza = cerda.partos_acumulados === 0;
+            const esMultipara = cerda.partos_acumulados > 0;
+
+            // Birth-based rules (for replacement gilts)
+            if (cerda.fecha_nacimiento) {
+                const reglasNacimiento = reglas.filter(r => r.evento_origen === 'nacimiento');
+                const fechaNacimiento = new Date(cerda.fecha_nacimiento);
+
+                for (const regla of reglasNacimiento) {
+                    // Filter by sow type
+                    const nombreLower = regla.nombre_tarea.toLowerCase();
+                    const esReglaPrimeriza = nombreLower.includes('primeriza');
+                    const esReglaMultipara = nombreLower.includes('multípara') || nombreLower.includes('multipara');
+                    const esReglaReemplazo = nombreLower.includes('reemplazo');
+
+                    // Skip if rule doesn't match sow type
+                    if (esReglaReemplazo && !esReemplazo) continue;
+                    if (esReglaPrimeriza && !esPrimeriza) continue;
+                    if (esReglaMultipara && !esMultipara) continue;
+
+                    const fechaTarea = new Date(fechaNacimiento);
+                    fechaTarea.setDate(fechaTarea.getDate() + regla.dias_target);
+                    fechaTarea.setHours(0, 0, 0, 0);
+
+                    if (fechaTarea <= limiteProximo) {
+                        tareas.push(this.crearTarea(cerda.id, cerda.chapeta, regla.tipo_aplicacion, regla.nombre_tarea, fechaTarea, hoy));
+                    }
+                }
+            }
+
+            // Cycle-based rules (only if cerda has an active cycle)
             if (!ciclo) continue;
 
             const reglasServicio = reglas.filter(r => r.evento_origen === 'servicio');
             if (ciclo.fecha_inseminacion) {
                 const fechaInsem = new Date(ciclo.fecha_inseminacion);
                 for (const regla of reglasServicio) {
+                    // Filter by sow type
+                    const nombreLower = regla.nombre_tarea.toLowerCase();
+                    const esReglaPrimeriza = nombreLower.includes('primeriza');
+                    const esReglaMultipara = nombreLower.includes('multípara') || nombreLower.includes('multipara');
+
+                    if (esReglaPrimeriza && !esPrimeriza) continue;
+                    if (esReglaMultipara && !esMultipara) continue;
+
                     const fechaTarea = new Date(fechaInsem);
                     fechaTarea.setDate(fechaTarea.getDate() + regla.dias_target);
                     fechaTarea.setHours(0, 0, 0, 0);
@@ -123,6 +159,14 @@ export class SanidadService {
             if (ciclo.fecha_parto_real) {
                 const fechaParto = new Date(ciclo.fecha_parto_real);
                 for (const regla of reglasParto) {
+                    // Filter by sow type
+                    const nombreLower = regla.nombre_tarea.toLowerCase();
+                    const esReglaPrimeriza = nombreLower.includes('primeriza');
+                    const esReglaMultipara = nombreLower.includes('multípara') || nombreLower.includes('multipara');
+
+                    if (esReglaPrimeriza && !esPrimeriza) continue;
+                    if (esReglaMultipara && !esMultipara) continue;
+
                     const fechaTarea = new Date(fechaParto);
                     fechaTarea.setDate(fechaTarea.getDate() + regla.dias_target);
                     fechaTarea.setHours(0, 0, 0, 0);
@@ -137,6 +181,14 @@ export class SanidadService {
             if (ciclo.fecha_destete) {
                 const fechaDestete = new Date(ciclo.fecha_destete);
                 for (const regla of reglasDestete) {
+                    // Filter by sow type
+                    const nombreLower = regla.nombre_tarea.toLowerCase();
+                    const esReglaPrimeriza = nombreLower.includes('primeriza');
+                    const esReglaMultipara = nombreLower.includes('multípara') || nombreLower.includes('multipara');
+
+                    if (esReglaPrimeriza && !esPrimeriza) continue;
+                    if (esReglaMultipara && !esMultipara) continue;
+
                     const fechaTarea = new Date(fechaDestete);
                     fechaTarea.setDate(fechaTarea.getDate() + regla.dias_target);
                     fechaTarea.setHours(0, 0, 0, 0);

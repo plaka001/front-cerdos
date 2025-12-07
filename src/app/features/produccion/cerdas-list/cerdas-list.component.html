@@ -12,15 +12,15 @@
             <div class="flex items-center gap-3">
                 <!-- Alimentar Button -->
                 <button (click)="abrirAlimentarModal()"
-                    class="flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-500 transition-all border border-emerald-500/20 h-12 min-w-[3rem]">
-                    <span class="text-lg leading-none">🍽️</span>
+                    class="h-12 w-12 sm:w-auto flex items-center justify-center gap-2 px-0 sm:px-4 bg-emerald-600 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-500 transition-all border border-emerald-500/20 active:scale-95">
+                    <span class="text-xl leading-none">🍽️</span>
                     <span class="hidden sm:inline">Alimentar</span>
                 </button>
 
                 <!-- Nueva Cerda Button -->
                 <button (click)="abrirNuevaCerdaModal()"
-                    class="flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-500 transition-all border border-emerald-500/20 h-12 min-w-[3rem]">
-                    <lucide-icon name="plus" [size]="20" class="leading-none"></lucide-icon>
+                    class="h-12 w-12 sm:w-auto flex items-center justify-center gap-2 px-0 sm:px-4 bg-emerald-600 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-500 transition-all border border-emerald-500/20 active:scale-95">
+                    <lucide-icon name="plus" [size]="24"></lucide-icon>
                     <span class="hidden sm:inline">Nueva Cerda</span>
                 </button>
             </div>
@@ -61,7 +61,7 @@
                 <button (click)="filtroEstado.set('todos')" [class]="filtroEstado() === 'todos'
                         ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
                         : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
-                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2">
+                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
                     <lucide-icon name="layers" [size]="16"></lucide-icon>
                     Todas
                 </button>
@@ -69,8 +69,9 @@
                 <button (click)="filtroEstado.set('gestante')" [class]="filtroEstado() === 'gestante'
                         ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
                         : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
-                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2">
-                    <span>🤰</span> <span class="hidden xs:inline">Gestantes</span><span class="xs:hidden">Gest</span>
+                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
+                    <lucide-icon name="baby" [size]="16"></lucide-icon>
+                    <span>Gestantes</span>
                     <span class="bg-slate-800 px-1.5 py-0.5 rounded text-[10px] font-bold opacity-80 text-slate-300">
                         {{ conteoGestantes() }}
                     </span>
@@ -79,8 +80,9 @@
                 <button (click)="filtroEstado.set('lactante')" [class]="filtroEstado() === 'lactante'
                         ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
                         : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
-                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2">
-                    <span>🍼</span> <span class="hidden xs:inline">Lactantes</span><span class="xs:hidden">Lact</span>
+                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
+                    <lucide-icon name="milk" [size]="16"></lucide-icon>
+                    <span>Lactantes</span>
                     <span class="bg-slate-800 px-1.5 py-0.5 rounded text-[10px] font-bold opacity-80 text-slate-300">
                         {{ conteoLactantes() }}
                     </span>
@@ -89,8 +91,9 @@
                 <button (click)="filtroEstado.set('vacia')" [class]="filtroEstado() === 'vacia'
                         ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
                         : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
-                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2">
-                    <span>⭕</span> Vacías
+                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
+                    <lucide-icon name="circle" [size]="16"></lucide-icon>
+                    Vacías
                     <span class="bg-slate-800 px-1.5 py-0.5 rounded text-[10px] font-bold opacity-80 text-slate-300">
                         {{ conteoVacias() }}
                     </span>
@@ -99,8 +102,9 @@
                 <button (click)="filtroEstado.set('descarte')" [class]="filtroEstado() === 'descarte'
                         ? 'bg-slate-700 text-white shadow-sm border-b-2 border-blue-500' 
                         : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'"
-                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2">
-                    <span>🚫</span> Descarte
+                    class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-grow sm:flex-grow-0 justify-center">
+                    <lucide-icon name="ban" [size]="16"></lucide-icon>
+                    Descarte
                     <span class="bg-slate-800 px-1.5 py-0.5 rounded text-[10px] font-bold opacity-80 text-slate-300">
                         {{ conteoDescarte() }}
                     </span>
@@ -230,12 +234,8 @@
                         class="bg-slate-900 border-t border-slate-700 p-3 flex items-center gap-2 relative rounded-b-xl">
                         <!-- Primary Action -->
                         <button
-                            class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm transition-colors"
-                            [ngClass]="{
-                                'bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30': cerda.estado === 'vacia',
-                                'bg-blue-600/20 text-blue-400 hover:bg-blue-600/30': cerda.estado === 'gestante',
-                                'bg-pink-600/20 text-pink-400 hover:bg-pink-600/30': cerda.estado === 'lactante'
-                            }" (click)="abrirModalEvento(cerda); $event.stopPropagation()">
+                            class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm transition-colors bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30"
+                            (click)="abrirModalEvento(cerda); $event.stopPropagation()">
 
                             @if (cerda.estado === 'vacia') {
                             <span>Inseminar</span>
@@ -249,7 +249,7 @@
                         <!-- Menu Trigger (Relative Container) -->
                         <div class="relative">
                             <button
-                                class="p-2.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                                class="p-3.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
                                 (click)="toggleMenu(cerda.id, $event)">
                                 <lucide-icon name="more-vertical" [size]="20"></lucide-icon>
                             </button>
