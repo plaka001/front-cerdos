@@ -18,48 +18,10 @@ export class ProduccionService {
     }
 
     private async init() {
-        await this.corregirContadoresPartos();
         await Promise.all([
             this.loadCerdas(),
             this.loadLotes()
         ]);
-    }
-
-    private async corregirContadoresPartos() {
-        try {
-            const { data: ciclos } = await this.supabase
-                .from('ciclos_reproductivos')
-                .select('cerda_id')
-                .not('fecha_parto_real', 'is', null);
-
-            if (!ciclos) return;
-
-            const conteo: Record<number, number> = {};
-            ciclos.forEach((c: any) => {
-                conteo[c.cerda_id] = (conteo[c.cerda_id] || 0) + 1;
-            });
-
-            const { data: cerdas } = await this.supabase.from('cerdas').select('id, partos_acumulados');
-
-            if (!cerdas) return;
-
-            const updates = [];
-            for (const cerda of cerdas) {
-                const real = conteo[cerda.id] || 0;
-                if (cerda.partos_acumulados !== real) {
-                    updates.push(
-                        this.supabase.from('cerdas').update({ partos_acumulados: real }).eq('id', cerda.id)
-                    );
-                }
-            }
-
-            if (updates.length > 0) {
-                await Promise.all(updates);
-                console.log(`Corregidos ${updates.length} contadores de partos.`);
-            }
-        } catch (err) {
-            console.error('Error corrigiendo contadores:', err);
-        }
     }
 
     async loadCerdas() {

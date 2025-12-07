@@ -92,6 +92,32 @@ export class ReportesComponent implements OnInit {
         return Math.max(...egresos.map(e => e.total));
     });
 
+    // --- Unified Logic for Redesign ---
+    movimientosUnificados = computed(() => {
+        const ingresos = this.ingresosFiltrados();
+        const egresos = this.egresosFiltrados();
+
+        // Combine and sort by total amount (descending)
+        return [...ingresos, ...egresos].sort((a, b) => b.total - a.total);
+    });
+
+    getIconoCategoria(nombre: string): string {
+        const n = nombre.toLowerCase();
+        if (n.includes('venta')) return 'piggy-bank';
+        if (n.includes('alimento') || n.includes('comida')) return 'wheat';
+        if (n.includes('medicamento') || n.includes('sanidad') || n.includes('veterinaria')) return 'stethoscope'; // pill/syringe not generic enough
+        if (n.includes('semen') || n.includes('genética')) return 'dna';
+        if (n.includes('personal') || n.includes('nómina')) return 'users';
+        if (n.includes('mantenimiento') || n.includes('reparaci')) return 'wrench';
+        if (n.includes('servicio') || n.includes('luz') || n.includes('agua')) return 'zap';
+        if (n.includes('transporte') || n.includes('flete')) return 'truck';
+        return 'wallet'; // Default
+    }
+
+    getColorCategoria(tipo: 'ingreso' | 'egreso'): string {
+        return tipo === 'ingreso' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400';
+    }
+
     ngOnInit() {
         this.loadReportes();
     }

@@ -342,14 +342,12 @@
     <!-- TAB: Flujo de Caja -->
     @if (activeTab() === 'flujo') {
     <div class="space-y-6">
-
-        <!-- Month Selector & Download -->
-        <div
-            class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-col sm:flex-row gap-4 items-end sm:items-center justify-between">
-            <div class="w-full sm:w-auto flex-1">
-                <label class="block text-sm font-medium text-slate-400 mb-2">Seleccionar Mes</label>
+        <!-- Control Bar (Minimalist) -->
+        <div class="flex flex-col sm:flex-row gap-4 items-center justify-between mb-2">
+            <!-- Month Selector -->
+            <div class="relative w-full sm:w-64">
                 <select [ngModel]="mesSeleccionado()" (ngModelChange)="mesSeleccionado.set($event)"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                    class="w-full bg-slate-800 border border-slate-700/50 rounded-xl py-2.5 pl-4 pr-10 text-white text-sm focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all appearance-none cursor-pointer hover:bg-slate-700/50">
                     @for (mes of mesesDisponibles(); track mes) {
                     <option [value]="mes">{{ mes }}</option>
                     }
@@ -357,126 +355,125 @@
                     <option [value]="mesSeleccionado()">{{ mesSeleccionado() }} (Sin datos)</option>
                     }
                 </select>
+                <lucide-icon name="chevron-down" [size]="16"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></lucide-icon>
             </div>
 
+            <!-- Download Button (Icon Only Variant) -->
             <button (click)="downloadExcel()" [disabled]="downloading()"
-                class="w-full sm:w-auto px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="p-2.5 rounded-xl bg-slate-800 border border-slate-700/50 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group">
                 @if (downloading()) {
-                <lucide-icon name="loader-2" class="animate-spin" [size]="20"></lucide-icon>
-                <span>Generando...</span>
+                <div class="animate-spin rounded-full h-5 w-5 border-2 border-emerald-500 border-t-transparent"></div>
                 } @else {
-                <lucide-icon name="download" [size]="20"></lucide-icon>
-                <span>Descargar Excel del Mes</span>
+                <lucide-icon name="file-spreadsheet" [size]="20"
+                    class="group-hover:text-emerald-300 transition-colors"></lucide-icon>
                 }
             </button>
         </div>
 
-        <!-- Balance Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <!-- Ingresos Card -->
+        <!-- Big Hero Card (Financial Summary) -->
+        <div class="bg-slate-800 rounded-3xl p-8 border border-slate-700/50 shadow-2xl relative overflow-hidden group">
+            <!-- Background Glow -->
             <div
-                class="bg-gradient-to-br from-emerald-900/30 to-emerald-800/20 p-5 rounded-xl border border-emerald-700/50">
-                <div class="flex items-center gap-2 mb-2"><span
-                        class="text-emerald-300 text-sm font-medium">Ingresos</span>
-                </div>
-                <div class="text-3xl font-bold text-emerald-400">
-                    {{ totalIngresosMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
-                </div>
+                class="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-1000">
             </div>
 
-            <!-- Egresos Card -->
-            <div class="bg-gradient-to-br from-red-900/30 to-red-800/20 p-5 rounded-xl border border-red-700/50">
-                <div class="flex items-center gap-2 mb-2"><span class="text-red-300 text-sm font-medium">Egresos</span>
+            <div class="relative z-10">
+                <!-- Top: Net Balance -->
+                <div class="text-center mb-8">
+                    <p class="text-sm font-medium text-slate-400 uppercase tracking-widest mb-2">Balance Neto</p>
+                    <h2 class="text-4xl sm:text-5xl font-black tracking-tight" [class.text-white]="balanceMes() >= 0"
+                        [class.text-red-400]="balanceMes() < 0">
+                        {{ balanceMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    </h2>
                 </div>
-                <div class="text-3xl font-bold text-red-400">
-                    {{ totalEgresosMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
-                </div>
-            </div>
 
-            <!-- Balance Card -->
-            <div class="bg-gradient-to-br from-blue-900/30 to-blue-800/20 p-5 rounded-xl border border-blue-700/50">
-                <div class="flex items-center gap-2 mb-2"><span class="text-blue-300 text-sm font-medium">Balance
-                        Neto</span>
-                </div>
-                <div class="text-3xl font-bold" [ngClass]="{
-                    'text-emerald-400': balanceMes() > 0,
-                    'text-red-400': balanceMes() < 0,
-                    'text-slate-400': balanceMes() === 0
-                }">
-                    {{ balanceMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
+                <!-- Divider -->
+                <div class="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent mb-8"></div>
+
+                <!-- Bottom: Split Stats -->
+                <div class="grid grid-cols-2 gap-8">
+                    <!-- Ingresos -->
+                    <div class="text-center border-r border-slate-700/50">
+                        <div
+                            class="inline-flex items-center justify-center p-2 rounded-full bg-emerald-500/10 text-emerald-400 mb-3">
+                            <lucide-icon name="arrow-up" [size]="18"></lucide-icon>
+                        </div>
+                        <p class="text-xs text-slate-500 uppercase font-bold mb-1">Ingresos Totales</p>
+                        <p class="text-xl sm:text-2xl font-bold text-emerald-400">
+                            {{ totalIngresosMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
+                        </p>
+                    </div>
+
+                    <!-- Egresos -->
+                    <div class="text-center">
+                        <div
+                            class="inline-flex items-center justify-center p-2 rounded-full bg-red-500/10 text-red-400 mb-3">
+                            <lucide-icon name="arrow-down" [size]="18"></lucide-icon>
+                        </div>
+                        <p class="text-xs text-slate-500 uppercase font-bold mb-1">Egresos Totales</p>
+                        <p class="text-xl sm:text-2xl font-bold text-red-400">
+                            {{ totalEgresosMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Detailed Lists: Two Columns -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-            <!-- INGRESOS Column -->
-            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-                <div class="p-4 border-b border-slate-700 bg-emerald-900/20">
-                    <h3 class="font-bold text-emerald-300 flex items-center gap-2"> Entradas
-                    </h3>
-                </div>
-
-                <div class="p-4 space-y-4">
-                    @for (item of ingresosFiltrados(); track item.categoria_nombre) {
-                    <div>
-                        <div class="flex justify-between items-end mb-1">
-                            <span class="text-white font-medium">{{ item.categoria_nombre }}</span>
-                            <span class="text-emerald-300 font-mono font-bold">
-                                {{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}
-                            </span>
-                        </div>
-                        <!-- Green Bar -->
-                        <div class="h-2 w-full bg-slate-700/50 rounded-full overflow-hidden">
-                            <div class="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                                [style.width.%]="getBarWidthIngreso(item.total)">
-                            </div>
-                        </div>
-                    </div>
-                    }
-
-                    @if (ingresosFiltrados().length === 0) {
-                    <div class="text-center py-10 text-slate-500">
-                        <p>No hay ingresos registrados para este mes.</p>
-                    </div>
-                    }
-                </div>
+        <!-- Unified Transactions List (Fintech Style) -->
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-xl">
+            <div
+                class="p-6 border-b border-slate-700/50 flex justify-between items-center bg-slate-800/50 backdrop-blur-sm">
+                <h3 class="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                    Movimientos del Mes
+                </h3>
+                <span
+                    class="text-xs font-medium text-slate-400 bg-slate-700/50 px-2 py-1 rounded-full border border-slate-600">
+                    {{ movimientosUnificados().length }} transacciones
+                </span>
             </div>
 
-            <!-- EGRESOS Column -->
-            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-                <div class="p-4 border-b border-slate-700 bg-red-900/20">
-                    <h3 class="font-bold text-red-300 flex items-center gap-2">Salidas
-                    </h3>
-                </div>
-
-                <div class="p-4 space-y-4">
-                    @for (item of egresosFiltrados(); track item.categoria_nombre) {
-                    <div>
-                        <div class="flex justify-between items-end mb-1">
-                            <span class="text-white font-medium">{{ item.categoria_nombre }}</span>
-                            <span class="text-red-300 font-mono font-bold">
-                                {{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}
-                            </span>
+            <div class="divide-y divide-slate-700/30">
+                @for (item of movimientosUnificados(); track item.categoria_nombre) {
+                <div class="p-4 flex items-center justify-between hover:bg-white/5 transition-colors group">
+                    <div class="flex items-center gap-4">
+                        <!-- Icon Avatar -->
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-105"
+                            [class]="getColorCategoria(item.tipo)">
+                            <lucide-icon [name]="getIconoCategoria(item.categoria_nombre)" [size]="20"></lucide-icon>
                         </div>
-                        <!-- Red Bar -->
-                        <div class="h-2 w-full bg-slate-700/50 rounded-full overflow-hidden">
-                            <div class="h-full bg-red-500 rounded-full transition-all duration-500"
-                                [style.width.%]="getBarWidthEgreso(item.total)">
-                            </div>
+
+                        <!-- Details -->
+                        <div>
+                            <p class="text-white font-semibold text-sm sm:text-base">{{ item.categoria_nombre }}</p>
+                            <p class="text-xs text-slate-400 mt-0.5 capitalize">{{ item.tipo }}</p>
                         </div>
                     </div>
-                    }
 
-                    @if (egresosFiltrados().length === 0) {
-                    <div class="text-center py-10 text-slate-500">
-                        <p>No hay egresos registrados para este mes.</p>
+                    <!-- Amount -->
+                    <div class="text-right">
+                        <p class="font-bold text-base sm:text-lg tracking-tight"
+                            [class]="item.tipo === 'ingreso' ? 'text-emerald-400' : 'text-red-400'">
+                            {{ item.tipo === 'ingreso' ? '+' : '-' }} {{ item.total |
+                            currency:'COP':'symbol-narrow':'1.0-0' }}
+                        </p>
                     </div>
-                    }
                 </div>
+                }
+
+                <!-- Empty State -->
+                @if (movimientosUnificados().length === 0) {
+                <div class="py-16 text-center flex flex-col items-center justify-center">
+                    <div class="w-20 h-20 rounded-full bg-slate-700/30 flex items-center justify-center mb-4">
+                        <lucide-icon name="wallet" [size]="40" class="text-slate-500"></lucide-icon>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">No hay movimientos registrados</h3>
+                    <p class="text-slate-400 max-w-xs mx-auto">
+                        No se han encontrado ingresos ni egresos para el mes seleccionado.
+                    </p>
+                </div>
+                }
             </div>
-
         </div>
     </div>
     }
