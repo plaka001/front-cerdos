@@ -59,27 +59,31 @@ import { RegistrarSanidadLoteModalComponent } from '../produccion/components/reg
                         
                         <div class="space-y-3">
                             @for (tarea of tareasAtrasadas(); track tarea.id_referencia + tarea.nombre_tarea) {
-                                <div class="bg-slate-800 rounded-xl border border-slate-700/50 shadow-md p-5 flex items-start sm:items-center justify-between gap-4 transition-all hover:border-slate-600">
+                                <div class="bg-slate-800 rounded-xl border border-slate-700/50 shadow-md p-4 flex items-start justify-between gap-4 transition-all hover:border-slate-600 group/card">
                                     <div class="min-w-0 flex-1">
-                                        <div class="flex items-center gap-3 mb-2 flex-wrap">
-                                            <h3 class="font-bold text-white text-lg leading-tight">{{ tarea.nombre_tarea }}</h3>
+                                        <!-- Target (Cerda/Lote) - PROMINENT -->
+                                        <div class="mb-1 flex items-center justify-between">
+                                            <span class="text-xl font-black text-white tracking-tight">
+                                                {{ formatearDestino(tarea) }}
+                                            </span>
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 text-[10px] font-bold uppercase tracking-wider border border-red-500/20 whitespace-nowrap">
                                                 Vencido
                                             </span>
                                         </div>
-                                        <div class="flex items-center text-slate-400 text-sm gap-3">
-                                            <div class="flex items-center gap-1.5">
-                                                <lucide-icon name="target" [size]="14" class="text-slate-500"></lucide-icon>
-                                                <span>{{ formatearDestino(tarea) }}</span>
-                                            </div>
-                                            <span class="text-slate-600">|</span>
-                                            <span class="text-red-400 font-medium text-xs">Hace {{ Math.abs(tarea.dias_vencimiento) }} días</span>
+                                        
+                                        <!-- Task Name -->
+                                        <h3 class="font-medium text-slate-300 text-sm mb-2">{{ tarea.nombre_tarea }}</h3>
+                                        
+                                        <!-- Time -->
+                                        <div class="flex items-center text-red-400 text-xs font-medium gap-1.5 bg-red-500/5 w-fit px-2 py-1 rounded-md">
+                                            <lucide-icon name="clock" [size]="12"></lucide-icon>
+                                            <span>Hace {{ Math.abs(tarea.dias_vencimiento) }} días</span>
                                         </div>
                                     </div>
                                     
                                     <button (click)="abrirModalAplicar(tarea)" 
-                                            class="shrink-0 h-10 w-10 flex items-center justify-center rounded-full border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-all active:scale-95 shadow-sm group">
-                                        <lucide-icon name="syringe" [size]="18" class="group-hover:scale-110 transition-transform"></lucide-icon>
+                                            class="shrink-0 h-10 w-10 flex items-center justify-center rounded-full border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-all active:scale-95 shadow-sm">
+                                        <lucide-icon name="syringe" [size]="18"></lucide-icon>
                                     </button>
                                 </div>
                             }
@@ -101,27 +105,33 @@ import { RegistrarSanidadLoteModalComponent } from '../produccion/components/reg
                         
                         <div class="space-y-3">
                             @for (tarea of tareasHoy(); track tarea.id_referencia + tarea.nombre_tarea) {
-                                <div class="bg-slate-800 rounded-xl border border-slate-700/50 shadow-md p-5 flex items-start sm:items-center justify-between gap-4 transition-all hover:border-slate-600">
+                                <div class="bg-slate-800 rounded-xl border border-slate-700/50 shadow-md p-4 flex items-start justify-between gap-4 transition-all hover:border-slate-600">
                                     <div class="min-w-0 flex-1">
-                                        <div class="flex items-center gap-3 mb-2 flex-wrap">
-                                            <h3 class="font-bold text-white text-lg leading-tight">{{ tarea.nombre_tarea }}</h3>
+                                         <!-- Target (Cerda/Lote) - PROMINENT -->
+                                        <div class="mb-1 flex items-center justify-between">
+                                            <span class="text-xl font-black text-white tracking-tight">
+                                                {{ formatearDestino(tarea) }}
+                                            </span>
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wider border border-emerald-500/20 whitespace-nowrap">
                                                 Hoy
                                             </span>
                                         </div>
-                                        <div class="flex items-center text-slate-400 text-sm gap-3">
-                                             <div class="flex items-center gap-1.5">
-                                                <lucide-icon name="target" [size]="14" class="text-slate-500"></lucide-icon>
-                                                <span>{{ formatearDestino(tarea) }}</span>
-                                            </div>
-                                            <span class="text-slate-600">|</span>
-                                            <span class="text-slate-400 text-xs">Programado para hoy</span>
+
+                                        <!-- Task Name -->
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <h3 class="font-medium text-slate-300 text-sm">{{ tarea.nombre_tarea }}</h3>
+                                        </div>
+
+                                        <!-- Subtext -->
+                                        <div class="text-slate-500 text-xs flex items-center gap-1.5">
+                                             <lucide-icon name="check-circle" [size]="12" class="text-emerald-500/50"></lucide-icon>
+                                             <span>Programado para hoy</span>
                                         </div>
                                     </div>
                                     
                                     <button (click)="abrirModalAplicar(tarea)" 
-                                            class="shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition-all active:scale-95 shadow-md hover:shadow-lg group border border-emerald-500/50">
-                                        <lucide-icon name="check" [size]="20" class="group-hover:stroke-[3px] transition-all"></lucide-icon>
+                                            class="shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition-all active:scale-95 shadow-md hover:shadow-lg border border-emerald-500/50">
+                                        <lucide-icon name="check" [size]="20"></lucide-icon>
                                     </button>
                                 </div>
                             }
@@ -144,18 +154,16 @@ import { RegistrarSanidadLoteModalComponent } from '../produccion/components/reg
                         <div class="space-y-3">
                             @for (tarea of tareasProximas(); track tarea.id_referencia + tarea.nombre_tarea) {
                                 <div class="bg-slate-800/50 rounded-xl border border-slate-700/50 shadow-sm p-4 flex items-center justify-between gap-3 opacity-90 hover:opacity-100 hover:bg-slate-800 transition-all">
-                                    <div class="min-w-0">
-                                        <div class="flex items-center gap-3 mb-1">
-                                            <h3 class="font-semibold text-slate-200 text-base leading-tight">{{ tarea.nombre_tarea }}</h3>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <span class="text-lg font-bold text-slate-200">
+                                                {{ formatearDestino(tarea) }}
+                                            </span>
+                                            <span class="text-blue-400 font-medium text-xs bg-blue-500/5 px-2 py-0.5 rounded-full">
+                                                En {{ tarea.dias_vencimiento }} días
+                                            </span>
                                         </div>
-                                        <div class="flex items-center text-slate-500 text-xs gap-3">
-                                            <span>{{ formatearDestino(tarea) }}</span>
-                                            <span class="text-slate-700">|</span>
-                                            <span class="text-blue-400 font-medium">En {{ tarea.dias_vencimiento }} días</span>
-                                        </div>
-                                    </div>
-                                    <div class="shrink-0 p-2 rounded-full bg-slate-800 text-slate-500 border border-slate-700">
-                                        <lucide-icon name="clock" [size]="16"></lucide-icon>
+                                        <h3 class="font-medium text-slate-500 text-sm">{{ tarea.nombre_tarea }}</h3>
                                     </div>
                                 </div>
                             }
