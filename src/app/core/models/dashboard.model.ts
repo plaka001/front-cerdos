@@ -2,6 +2,7 @@
 
 export interface DashboardKpi {
     totalCerdas: number;
+    totalPrecebo: number;
     totalEngorde: number;
     lotesActivos: number;
     tasaMortalidad: number; // Porcentaje con 1 decimal

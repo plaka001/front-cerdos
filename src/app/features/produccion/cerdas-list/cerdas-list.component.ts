@@ -7,6 +7,7 @@ import { EventModalComponent } from '../components/event-modal/event-modal.compo
 import { NuevaCerdaModalComponent } from '../components/nueva-cerda-modal/nueva-cerda-modal.component';
 import { AlimentarCerdasModalComponent } from '../components/alimentar-cerdas-modal/alimentar-cerdas-modal.component';
 import { CerdaHistorialModalComponent } from '../components/cerda-historial-modal/cerda-historial-modal.component';
+import { HistorialAlimentacionCerdasModalComponent } from '../components/historial-alimentacion-cerdas-modal/historial-alimentacion-cerdas-modal.component';
 
 // Interfaz extendida con propiedades calculadas
 interface CerdaConBadge extends CerdaDetalle {
@@ -16,7 +17,7 @@ interface CerdaConBadge extends CerdaDetalle {
 @Component({
     selector: 'app-cerdas-list',
     standalone: true,
-    imports: [CommonModule, LucideAngularModule, EventModalComponent, NuevaCerdaModalComponent, AlimentarCerdasModalComponent, CerdaHistorialModalComponent],
+    imports: [CommonModule, LucideAngularModule, EventModalComponent, NuevaCerdaModalComponent, AlimentarCerdasModalComponent, CerdaHistorialModalComponent, HistorialAlimentacionCerdasModalComponent],
     templateUrl: './cerdas-list.component.html'
 })
 export class CerdasListComponent implements OnInit {
@@ -31,8 +32,11 @@ export class CerdasListComponent implements OnInit {
     modalOpen = signal<boolean>(false);
     modalType = signal<'inseminacion' | 'parto' | 'destete' | 'falla' | 'sanidad' | 'venta' | 'muerte' | null>(null);
 
-    // Historial Modal
+    // Historial Modal (Individual)
     historialModalOpen = signal<boolean>(false);
+
+    // Historial Alimentacion General Modal
+    historialAlimentacionOpen = signal<boolean>(false);
 
     // Dropdown Menu State
     openMenuId = signal<number | null>(null);

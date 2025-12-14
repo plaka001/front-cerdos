@@ -38,6 +38,8 @@ export interface Cerda {
     partos_acumulados: number; // default 0
     activa: boolean; // default true
     notas?: string;
+    corral_id?: number | null;
+    corrales?: { id: number; nombre: string } | null;
     created_at?: string;
 }
 
@@ -94,6 +96,9 @@ export interface Lote {
     peso_promedio_inicial?: number;
     observaciones?: string;
     peso_promedio_actual?: number;
+    corral_id?: number | null;
+    etapa: 'precebo' | 'engorde'; // Default 'precebo'
+    corrales?: { id: number; nombre: string } | null;
 }
 
 export interface LoteDetalle extends Lote {
@@ -192,4 +197,19 @@ export interface ReporteFlujoCaja {
     categoria_nombre: string;
     tipo: 'ingreso' | 'egreso';
     total: number;
+}
+
+export interface Corral {
+    id: number;
+    nombre: string;
+    tipo: 'gestacion' | 'paridera' | 'precebo' | 'engorde' | 'cuarentena';
+    capacidad_maxima: number;
+    activo: boolean;
+    created_at?: string;
+}
+
+export interface EstadoCorral extends Corral {
+    ocupacion_lotes: number;
+    ocupacion_cerdas: number;
+    ocupacion_total: number;
 }

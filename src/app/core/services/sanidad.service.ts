@@ -230,7 +230,7 @@ export class SanidadService {
 
         // 6. Filter Completed Tasks Logic
         // Remove task if an event exists today for the same reference ID and containing task name in observations
-        console.log('Tareas generadas (antes de filtrar):', tareas);
+        // Create filtered list
 
         const tareasFiltradas = tareas.filter(t => {
             const yaRealizada = eventosHoy?.some(e => {

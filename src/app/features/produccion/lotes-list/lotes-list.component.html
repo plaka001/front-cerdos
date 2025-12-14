@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="p-5 space-y-6 fade-in">
         <div class="mb-6">
-            <h1 class="text-2xl font-bold text-white mb-2">Lotes de Engorde</h1>
-            <p class="text-sm text-slate-400">Gestión de lotes activos</p>
+            <h1 class="text-2xl font-bold text-white mb-2">{{ tituloPagina() }}</h1>
+            <p class="text-sm text-slate-400">Gestión de lotes {{ etapaActual() ? 'de ' + etapaActual() : '' }}</p>
         </div>
 
         <!-- Loading State -->
@@ -102,7 +102,14 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h3 class="text-lg font-bold text-white truncate">{{ lote.codigo }}</h3>
-                                <p class="text-xs text-slate-400 truncate">{{ lote.ubicacion }}</p>
+                                @if (lote.corrales) {
+                                <div class="flex items-center gap-1 mt-0.5 text-xs text-emerald-500/80 font-medium">
+                                    <lucide-icon name="map-pin" [size]="12"></lucide-icon>
+                                    <span class="truncate">{{ lote.corrales.nombre }}</span>
+                                </div>
+                                } @else {
+                                <p class="text-xs text-slate-400 truncate capitalize">{{ lote.ubicacion }}</p>
+                                }
                             </div>
                         </div>
 
@@ -186,6 +193,14 @@
                                         Acciones
                                     </div>
 
+                                    @if(etapaActual() === 'precebo') {
+                                    <button (click)="trasladarEtapa(lote); $event.stopPropagation()"
+                                        class="w-full flex items-center gap-3 px-3 py-2 text-sm text-emerald-400 hover:bg-emerald-900/20 rounded-lg transition-colors text-left font-bold bg-emerald-900/10 mb-1 border border-emerald-900/30">
+                                        <lucide-icon name="truck" [size]="16"></lucide-icon>
+                                        Pasar a Engorde
+                                    </button>
+                                    }
+
                                     <button (click)="registrarMortalidad(lote); $event.stopPropagation()"
                                         class="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-900/20 rounded-lg transition-colors text-left">
                                         <lucide-icon name="skull" [size]="16"></lucide-icon>
@@ -202,6 +217,12 @@
                                         class="w-full flex items-center gap-3 px-3 py-2 text-sm text-amber-400 hover:bg-amber-900/20 rounded-lg transition-colors text-left">
                                         <lucide-icon name="dollar-sign" [size]="16"></lucide-icon>
                                         Venta Lote
+                                    </button>
+
+                                    <button (click)="trasladarLote(lote); $event.stopPropagation()"
+                                        class="w-full flex items-center gap-3 px-3 py-2 text-sm text-indigo-400 hover:bg-indigo-900/20 rounded-lg transition-colors text-left">
+                                        <lucide-icon name="arrow-right-left" [size]="16"></lucide-icon>
+                                        Trasladar Lote
                                     </button>
 
                                     <div class="h-px bg-slate-700 my-1"></div>
@@ -275,6 +296,18 @@
     <app-registrar-sanidad-lote-modal [lote]="loteSeleccionadoSanidad()!" (close)="onSanidadClosed()"
         (saved)="onSanidadSaved()">
     </app-registrar-sanidad-lote-modal>
+    }
+
+    @if (showTrasladoModal() && loteSeleccionadoTraslado()) {
+    <app-traslado-lote-modal [lote]="loteSeleccionadoTraslado()!" (close)="onTrasladoClosed()"
+        (saved)="onTrasladoSaved()">
+    </app-traslado-lote-modal>
+    }
+
+    @if (showTrasladoEtapaModal() && loteSeleccionadoTrasladoEtapa()) {
+    <app-traslado-etapa-modal [lote]="loteSeleccionadoTrasladoEtapa()!" (close)="onTrasladoEtapaClosed()"
+        (saved)="onTrasladoEtapaSaved()">
+    </app-traslado-etapa-modal>
     }
 
     <!-- Toast Notification -->

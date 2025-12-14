@@ -60,6 +60,10 @@ export class ProduccionService {
                 .from('cerdas')
                 .select(`
                     *,
+                    corrales (
+                        id,
+                        nombre
+                    ),
                     ciclos_reproductivos (
                         id,
                         fecha_inseminacion,
@@ -187,7 +191,13 @@ export class ProduccionService {
 
             const { data, error } = await this.supabase
                 .from('lotes')
-                .select('*')
+                .select(`
+                    *,
+                    corrales (
+                        id,
+                        nombre
+                    )
+                `)
                 .order('codigo');
 
             if (error) {
@@ -256,7 +266,14 @@ export class ProduccionService {
         }
     }
 
-    async registrarParto(cerdaId: number, cicloId: number, data: { fecha: string; nacidos_vivos: number; nacidos_muertos: number; momias: number; observaciones?: string }) {
+    async registrarParto(cerdaId: number, cicloId: number, data: {
+        fecha: string;
+        nacidos_vivos: number;
+        nacidos_muertos: number;
+        momias: number;
+        observaciones?: string;
+        corral_id?: number; // ✅ Paridera ID
+    }) {
         try {
             this.error.set(null);
 
@@ -290,7 +307,8 @@ export class ProduccionService {
                 .from('cerdas')
                 .update({
                     estado: 'lactante',
-                    partos_acumulados: nuevosPartos
+                    partos_acumulados: nuevosPartos,
+                    corral_id: data.corral_id // ✅ Move to Paridera
                 })
                 .eq('id', cerdaId);
 
@@ -303,7 +321,17 @@ export class ProduccionService {
         }
     }
 
-    async registrarDestete(cerdaId: number, cicloId: number, data: { fecha: string; cantidad: number; peso: number; crear_lote: boolean; observaciones?: string; valor_venta?: number; comprador?: string }) {
+    async registrarDestete(cerdaId: number, cicloId: number, data: {
+        fecha: string;
+        cantidad: number;
+        peso: number;
+        crear_lote: boolean;
+        observaciones?: string;
+        valor_venta?: number;
+        comprador?: string;
+        corral_madre_id?: number; // ✅ Return to Gestacion
+        corral_lote_id?: number; // ✅ New Lote Location
+    }) {
         try {
             this.error.set(null);
 
@@ -332,7 +360,10 @@ export class ProduccionService {
                         cantidad_inicial: data.cantidad,
                         cantidad_actual: data.cantidad,
                         peso_promedio_inicial: data.peso,
-                        estado: 'activo'
+                        estado: 'activo',
+                        etapa: 'precebo',
+                        ubicacion: 'Corral de Precebo', // Legacy text field
+                        corral_id: data.corral_lote_id // ✅ Linked Corral ID
                     });
 
                 if (errorLote) throw errorLote;
@@ -374,7 +405,13 @@ export class ProduccionService {
                 if (errorVenta) throw errorVenta;
             }
 
-            await this.actualizarEstadoCerda(cerdaId, 'vacia');
+            // 2. Actualizar estado de cerda a 'vacia' y moverla si se especificó corral
+            const updatesCerda: any = { estado: 'vacia' };
+            if (data.corral_madre_id) {
+                updatesCerda.corral_id = data.corral_madre_id;
+            }
+
+            await this.supabase.from('cerdas').update(updatesCerda).eq('id', cerdaId);
         } catch (err: any) {
             console.error('Error registrando destete:', err);
             this.error.set(err.message);
@@ -713,16 +750,28 @@ export class ProduccionService {
         }
     }
 
-    async getLotes(): Promise<LoteDetalle[]> {
+    async getLotes(etapa?: string): Promise<LoteDetalle[]> {
         try {
             this.loading.set(true);
             this.error.set(null);
 
-            const { data, error } = await this.supabase
+            let query = this.supabase
                 .from('lotes')
-                .select('*')
+                .select(`
+                *,
+                corrales (
+                    id,
+                    nombre
+                )
+            `)
                 .order('estado', { ascending: true })
                 .order('fecha_inicio', { ascending: false });
+
+            if (etapa) {
+                query = query.eq('etapa', etapa);
+            }
+
+            const { data, error } = await query;
 
             if (error) {
                 console.error('Error cargando lotes:', error);
@@ -938,7 +987,7 @@ export class ProduccionService {
                 throw new Error(errorMsg);
             }
 
-            console.log('âœ… CategorÃ­a ID encontrada para venta:', categoriaId);
+
 
             const { error: errorIngreso } = await this.supabase
                 .from('movimientos_caja')
@@ -957,7 +1006,7 @@ export class ProduccionService {
                 throw errorIngreso;
             }
 
-            console.log('âœ… Ingreso de venta registrado correctamente');
+
 
             // CRITICAL: Get current cantidad_actual to calculate remaining animals
             const { data: loteActual, error: errorLote } = await this.supabase
@@ -1006,6 +1055,7 @@ export class ProduccionService {
         fue_comprada: boolean;
         valor_compra?: number;
         fecha_compra?: string;
+        corral_id?: number | null; // ✅ Added optional corral_id
     }): Promise<void> {
         try {
             this.error.set(null);
@@ -1019,7 +1069,8 @@ export class ProduccionService {
                     fecha_nacimiento: data.fecha_nacimiento,
                     partos_acumulados: data.partos_acumulados,
                     estado: 'vacia',
-                    activa: true
+                    activa: true,
+                    corral_id: data.corral_id // ✅ Added corral_id
                 })
                 .select()
                 .single();
@@ -1041,7 +1092,7 @@ export class ProduccionService {
                     throw new Error(errorMsg);
                 }
 
-                console.log('âœ… CategorÃ­a ID encontrada para compra de cerda:', categoriaId);
+
 
                 const { error: errorEgreso } = await this.supabase
                     .from('movimientos_caja')
@@ -1060,7 +1111,7 @@ export class ProduccionService {
                     throw errorEgreso;
                 }
 
-                console.log('âœ… Egreso de compra de cerda registrado correctamente');
+
             }
 
             await this.loadCerdas();
@@ -1073,20 +1124,20 @@ export class ProduccionService {
     }
 
     /**
-     * Registrar alimentaciÃ³n grupal para cerdas (maternidad/gestaciÃ³n)
+     * Registrar alimentación grupal para cerdas (maternidad/gestación)
      */
     async registrarAlimentacionCerdas(data: {
         insumo_id: number;
         cantidad: number;  // en kg
         costo_unitario_momento: number;
-        etapa: string;  // 'GestaciÃ³n' o 'Lactancia'
+        etapa: string;  // 'Gestación' o 'Lactancia'
     }): Promise<void> {
         try {
             this.error.set(null);
 
             const notas = data.etapa
-                ? `AlimentaciÃ³n Grupal - ${data.etapa}`
-                : 'AlimentaciÃ³n Grupal - Maternidad';
+                ? `Alimentación Grupal - ${data.etapa}`
+                : 'Alimentación Grupal - Maternidad';
 
             // Insertar en salidas_insumos
             const { error: errorSalida } = await this.supabase
@@ -1096,9 +1147,9 @@ export class ProduccionService {
                     cantidad: data.cantidad,
                     fecha: new Date().toISOString().split('T')[0],
                     costo_unitario_momento: data.costo_unitario_momento,
-                    destino_tipo: 'cerda',  // CRÃTICO: Identifica gasto de cerdas
+                    destino_tipo: 'cerda',  // CRÍTICO: Identifica gasto de cerdas
                     lote_id: null,
-                    cerda_id: null,  // Gasto grupal, no especÃ­fico
+                    cerda_id: null,  // Gasto grupal, no específico
                     notas: notas
                 });
 
@@ -1107,11 +1158,9 @@ export class ProduccionService {
                 throw errorSalida;
             }
 
-            console.log('AlimentaciÃ³n de cerdas registrada correctamente');
-
         } catch (err: any) {
             console.error('Error en registrarAlimentacionCerdas:', err);
-            this.error.set(err.message || 'Error al registrar la alimentaciÃ³n');
+            this.error.set(err.message || 'Error al registrar la alimentación');
             throw err;
         }
     }
@@ -1154,7 +1203,7 @@ export class ProduccionService {
                     .single();
 
                 if (newCat?.id) {
-                    console.log(`âœ… CategorÃ­a creada: ${nombreCategoria}`);
+
                     return newCat.id;
                 }
             }
@@ -1255,4 +1304,64 @@ export class ProduccionService {
         this.error.set(null);
     }
 
+    async trasladarAEngorde(loteId: number, data: { fecha: string; corral_id: number; peso_promedio?: number; cantidad?: number }) {
+        try {
+            this.error.set(null);
+
+            const updates: any = {
+                etapa: 'engorde',
+                corral_id: data.corral_id
+            };
+
+            if (data.peso_promedio) {
+                updates.peso_promedio_actual = data.peso_promedio;
+            }
+
+            if (data.cantidad) {
+                updates.cantidad_actual = data.cantidad;
+            }
+
+            const { error } = await this.supabase
+                .from('lotes')
+                .update(updates)
+                .eq('id', loteId);
+
+            if (error) throw error;
+
+
+        } catch (err: any) {
+            console.error('Error trasladando a engorde:', err);
+            this.error.set(err.message || 'Error al trasladar lote a engorde');
+            throw err;
+        }
+    }
+
+    /**
+     * Obtiene el historial general de alimentación de cerdas (Gasto Grupal)
+     */
+    async getHistorialAlimentacionGeneral(): Promise<any[]> {
+        try {
+            const { data, error } = await this.supabase
+                .from('salidas_insumos')
+                .select(`
+                    *,
+                    insumos (
+                        nombre,
+                        unidad_medida
+                    )
+                `)
+                .eq('destino_tipo', 'cerda')
+                .order('fecha', { ascending: false });
+
+            if (error) {
+                console.error('Error cargando historial de alimentación general:', error);
+                throw error;
+            }
+
+            return data || [];
+        } catch (err: any) {
+            console.error('Error inesperado cargando historial de alimentación:', err);
+            throw err;
+        }
+    }
 }

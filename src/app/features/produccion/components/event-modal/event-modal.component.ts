@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { ProduccionService } from '../../../../core/services/produccion.service';
-import { CerdaDetalle, Insumo } from '../../../../core/models';
+import { CorralesService } from '../../../../core/services/corrales.service';
+import { CerdaDetalle, Insumo, Corral, EstadoCorral } from '../../../../core/models';
 import { InputComponent } from '../../../../shared/ui/input/input.component';
 
 @Component({
@@ -42,6 +43,22 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
           @if (tipoEvento === 'parto') {
             <div class="space-y-4">
               <app-input label="Fecha de Parto" type="date" formControlName="fecha"></app-input>
+
+              <!-- Selector Paridera -->
+              <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Mover a Paridera (Corral) <span class="text-red-400">*</span></label>
+                <select formControlName="corral_id" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                  <option value="" disabled>Seleccione paridera...</option>
+                  @for (c of corralesParidera(); track c.id) {
+                    <option [value]="c.id">
+                      {{ c.nombre }} (Cap: {{ c.capacidad_maxima }})
+                    </option>
+                  }
+                </select>
+                @if (form.get('corral_id')?.touched && form.get('corral_id')?.invalid) {
+                  <p class="text-xs text-red-400 mt-1">Debe asignar el corral.</p>
+                }
+              </div>
               
               <div class="grid grid-cols-3 gap-3">
                 <app-input label="Vivos" type="number" formControlName="nacidos_vivos" placeholder="0"></app-input>
@@ -57,10 +74,23 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
           @if (tipoEvento === 'destete') {
             <div class="space-y-4">
               <app-input label="Fecha de Destete" type="date" formControlName="fecha"></app-input>
+
+              <!-- Regresar Madre -->
+              <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Regresar Madre a... (Gestación) <span class="text-red-400">*</span></label>
+                <select formControlName="corral_madre_id" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                  <option value="" disabled>Seleccione gestación...</option>
+                  @for (c of corralesGestacion(); track c.id) {
+                    <option [value]="c.id">
+                      {{ c.nombre }}
+                    </option>
+                  }
+                </select>
+              </div>
               
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <app-input label="Cantidad" type="number" formControlName="cantidad" placeholder="0"></app-input>
+                  <app-input label="Cantidad" type="number" formControlName="cantidad" (input)="validarCapacidadPrecebo()" placeholder="0"></app-input>
                   @if (form.get('cantidad')?.hasError('max') && form.get('cantidad')?.touched) {
                     <p class="text-xs text-red-400 mt-1">
                       Error: La cerda solo tiene {{ maxLechonesDestete() }} lechones vivos registrados.
@@ -78,9 +108,33 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
               <div class="flex items-center p-3 bg-slate-700/50 rounded-lg border border-slate-600">
                 <input type="checkbox" formControlName="crear_lote" id="crear_lote" class="w-5 h-5 text-emerald-500 rounded focus:ring-emerald-500 border-slate-500 bg-slate-600">
                 <label for="crear_lote" class="ml-3 text-sm font-medium text-slate-300 cursor-pointer">
-                  Crear Lote de Engorde automáticamente
+                  Crear Lote de Precebo / Inicio
                 </label>
               </div>
+
+               <!-- Ubicación Precebo (Solo si crea lote) -->
+               @if (form.get('crear_lote')?.value) {
+                <div class="animate-in fade-in slide-in-from-top-2">
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Ubicación (Precebo) <span class="text-red-400">*</span></label>
+                    <select formControlName="corral_lote_id" (change)="validarCapacidadPrecebo()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                    <option value="" disabled>Seleccione precebo...</option>
+                    @for (c of corralesPrecebo(); track c.id) {
+                        <option [value]="c.id" [disabled]="c.ocupacion_total >= c.capacidad_maxima">
+                        {{ c.nombre }} (Disp: {{ c.capacidad_maxima - c.ocupacion_total }})
+                        </option>
+                    }
+                    </select>
+                    @if (form.get('corral_lote_id')?.touched && form.get('corral_lote_id')?.invalid) {
+                        <p class="text-xs text-red-400 mt-1">Ubicación requerida.</p>
+                    }
+                    @if (errorCapacidadPrecebo()) {
+                        <p class="text-xs text-red-400 font-medium flex items-center gap-1 animate-pulse mt-1">
+                            <lucide-icon name="alert-circle" [size]="12"></lucide-icon>
+                            Excede capacidad disponible
+                        </p>
+                    }
+                </div>
+              }
 
               <!-- ✅ NUEVO: Sección de Venta -->
               @if (!form.get('crear_lote')?.value) {
@@ -210,7 +264,7 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
           <!-- Actions -->
           <div class="pt-2">
             <button type="submit" 
-                    [disabled]="form.invalid || loading()"
+                    [disabled]="form.invalid || loading() || errorCapacidadPrecebo()"
                     class="w-full py-3 px-4 bg-emerald-600 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex justify-center items-center border border-emerald-500/20">
               @if (loading()) {
                 <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
@@ -235,6 +289,13 @@ export class EventModalComponent {
 
   private fb = inject(FormBuilder);
   private produccionService = inject(ProduccionService);
+  private corralesService = inject(CorralesService);
+
+  // Corrales Signals
+  corralesParidera = signal<Corral[]>([]);
+  corralesGestacion = signal<Corral[]>([]);
+  corralesPrecebo = signal<EstadoCorral[]>([]);
+  errorCapacidadPrecebo = signal<boolean>(false);
 
   form!: FormGroup;
   loading = signal<boolean>(false);
@@ -247,6 +308,30 @@ export class EventModalComponent {
     this.initForm();
     if (this.tipoEvento === 'sanidad') {
       this.loadInsumos();
+    }
+    // Load Corrales based on Event Type
+    if (this.tipoEvento === 'parto' || this.tipoEvento === 'destete') {
+      this.loadCorrales();
+    }
+  }
+
+  async loadCorrales() {
+    try {
+      if (this.tipoEvento === 'parto') {
+        const data = await this.corralesService.getCorrales();
+        const activos = data.filter(c => c.activo);
+        this.corralesParidera.set(activos.filter(c => c.tipo === 'paridera'));
+      } else if (this.tipoEvento === 'destete') {
+        // Use EstadoCorrales for validation
+        const dataConOcupacion = await this.corralesService.getEstadoCorrales();
+        const activos = dataConOcupacion.filter(c => c.activo);
+
+        const dataBasica = await this.corralesService.getCorrales();
+        this.corralesGestacion.set(dataBasica.filter(c => c.activo && c.tipo === 'gestacion'));
+        this.corralesPrecebo.set(activos.filter(c => c.tipo === 'precebo'));
+      }
+    } catch (e) {
+      console.error('Error loading corrales', e);
     }
   }
 
@@ -281,6 +366,7 @@ export class EventModalComponent {
         nacidos_vivos: [null, [Validators.required, Validators.min(0)]],
         nacidos_muertos: [0, [Validators.required, Validators.min(0)]],
         momias: [0, [Validators.required, Validators.min(0)]],
+        corral_id: ['', Validators.required], // New Field
         observaciones: ['']
       });
     } else if (this.tipoEvento === 'destete') {
@@ -298,6 +384,8 @@ export class EventModalComponent {
         cantidad: [null, validadoresCantidad],
         peso: [null, [Validators.required, Validators.min(0)]],
         crear_lote: [true],
+        corral_madre_id: ['', Validators.required], // New field for Mom
+        corral_lote_id: ['', Validators.required],  // New field for Piglets
         valor_venta: [null],
         comprador: [''],
         observaciones: ['']
@@ -393,15 +481,36 @@ export class EventModalComponent {
   updateDesteteValidators(crearLote: boolean) {
     const valorVentaCtrl = this.form.get('valor_venta');
     const compradorCtrl = this.form.get('comprador');
+    const corralLoteCtrl = this.form.get('corral_lote_id');
 
     if (!crearLote) {
       valorVentaCtrl?.setValidators([Validators.required, Validators.min(0)]);
+      corralLoteCtrl?.clearValidators(); // No need for precebo location if sold
+      corralLoteCtrl?.setValue(null);
     } else {
       valorVentaCtrl?.clearValidators();
       valorVentaCtrl?.setValue(null);
       compradorCtrl?.setValue('');
+      corralLoteCtrl?.setValidators([Validators.required]); // Require location
     }
     valorVentaCtrl?.updateValueAndValidity();
+    corralLoteCtrl?.updateValueAndValidity();
+  }
+
+  validarCapacidadPrecebo() {
+    const corralId = Number(this.form.get('corral_lote_id')?.value);
+    const cantidad = Number(this.form.get('cantidad')?.value || 0);
+
+    if (!corralId || !cantidad) {
+      this.errorCapacidadPrecebo.set(false);
+      return;
+    }
+
+    const corral = this.corralesPrecebo().find(c => c.id === corralId);
+    if (corral) {
+      const disponible = corral.capacidad_maxima - corral.ocupacion_total;
+      this.errorCapacidadPrecebo.set(cantidad > disponible);
+    }
   }
 
   getTitle(): string {
@@ -445,7 +554,10 @@ export class EventModalComponent {
           this.error.set('Esta cerda no tiene un ciclo reproductivo activo.');
           return;
         }
-        await this.produccionService.registrarParto(this.cerda.id, this.cerda.cicloActivo.id, val);
+        await this.produccionService.registrarParto(this.cerda.id, this.cerda.cicloActivo.id, {
+          ...val,
+          corral_id: Number(val.corral_id)
+        });
       } else if (this.tipoEvento === 'destete') {
         if (!this.cerda.cicloActivo) {
           this.error.set('Esta cerda no tiene un ciclo reproductivo activo.');
@@ -467,7 +579,9 @@ export class EventModalComponent {
           crear_lote: val.crear_lote,
           observaciones: val.observaciones,
           valor_venta: val.valor_venta,
-          comprador: val.comprador
+          comprador: val.comprador,
+          corral_madre_id: Number(val.corral_madre_id),
+          corral_lote_id: val.crear_lote ? Number(val.corral_lote_id) : undefined
         });
       } else if (this.tipoEvento === 'falla') {
         if (!this.cerda.cicloActivo) {

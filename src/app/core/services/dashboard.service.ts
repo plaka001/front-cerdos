@@ -62,7 +62,7 @@ export class DashboardService {
             // 2. Sumar animales en lotes activos
             this.supabase
                 .from('lotes')
-                .select('cantidad_actual')
+                .select('cantidad_actual, etapa')
                 .eq('estado', 'activo'),
 
             // 3. Contar muertes del mes actual
@@ -82,11 +82,12 @@ export class DashboardService {
                 .lte('fecha', ultimoDiaStr)
         ]);
 
-        const totalEngorde = lotesData?.reduce((sum, lote) => sum + (lote.cantidad_actual || 0), 0) || 0;
+        const totalPrecebo = lotesData?.filter(l => l.etapa === 'precebo').reduce((sum, lote) => sum + (lote.cantidad_actual || 0), 0) || 0;
+        const totalEngorde = lotesData?.filter(l => l.etapa !== 'precebo').reduce((sum, lote) => sum + (lote.cantidad_actual || 0), 0) || 0;
         const lotesActivos = lotesData?.length || 0;
 
         // Calcular tasa de mortalidad
-        const totalAnimales = (totalCerdas || 0) + totalEngorde;
+        const totalAnimales = (totalCerdas || 0) + totalPrecebo + totalEngorde;
         const tasaMortalidad = totalAnimales > 0
             ? parseFloat(((muertesMes || 0) / totalAnimales * 100).toFixed(1))
             : 0;
@@ -96,6 +97,7 @@ export class DashboardService {
 
         return {
             totalCerdas: totalCerdas || 0,
+            totalPrecebo,
             totalEngorde,
             lotesActivos,
             tasaMortalidad,

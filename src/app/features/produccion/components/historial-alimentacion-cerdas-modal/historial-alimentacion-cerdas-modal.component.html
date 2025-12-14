@@ -1,0 +1,113 @@
+<div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in"
+    (click)="cerrar()">
+    <div class="bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col border border-slate-700 overflow-hidden"
+        (click)="$event.stopPropagation()">
+
+        <!-- Header Compacto -->
+        <div
+            class="px-5 py-4 border-b border-slate-700 bg-slate-900 flex items-center justify-between z-20 sticky top-0">
+            <div class="flex flex-col">
+                <h2 class="text-lg font-bold text-white leading-tight">Historial Alimentación</h2>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="text-xs text-slate-400">Total:</span>
+                    <span class="text-emerald-400 text-xs font-bold font-mono">{{ formatearMoneda(grandTotalCost())
+                        }}</span>
+                    <span class="text-slate-600 text-xs">|</span>
+                    <span class="text-blue-400 text-xs font-bold">{{ grandTotalKg() }} kg</span>
+                </div>
+            </div>
+            <button (click)="cerrar()"
+                class="text-slate-400 hover:text-white transition-colors p-2 rounded-full hover:bg-slate-800">
+                <lucide-icon name="x" [size]="24"></lucide-icon>
+            </button>
+        </div>
+
+        <!-- Body (Lista) -->
+        <div
+            class="overflow-y-auto flex-1 p-0 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800/50 bg-slate-950">
+
+            @if (loading()) {
+            <div class="flex flex-col items-center justify-center py-20 text-slate-500 gap-3">
+                <lucide-icon name="loader-2" [size]="40" class="animate-spin text-blue-500"></lucide-icon>
+                <p>Cargando transacciones...</p>
+            </div>
+            } @else if (error()) {
+            <div class="flex flex-col items-center justify-center py-20 text-red-400 gap-3 px-6 text-center">
+                <lucide-icon name="alert-circle" [size]="48"></lucide-icon>
+                <p>{{ error() }}</p>
+            </div>
+            } @else if (monthGroups().length === 0) {
+            <div class="flex flex-col items-center justify-center py-20 text-slate-500 gap-3">
+                <lucide-icon name="clipboard-list" [size]="32" class="text-slate-600"></lucide-icon>
+                <p class="font-medium">Sin movimientos</p>
+            </div>
+            } @else {
+
+            <div class="flex flex-col pb-6">
+                @for (group of monthGroups(); track group.label) {
+                <!-- Accordion Month Header -->
+                <div (click)="toggleGroup(group)"
+                    class="sticky top-0 z-10 flex items-center justify-between px-5 py-3 bg-slate-900 border-b border-slate-700 cursor-pointer hover:bg-slate-800 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <lucide-icon name="calendar" [size]="16" class="text-blue-400"></lucide-icon>
+                        <span class="font-bold text-white text-sm uppercase tracking-wide">{{ group.label }}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-bold text-emerald-400 font-mono">{{ formatearMoneda(group.totalCost)
+                            }}</span>
+                        <lucide-icon name="chevron-down" [size]="18"
+                            class="text-slate-500 transition-transform duration-200"
+                            [class.rotate-180]="group.expanded"></lucide-icon>
+                    </div>
+                </div>
+
+                <!-- Accordion Body -->
+                @if (group.expanded) {
+                <div class="animate-in slide-in-from-top-1 duration-200">
+                    @for (item of group.items; track item.id; let i = $index) {
+                    <!-- Separador de Fecha -->
+                    @if (i === 0 || item.fecha !== group.items[i-1].fecha) {
+                    <div class="px-4 py-2 mt-2">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide px-2 py-0.5">
+                            {{ getFormattedDate(item.fecha) }}
+                        </span>
+                    </div>
+                    }
+
+                    <!-- Transaction Row -->
+                    <div
+                        class="relative bg-slate-800 border-b border-slate-800/50 mx-0 pl-4 pr-4 py-3 flex justify-between items-start hover:bg-slate-700/30 transition-colors">
+                        <!-- Left Col: Context -->
+                        <div class="flex flex-col gap-0.5">
+                            <div class="flex items-center gap-2">
+                                <div class="w-1.5 h-1.5 rounded-full"
+                                    [class.bg-purple-400]="getStageFromNotes(item.notas) === 'Gestación'"
+                                    [class.bg-pink-400]="getStageFromNotes(item.notas) === 'Lactancia'"
+                                    [class.bg-blue-400]="getStageFromNotes(item.notas) !== 'Gestación' && getStageFromNotes(item.notas) !== 'Lactancia'">
+                                </div>
+                                <span class="text-base font-medium text-white shadow-sm">{{
+                                    getStageFromNotes(item.notas) }}</span>
+                            </div>
+                            <span class="text-xs text-slate-400 pl-3.5 truncate max-w-[180px]">{{ item.insumos.nombre
+                                }}</span>
+                        </div>
+
+                        <!-- Right Col: Metrics -->
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="text-sm font-bold text-emerald-400 font-mono tracking-tight tabular-nums">
+                                {{ formatearMoneda(item.cantidad * item.costo_unitario_momento) }}
+                            </span>
+                            <div class="px-2 py-0.5 roundedElement bg-slate-700 border border-slate-600">
+                                <span class="text-[10px] font-bold text-white">{{ item.cantidad }} kg</span>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+                }
+            </div>
+            }
+        </div>
+    </div>
+</div>

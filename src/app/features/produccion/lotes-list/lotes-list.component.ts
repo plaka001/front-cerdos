@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { LoteDetalle } from '../../../core/models';
@@ -9,15 +10,18 @@ import { RegistrarPesajeModalComponent } from '../components/registrar-pesaje-mo
 import { RegistrarVentaModalComponent } from '../components/registrar-venta-modal/registrar-venta-modal.component';
 import { LoteDetalleModalComponent } from '../components/lote-detalle-modal/lote-detalle-modal.component';
 import { RegistrarSanidadLoteModalComponent } from '../components/registrar-sanidad-lote-modal/registrar-sanidad-lote-modal.component';
+import { TrasladoLoteModalComponent } from '../components/traslado-lote-modal/traslado-lote-modal.component';
+import { TrasladoEtapaModalComponent } from '../components/traslado-etapa-modal/traslado-etapa-modal.component';
 
 @Component({
     selector: 'app-lotes-list',
     standalone: true,
-    imports: [CommonModule, LucideAngularModule, AlimentarLoteModalComponent, RegistrarMortalidadModalComponent, RegistrarPesajeModalComponent, RegistrarVentaModalComponent, LoteDetalleModalComponent, RegistrarSanidadLoteModalComponent],
+    imports: [CommonModule, LucideAngularModule, AlimentarLoteModalComponent, RegistrarMortalidadModalComponent, RegistrarPesajeModalComponent, RegistrarVentaModalComponent, LoteDetalleModalComponent, RegistrarSanidadLoteModalComponent, TrasladoLoteModalComponent, TrasladoEtapaModalComponent],
     templateUrl: './lotes-list.component.html'
 })
 export class LotesListComponent implements OnInit {
     private produccionService = inject(ProduccionService);
+    private route = inject(ActivatedRoute);
 
     lotes = signal<LoteDetalle[]>([]);
     loading = signal<boolean>(true);
@@ -35,6 +39,14 @@ export class LotesListComponent implements OnInit {
     loteSeleccionadoDetalle = signal<LoteDetalle | null>(null);
     showSanidadModal = signal<boolean>(false);
     loteSeleccionadoSanidad = signal<LoteDetalle | null>(null);
+    showTrasladoModal = signal<boolean>(false);
+    loteSeleccionadoTraslado = signal<LoteDetalle | null>(null);
+    showTrasladoEtapaModal = signal<boolean>(false);
+    loteSeleccionadoTrasladoEtapa = signal<LoteDetalle | null>(null);
+
+    // Route Data
+    tituloPagina = signal('Lotes');
+    etapaActual = signal<string | undefined>(undefined);
 
     // Accordion state
     expandedLotes = signal<Set<number>>(new Set());
@@ -62,7 +74,15 @@ export class LotesListComponent implements OnInit {
     conteoCerrados = computed(() => this.lotes().filter(l => l.estado === 'cerrado_vendido').length);
 
     async ngOnInit() {
-        await this.cargarLotes();
+        this.route.data.subscribe(data => {
+            if (data['etapa']) {
+                this.etapaActual.set(data['etapa']);
+                this.tituloPagina.set(data['titulo'] || (data['etapa'] === 'precebo' ? 'Precebo' : 'Engorde'));
+            } else {
+                this.tituloPagina.set('Todos los Lotes');
+            }
+            this.cargarLotes();
+        });
 
         // Close menu on click outside
         document.addEventListener('click', (event) => {
@@ -110,7 +130,7 @@ export class LotesListComponent implements OnInit {
     async cargarLotes() {
         try {
             this.loading.set(true);
-            const data = await this.produccionService.getLotes();
+            const data = await this.produccionService.getLotes(this.etapaActual());
             this.lotes.set(data);
         } catch (err: any) {
             this.error.set('Error cargando la lista de lotes');
@@ -228,5 +248,41 @@ export class LotesListComponent implements OnInit {
     onSanidadClosed() {
         this.showSanidadModal.set(false);
         this.loteSeleccionadoSanidad.set(null);
+    }
+
+    // Traslado
+    trasladarLote(lote: LoteDetalle) {
+        this.loteSeleccionadoTraslado.set(lote);
+        this.showTrasladoModal.set(true);
+    }
+
+    onTrasladoSaved() {
+        this.showTrasladoModal.set(false);
+        this.loteSeleccionadoTraslado.set(null);
+        this.showToast('Lote trasladado exitosamente');
+        this.cargarLotes();
+    }
+
+    onTrasladoClosed() {
+        this.showTrasladoModal.set(false);
+        this.loteSeleccionadoTraslado.set(null);
+    }
+
+    // Traslado Etapa
+    trasladarEtapa(lote: LoteDetalle) {
+        this.loteSeleccionadoTrasladoEtapa.set(lote);
+        this.showTrasladoEtapaModal.set(true);
+    }
+
+    onTrasladoEtapaSaved() {
+        this.showTrasladoEtapaModal.set(false);
+        this.loteSeleccionadoTrasladoEtapa.set(null);
+        this.showToast('¡Lote trasladado a Engorde! 🚀');
+        this.cargarLotes();
+    }
+
+    onTrasladoEtapaClosed() {
+        this.showTrasladoEtapaModal.set(false);
+        this.loteSeleccionadoTrasladoEtapa.set(null);
     }
 }

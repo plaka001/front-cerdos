@@ -195,14 +195,11 @@
       <h2 class="text-h2 mb-4">Indicadores Clave</h2>
       <div class="grid grid-cols-2 gap-4">
 
-        <!-- 1. Pie de Cría (KPI: Total Cerdas) -->
+        <!-- 1. Pie de Cría -->
         <div (click)="navegarA('/produccion')"
           class="bg-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:ring-1 hover:ring-pink-500/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-pink-900/10 active:scale-95">
-          <!-- Watermark Icon -->
           <lucide-icon name="piggy-bank" [size]="80"
             class="absolute -bottom-4 -right-4 text-pink-500 opacity-[0.08] group-hover:opacity-20 transition-all duration-500 transform -rotate-12"></lucide-icon>
-
-          <!-- Content -->
           <div class="relative z-10">
             <div
               class="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center mb-3 group-hover:bg-pink-500/20 transition-colors">
@@ -215,14 +212,46 @@
           </div>
         </div>
 
-        <!-- 2. Engorde (KPI: Total Engorde) -->
-        <div (click)="navegarA('/lotes')"
+        <!-- 2. Sanidad -->
+        <div (click)="navegarA('/sanidad')"
+          class="bg-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:ring-1 hover:ring-emerald-500/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-emerald-900/10 active:scale-95">
+          <lucide-icon name="syringe" [size]="80"
+            class="absolute -bottom-4 -right-4 text-emerald-500 opacity-[0.08] group-hover:opacity-20 transition-all duration-500 transform -rotate-12"></lucide-icon>
+          <div class="relative z-10">
+            <div
+              class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3 group-hover:bg-emerald-500/20 transition-colors">
+              <lucide-icon name="syringe" [size]="18" class="text-emerald-400"></lucide-icon>
+            </div>
+            <p class="text-4xl font-extrabold text-white tracking-tight"
+              [class.text-red-400]="tareasPendientesCount() > 0">
+              {{ tareasPendientesCount() }}
+            </p>
+            <p class="text-sm font-medium text-slate-400 mt-1">Sanidad Pendientes</p>
+          </div>
+        </div>
+
+        <!-- 3. Precebo (NEW) -->
+        <div (click)="navegarA('/produccion/precebo')"
+          class="bg-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:ring-1 hover:ring-indigo-500/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-indigo-900/10 active:scale-95">
+          <lucide-icon name="layers" [size]="80"
+            class="absolute -bottom-4 -right-4 text-indigo-500 opacity-[0.08] group-hover:opacity-20 transition-all duration-500 transform -rotate-12"></lucide-icon>
+          <div class="relative z-10">
+            <div
+              class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center mb-3 group-hover:bg-indigo-500/20 transition-colors">
+              <lucide-icon name="layers" [size]="18" class="text-indigo-400"></lucide-icon>
+            </div>
+            <p class="text-4xl font-extrabold text-white tracking-tight">
+              {{ dashboardData()!.kpis.totalPrecebo }}
+            </p>
+            <p class="text-sm font-medium text-slate-400 mt-1">Precebo</p>
+          </div>
+        </div>
+
+        <!-- 4. Engorde -->
+        <div (click)="navegarA('/produccion/engorde')"
           class="bg-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:ring-1 hover:ring-amber-500/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-amber-900/10 active:scale-95">
-          <!-- Watermark Icon -->
           <lucide-icon name="wheat" [size]="80"
             class="absolute -bottom-4 -right-4 text-amber-500 opacity-[0.08] group-hover:opacity-20 transition-all duration-500 transform -rotate-12"></lucide-icon>
-
-          <!-- Content -->
           <div class="relative z-10">
             <div
               class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3 group-hover:bg-amber-500/20 transition-colors">
@@ -231,18 +260,15 @@
             <p class="text-4xl font-extrabold text-white tracking-tight">
               {{ dashboardData()!.kpis.totalEngorde }}
             </p>
-            <p class="text-sm font-medium text-slate-400 mt-1">En Ceba</p>
+            <p class="text-sm font-medium text-slate-400 mt-1">Engorde</p>
           </div>
         </div>
 
-        <!-- 3. Inventario (KPI: Alertas) -->
+        <!-- 5. Institucional / Inventario -->
         <div (click)="navegarA('/inventario')"
           class="bg-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:ring-1 hover:ring-blue-500/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-blue-900/10 active:scale-95">
-          <!-- Watermark Icon -->
           <lucide-icon name="package" [size]="80"
             class="absolute -bottom-4 -right-4 text-blue-500 opacity-[0.08] group-hover:opacity-20 transition-all duration-500 transform -rotate-12"></lucide-icon>
-
-          <!-- Content -->
           <div class="relative z-10">
             <div
               class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center mb-3 group-hover:bg-blue-500/20 transition-colors">
@@ -260,47 +286,27 @@
           </div>
         </div>
 
-        <!-- 4. Sanidad (KPI: Pendientes) -->
-        <div (click)="navegarA('/sanidad')"
-          class="bg-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:ring-1 hover:ring-emerald-500/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-emerald-900/10 active:scale-95">
-          <!-- Watermark Icon -->
-          <lucide-icon name="syringe" [size]="80"
-            class="absolute -bottom-4 -right-4 text-emerald-500 opacity-[0.08] group-hover:opacity-20 transition-all duration-500 transform -rotate-12"></lucide-icon>
-
-          <!-- Content -->
+        <!-- 6. Mapa de Granja (NEW) -->
+        <div (click)="navegarA('/produccion/mapa')"
+          class="bg-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:ring-1 hover:ring-cyan-500/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-cyan-900/10 active:scale-95">
+          <lucide-icon name="map" [size]="80"
+            class="absolute -bottom-4 -right-4 text-cyan-500 opacity-[0.08] group-hover:opacity-20 transition-all duration-500 transform -rotate-12"></lucide-icon>
           <div class="relative z-10">
             <div
-              class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3 group-hover:bg-emerald-500/20 transition-colors">
-              <lucide-icon name="syringe" [size]="18" class="text-emerald-400"></lucide-icon>
+              class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center mb-3 group-hover:bg-cyan-500/20 transition-colors">
+              <lucide-icon name="map" [size]="18" class="text-cyan-400"></lucide-icon>
             </div>
-            <p class="text-4xl font-extrabold text-white tracking-tight"
-              [class.text-red-400]="tareasPendientesCount() > 0">
-              {{ tareasPendientesCount() }}
+            <p class="text-3xl font-extrabold text-white tracking-tight">
+              Mapa
             </p>
-            <p class="text-sm font-medium text-slate-400 mt-1">Pendientes</p>
+            <p class="text-sm font-medium text-slate-400 mt-1">Ver Corrales</p>
           </div>
         </div>
 
       </div>
     </div>
 
-    <!-- ========== QUICK ACTIONS ========== -->
-    <div>
-      <h2 class="text-h2 mb-4">Acciones Rápidas</h2>
-      <div class="space-y-3">
 
-        <button (click)="navegarA('/finanzas')" class="btn btn-primary w-full py-4 text-base">
-          <lucide-icon name="dollar-sign" [size]="20" class="mr-2"></lucide-icon>
-          Registrar Gasto
-        </button>
-
-        <button (click)="navegarA('/produccion')" class="btn btn-secondary w-full py-4 text-base">
-          <lucide-icon name="alert-triangle" [size]="20" class="mr-2"></lucide-icon>
-          Registrar Evento
-        </button>
-
-      </div>
-    </div>
 
   </div>
   }

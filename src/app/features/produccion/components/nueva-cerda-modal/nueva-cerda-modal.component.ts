@@ -5,6 +5,8 @@ import { LucideAngularModule } from 'lucide-angular';
 import { InputComponent } from '../../../../shared/ui/input/input.component';
 import { CurrencyCopDirective } from '../../../../shared/directives/currency-cop.directive';
 import { ProduccionService } from '../../../../core/services/produccion.service';
+import { CorralesService } from '../../../../core/services/corrales.service';
+import { Corral } from '../../../../core/models';
 
 @Component({
   selector: 'app-nueva-cerda-modal',
@@ -33,6 +35,22 @@ import { ProduccionService } from '../../../../core/services/produccion.service'
             <app-input label="Chapeta (ID)" formControlName="chapeta" placeholder="Ej: C-012"></app-input>
             
             <app-input label="Raza" formControlName="raza" placeholder="Ej: F1, Landrace..."></app-input>
+
+            <!-- Selector de Corral -->
+             <div>
+              <label class="block text-sm font-medium text-slate-300 mb-1">Ubicación Inicial (Corral) <span class="text-red-400">*</span></label>
+              <select formControlName="corral_id" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                <option value="" disabled>Seleccione ubicación...</option>
+                @for (c of corrales(); track c.id) {
+                  <option [value]="c.id">
+                    {{ c.nombre }} ({{ c.tipo | titlecase }}) - Cap: {{ c.capacidad_maxima }}
+                  </option>
+                }
+              </select>
+              @if (form.get('corral_id')?.touched && form.get('corral_id')?.invalid) {
+                <p class="text-xs text-red-400 mt-1">La ubicación es obligatoria.</p>
+              }
+            </div>
             
             <app-input label="Fecha de Nacimiento" type="date" formControlName="fecha_nacimiento"></app-input>
             
@@ -135,6 +153,9 @@ export class NuevaCerdaModalComponent implements OnInit, OnDestroy {
 
   private fb = inject(FormBuilder);
   private produccionService = inject(ProduccionService);
+  private corralesService = inject(CorralesService);
+
+  corrales = signal<Corral[]>([]);
 
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
@@ -142,6 +163,7 @@ export class NuevaCerdaModalComponent implements OnInit, OnDestroy {
   form: FormGroup = this.fb.group({
     chapeta: ['', Validators.required],
     raza: ['', Validators.required],
+    corral_id: ['', Validators.required],
     fecha_nacimiento: ['', Validators.required],
     partos_acumulados: [0, [Validators.required, Validators.min(0)]],
     fue_comprada: [false],
@@ -152,6 +174,18 @@ export class NuevaCerdaModalComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // Bloquear scroll del body cuando el modal está abierto
     document.body.style.overflow = 'hidden';
+    this.loadCorrales();
+  }
+
+  async loadCorrales() {
+    try {
+      const data = await this.corralesService.getCorrales();
+      // Filter: Gestación or Cuarentena
+      const filtered = data.filter(c => c.activo && (c.tipo === 'gestacion' || c.tipo === 'cuarentena'));
+      this.corrales.set(filtered);
+    } catch (e) {
+      console.error('Error loading corrales', e);
+    }
   }
 
   ngOnDestroy() {
@@ -175,7 +209,8 @@ export class NuevaCerdaModalComponent implements OnInit, OnDestroy {
         partos_acumulados: formVal.partos_acumulados,
         fue_comprada: formVal.fue_comprada,
         valor_compra: formVal.fue_comprada ? formVal.valor_compra : 0,
-        fecha_compra: formVal.fue_comprada ? formVal.fecha_compra : null
+        fecha_compra: formVal.fue_comprada ? formVal.fecha_compra : null,
+        corral_id: Number(formVal.corral_id)
       });
 
       this.saved.emit();

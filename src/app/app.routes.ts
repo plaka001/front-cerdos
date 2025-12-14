@@ -41,8 +41,22 @@ export const routes: Routes = [
                 component: CerdasListComponent
             },
             {
+                path: 'produccion/mapa',
+                loadComponent: () => import('./features/produccion/pages/mapa-granja/mapa-granja.component').then(m => m.MapaGranjaComponent)
+            },
+            {
                 path: 'lotes',
-                component: LotesListComponent
+                component: LotesListComponent // Ruta legacy/general
+            },
+            {
+                path: 'produccion/precebo',
+                component: LotesListComponent,
+                data: { etapa: 'precebo', titulo: 'Precebo' }
+            },
+            {
+                path: 'produccion/engorde',
+                component: LotesListComponent,
+                data: { etapa: 'engorde', titulo: 'Engorde' }
             },
             {
                 path: 'finanzas',
