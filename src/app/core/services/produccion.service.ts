@@ -335,7 +335,7 @@ export class ProduccionService {
         try {
             this.error.set(null);
 
-            // 1. Cerrar ciclo (ComÃºn)
+            // 1. Cerrar ciclo (Común)
             const { error: errorCiclo } = await this.supabase
                 .from('ciclos_reproductivos')
                 .update({
@@ -349,7 +349,7 @@ export class ProduccionService {
 
             if (errorCiclo) throw errorCiclo;
 
-            // 2. BifurcaciÃ³n: Lote vs Venta
+            // 2. Bifurcación: Lote vs Venta
             if (data.crear_lote) {
                 // Camino A: Crear Lote
                 const { error: errorLote } = await this.supabase
@@ -369,7 +369,7 @@ export class ProduccionService {
                 if (errorLote) throw errorLote;
             } else {
                 // Camino B: Venta Inmediata
-                // Buscar categorÃ­a 'Venta de Lechones'
+                // Buscar categoría 'Venta de Lechones'
                 const { data: catData } = await this.supabase
                     .from('categorias_financieras')
                     .select('id')
@@ -379,10 +379,10 @@ export class ProduccionService {
                 const categoriaId = catData?.id;
 
                 if (!categoriaId) {
-                    console.warn('CategorÃ­a "Venta de Lechones" no encontrada. Se registrarÃ¡ sin categorÃ­a.');
+                    console.warn('Categoría "Venta de Lechones" no encontrada. Se registrará sin categoría.');
                 }
 
-                // Obtener chapeta para descripciÃ³n
+                // Obtener chapeta para descripción
                 const { data: cerda } = await this.supabase
                     .from('cerdas')
                     .select('chapeta')
@@ -428,7 +428,7 @@ export class ProduccionService {
                 .from('ciclos_reproductivos')
                 .update({
                     estado: 'fallido',
-                    observaciones: data.observaciones ? `FALLA: ${data.observaciones}` : 'Falla reproductiva / RepeticiÃ³n de celo'
+                    observaciones: data.observaciones ? `FALLA: ${data.observaciones}` : 'Falla reproductiva / Repetición de celo'
                 })
                 .eq('id', cicloId);
 
@@ -458,12 +458,12 @@ export class ProduccionService {
             this.error.set(null);
             const hoy = new Date().toISOString().split('T')[0];
 
-            // 1. Construir la observaciÃ³n del evento
+            // 1. Construir la observación del evento
             let detalleEvento = data.nombre_tarea || data.observaciones;
 
             if (!detalleEvento) {
                 const nombresProductos = data.insumos.map(i => i.nombre_producto).join(' + ');
-                detalleEvento = `AplicaciÃ³n: ${nombresProductos}`;
+                detalleEvento = `Aplicación: ${nombresProductos}`;
             }
 
             if (data.nombre_tarea && data.observaciones && data.nombre_tarea !== data.observaciones) {
@@ -492,7 +492,7 @@ export class ProduccionService {
             }
 
             // ---------------------------------------------------------
-            // PASO 2: Un Solo Evento ClÃ­nico
+            // PASO 2: Un Solo Evento Clínico
             // ---------------------------------------------------------
             const { error: errorEvento } = await this.supabase
                 .from('eventos_sanitarios')
@@ -528,13 +528,13 @@ export class ProduccionService {
             this.error.set(null);
             const hoy = new Date().toISOString().split('T')[0];
 
-            // 1. Construir la observaciÃ³n del evento
+            // 1. Construir la observación del evento
             // Si hay nombre_tarea (ej: "Hierro + Anticoccidial"), usarlo. Si no, listar productos.
             let detalleEvento = data.nombre_tarea || data.observaciones;
 
             if (!detalleEvento) {
                 const nombresProductos = data.insumos.map(i => i.nombre_producto).join(' + ');
-                detalleEvento = `AplicaciÃ³n: ${nombresProductos}`;
+                detalleEvento = `Aplicación: ${nombresProductos}`;
             }
 
             // Si hay observaciones adicionales y ya usamos el nombre de tarea, las agregamos
@@ -564,7 +564,7 @@ export class ProduccionService {
             }
 
             // ---------------------------------------------------------
-            // PASO 2: Un Solo Evento ClÃ­nico
+            // PASO 2: Un Solo Evento Clínico
             // ---------------------------------------------------------
             const { error: errorEvento } = await this.supabase
                 .from('eventos_sanitarios')
@@ -574,7 +574,7 @@ export class ProduccionService {
                     cerda_id: null,
                     lote_id: loteId,
                     cantidad_afectada: null, // General al lote
-                    observacion: detalleEvento // CRÃTICO: Debe coincidir con nombre_tarea para el filtro
+                    observacion: detalleEvento // CRÍTICO: Debe coincidir con nombre_tarea para el filtro
                 });
 
             if (errorEvento) throw errorEvento;
@@ -598,11 +598,11 @@ export class ProduccionService {
 
             const descripcion = `Venta Descarte - Cerda ID ${cerdaId} - ${data.cliente || 'Cliente General'}`;
 
-            // Obtener categorÃ­a 'Venta de Cerda Descarte' o fallback
+            // Obtener categoría 'Venta de Cerda Descarte' o fallback
             const categoriaId = await this.obtenerCategoriaId('Venta de Cerda Descarte', 'operativo');
 
             if (!categoriaId) {
-                throw new Error('No se encontrÃ³ categorÃ­a financiera para Venta de Descarte');
+                throw new Error('No se encontró categoría financiera para Venta de Descarte');
             }
 
             // 1. Registrar Ingreso
@@ -679,11 +679,11 @@ export class ProduccionService {
 
             // 1. Registrar Evento Sanitario (Muerte)
             // Nota: Usamos eventos_sanitarios aunque originalmente era para lotes, 
-            // o podrÃ­amos crear una tabla de mortalidad_cerdas. 
+            // o podríamos crear una tabla de mortalidad_cerdas. 
             // Por simplicidad y si la tabla lo permite (lote_id nullable), usamos eventos_sanitarios o solo desactivamos.
             // Dado el esquema actual, si eventos_sanitarios requiere lote_id, mejor solo desactivamos la cerda 
             // y guardamos la info en un log o notas. 
-            // Asumiremos que solo desactivamos por ahora para no romper integridad si no hay tabla especÃ­fica.
+            // Asumiremos que solo desactivamos por ahora para no romper integridad si no hay tabla específica.
 
             // 2. Desactivar Cerda
             const { error: errorCerda } = await this.supabase
@@ -976,18 +976,16 @@ export class ProduccionService {
 
             const descripcion = `Venta Lote ${data.lote_codigo} - ${data.cliente}`;
 
-            // Obtener categorÃ­a de forma robusta (busca "Venta de Cerdos" o fallback a tipo "operativo")
+            // Obtener categoría de forma robusta (busca "Venta de Cerdos" o fallback a tipo "operativo")
             const categoriaId = await this.obtenerCategoriaId('Venta de Cerdos', 'operativo');
 
-            // VALIDACIÃ“N CRÃTICA: No permitir insertar con categoria_id null
+            // VALIDACIÓN CRÍTICA: No permitir insertar con categoria_id null
             if (!categoriaId) {
-                const errorMsg = 'No se pudo encontrar la categorÃ­a financiera para la venta. Por favor, asegÃºrate de que existe la categorÃ­a "Venta de Cerdos" o una categorÃ­a de tipo "operativo" en el sistema.';
-                console.error('âŒ Error de integridad de datos:', errorMsg);
+                const errorMsg = 'No se pudo encontrar la categoría financiera para la venta. Por favor, asegúrate de que existe la categoría "Venta de Cerdos" o una categoría de tipo "operativo" en el sistema.';
+                console.error('❌ Error de integridad de datos:', errorMsg);
                 this.error.set(errorMsg);
                 throw new Error(errorMsg);
             }
-
-
 
             const { error: errorIngreso } = await this.supabase
                 .from('movimientos_caja')
@@ -1001,12 +999,10 @@ export class ProduccionService {
                 });
 
             if (errorIngreso) {
-                console.error('âŒ Error registrando ingreso:', errorIngreso);
+                console.error('❌ Error registrando ingreso:', errorIngreso);
                 this.error.set(errorIngreso.message);
                 throw errorIngreso;
             }
-
-
 
             // CRITICAL: Get current cantidad_actual to calculate remaining animals
             const { data: loteActual, error: errorLote } = await this.supabase
@@ -1081,18 +1077,16 @@ export class ProduccionService {
             if (data.fue_comprada && data.valor_compra && data.valor_compra > 0) {
                 const descripcion = `Compra Cerda ${data.chapeta}`;
 
-                // Obtener categorÃ­a de forma robusta (busca "Compra de Pie de CrÃ­a" o fallback a tipo "inversion")
-                const categoriaId = await this.obtenerCategoriaId('Compra de Pie de CrÃ­a', 'inversion');
+                // Obtener categoría de forma robusta (busca "Compra de Pie de Cría" o fallback a tipo "inversion")
+                const categoriaId = await this.obtenerCategoriaId('Compra de Pie de Cría', 'inversion');
 
-                // VALIDACIÃ“N CRÃTICA: No permitir insertar con categoria_id null
+                // VALIDACIÓN CRÍTICA: No permitir insertar con categoria_id null
                 if (!categoriaId) {
-                    const errorMsg = 'No se pudo encontrar la categorÃ­a financiera para la compra de cerda. Por favor, asegÃºrate de que existe la categorÃ­a "Compra de Pie de CrÃ­a" o una categorÃ­a de tipo "inversiÃ³n" en el sistema.';
-                    console.error('âŒ Error de integridad de datos:', errorMsg);
+                    const errorMsg = 'No se pudo encontrar la categoría financiera para la compra de cerda. Por favor, asegúrate de que existe la categoría "Compra de Pie de Cría" o una categoría de tipo "inversión" en el sistema.';
+                    console.error('❌ Error de integridad de datos:', errorMsg);
                     this.error.set(errorMsg);
                     throw new Error(errorMsg);
                 }
-
-
 
                 const { error: errorEgreso } = await this.supabase
                     .from('movimientos_caja')
@@ -1106,12 +1100,10 @@ export class ProduccionService {
                     });
 
                 if (errorEgreso) {
-                    console.error('âŒ Error registrando egreso de compra:', errorEgreso);
+                    console.error('❌ Error registrando egreso de compra:', errorEgreso);
                     this.error.set(errorEgreso.message);
                     throw errorEgreso;
                 }
-
-
             }
 
             await this.loadCerdas();
@@ -1166,15 +1158,15 @@ export class ProduccionService {
     }
 
     /**
-     * MÃ©todo robusto para obtener el ID de una categorÃ­a financiera
+     * Método robusto para obtener el ID de una categoría financiera
      * Busca por nombre exacto, y si no encuentra, busca por tipo_flujo como fallback
-     * @param nombreCategoria Nombre exacto de la categorÃ­a a buscar
+     * @param nombreCategoria Nombre exacto de la categoría a buscar
      * @param tipoFlujo Tipo de flujo como fallback ('operativo', 'inversion', 'administrativo')
-     * @returns ID de la categorÃ­a o null si no se encuentra
+     * @returns ID de la categoría o null si no se encuentra
      */
     private async obtenerCategoriaId(nombreCategoria: string, tipoFlujo?: 'operativo' | 'inversion' | 'administrativo'): Promise<number | null> {
         try {
-            // Primera bÃºsqueda: por nombre exacto
+            // Primera búsqueda: por nombre exacto
             const { data: categoria, error: errorCategoria } = await this.supabase
                 .from('categorias_financieras')
                 .select('id')
@@ -1185,9 +1177,9 @@ export class ProduccionService {
                 return categoria.id;
             }
 
-            // Segunda bÃºsqueda: por tipo_flujo si se proporciona (Fallback)
-            // SI Y SOLO SI no es una categorÃ­a crÃ­tica que DEBE existir con ese nombre exacto.
-            // Para 'Compra de Semen/GenÃ©tica', preferimos crearla si no existe.
+            // Segunda búsqueda: por tipo_flujo si se proporciona (Fallback)
+            // SI Y SOLO SI no es una categoría crítica que DEBE existir con ese nombre exacto.
+            // Para 'Compra de Semen/Genética', preferimos crearla si no existe.
 
             if (tipoFlujo) {
                 // Intentar crearla si tenemos el tipo de flujo
@@ -1196,7 +1188,7 @@ export class ProduccionService {
                     .insert({
                         nombre: nombreCategoria,
                         tipo_flujo: tipoFlujo,
-                        descripcion: 'CategorÃ­a generada automÃ¡ticamente por ProducciÃ³n',
+                        descripcion: 'Categoría generada automáticamente por Producción',
                         es_automatica: true
                     })
                     .select('id')
@@ -1208,7 +1200,7 @@ export class ProduccionService {
                 }
             }
 
-            console.error(`âŒ CategorÃ­a "${nombreCategoria}" no encontrada y no se pudo crear.`);
+            console.error(`❌ Categoría "${nombreCategoria}" no encontrada y no se pudo crear.`);
             return null;
         } catch (err: any) {
             console.error(`Error en obtenerCategoriaId para "${nombreCategoria}":`, err);
@@ -1240,7 +1232,7 @@ export class ProduccionService {
     }
 
     /**
-     * Obtiene el historial de alimentaciÃ³n de un lote
+     * Obtiene el historial de alimentación de un lote
      */
     async getHistorialAlimento(loteId: number): Promise<SalidaInsumo[]> {
         try {
