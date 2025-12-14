@@ -290,4 +290,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 8, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict cBe42epPmVkKWJo74Gawgxw3zAEAo5c1MrxmGYeveso0g1Drv7e6mWh3kS99wWz
+\unrestrict tbZErbYYkd2KGFDUiCtgoG5eUlgOUvLk6Ixi3VafeMoLvPj3qV2U0U5DpmlnnNj
+
