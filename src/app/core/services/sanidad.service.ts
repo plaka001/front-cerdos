@@ -60,16 +60,22 @@ export class SanidadService {
 
         if (errCerdas) throw errCerdas;
 
-        // 4. Fetch Today's Sanitary Events for Filtering
-        const hoyString = hoy.toISOString().split('T')[0];
-        const { data: eventosHoy, error: errEventos } = await this.supabase.client
+        // 4. Fetch Sanitary Events for Filtering (Last 30 days window)
+        // This covers both:
+        // a) Tasks completed today/recently
+        // b) Tasks completed "late" (overdue) but still in the recent past
+        // c) Fixes timezone edge cases where 'today' differs between insertion and fetch
+        const fechaLimiteBusqueda = new Date(hoy);
+        fechaLimiteBusqueda.setDate(hoy.getDate() - 30);
+        const fechaBusquedaStr = fechaLimiteBusqueda.toISOString().split('T')[0];
+
+        const { data: eventosRecientes, error: errEventos } = await this.supabase.client
             .from('eventos_sanitarios')
             .select('*')
-            .eq('fecha', hoyString);
+            .gte('fecha', fechaBusquedaStr); // ✅ Look back 30 days
 
         if (errEventos) {
-            console.error('Error fetching daily events:', errEventos);
-            // Optionally throw or continue without filtering
+            console.error('Error fetching recent events:', errEventos);
         }
 
         const tareas: TareaSanitaria[] = [];
@@ -229,21 +235,27 @@ export class SanidadService {
         }
 
         // 6. Filter Completed Tasks Logic
-        // Remove task if an event exists today for the same reference ID and containing task name in observations
-        // Create filtered list
-
+        // Enhanced to check against the broader list of recent events with fuzzy name matching and date proximity
         const tareasFiltradas = tareas.filter(t => {
-            const yaRealizada = eventosHoy?.some(e => {
+            const yaRealizada = eventosRecientes?.some(e => {
                 const mismoDestino = (t.tipo_aplicacion === 'lote' && e.lote_id === t.id_referencia) ||
                     (t.tipo_aplicacion !== 'lote' && e.cerda_id === t.id_referencia);
 
-                // Flexible matching: check if observation includes the task name
+                // Check 1: Subject Match (Observation contains task name)
                 const coincidenciaTema = e.observacion && e.observacion.toLowerCase().includes(t.nombre_tarea.toLowerCase());
 
-                return mismoDestino && coincidenciaTema;
+                // Check 2: Date Proximity
+                // Prevents matching an event from a previous cycle (e.g. 5 months ago)
+                // We allow a wide window (+/- 20 days) because sometimes records are entered late or early
+                const fechaEvento = new Date(e.fecha + 'T00:00:00'); // Force local midnight parsing for safe math
+                const diffTime = Math.abs(fechaEvento.getTime() - t.fecha_programada.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const esFechaCercana = diffDays <= 20;
+
+                return mismoDestino && coincidenciaTema && esFechaCercana;
             });
 
-            return !yaRealizada; // Keep only if not realized
+            return !yaRealizada; // Keep only if NOT realized
         });
 
         // 7. Sort
