@@ -13,10 +13,10 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
   imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, InputComponent],
   template: `
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in">
-      <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-700">
+      <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 border border-slate-700">
         
         <!-- Header -->
-        <div class="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800">
+        <div class="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800 flex-shrink-0">
           <div>
             <h3 class="text-lg font-bold text-white">{{ getTitle() }}</h3>
             <p class="text-sm text-slate-400">Cerda {{ cerda.chapeta }}</p>
@@ -27,7 +27,7 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
         </div>
 
         <!-- Form -->
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-5 space-y-4">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-5 pb-24 space-y-4 overflow-y-auto flex-1">
           
           <!-- Inseminación Fields -->
           @if (tipoEvento === 'inseminacion') {

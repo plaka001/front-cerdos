@@ -26,7 +26,7 @@ import { LoteDetalle, Insumo } from '../../../../core/models';
         </div>
 
         <!-- Form (Scrollable) -->
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex-1 overflow-y-auto p-5 space-y-5 custom-scrollbar">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex-1 overflow-y-auto p-5 space-y-5 custom-scrollbar pb-24">
           
           <div class="space-y-4">
             

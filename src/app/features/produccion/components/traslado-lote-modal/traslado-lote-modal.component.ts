@@ -12,14 +12,14 @@ import { LucideAngularModule } from 'lucide-angular';
     imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
     template: `
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in" (click)="close.emit()">
-      <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200 border border-slate-700" (click)="$event.stopPropagation()">
+      <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-700" (click)="$event.stopPropagation()">
         
-        <div class="p-4 border-b border-slate-700 flex justify-between items-center">
+        <div class="p-4 border-b border-slate-700 flex justify-between items-center flex-shrink-0">
           <h3 class="text-lg font-bold text-white">Trasladar Lote</h3>
           <button (click)="close.emit()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
         </div>
 
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-5 space-y-4">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-5 space-y-4 flex-1 overflow-y-auto pb-24">
           
           <!-- Lote Info -->
           <div class="bg-slate-700/50 p-3 rounded-lg border border-slate-600">

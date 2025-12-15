@@ -30,7 +30,9 @@ export class AlimentarLoteModalComponent implements OnInit {
     }
 
     private initForm() {
+        const hoy = new Date().toISOString().split('T')[0];
         this.form = this.fb.group({
+            fecha: [hoy, Validators.required],
             insumo_id: ['', Validators.required],
             cantidad: ['', [Validators.required, Validators.min(0.01)]]
         });
@@ -77,6 +79,7 @@ export class AlimentarLoteModalComponent implements OnInit {
             }
 
             await this.produccionService.registrarConsumo({
+                fecha: this.form.get('fecha')?.value,
                 insumo_id: insumo.id,
                 lote_id: this.lote.id,
                 cantidad: this.form.get('cantidad')?.value,

@@ -49,13 +49,13 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
     styles: [`
     /* Estilos específicos para inputs de tipo date */
     input[type="date"].date-input {
-      padding-right: 0.75rem;
+      padding-right: 2.5rem;
     }
     
     /* Control del icono del calendario en WebKit (Chrome, Safari, Edge) */
     input[type="date"].date-input::-webkit-calendar-picker-indicator {
       position: absolute;
-      right: 0.75rem;
+      right: 1rem;
       top: 50%;
       transform: translateY(-50%);
       cursor: pointer;

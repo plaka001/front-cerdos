@@ -59,7 +59,7 @@ import { ProduccionService } from '../../../../core/services/produccion.service'
         </div>
 
         <!-- Content -->
-        <div class="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+        <div class="p-6 pb-24 overflow-y-auto max-h-[calc(90vh-200px)]">
           @if (loading()) {
           <div class="flex items-center justify-center h-64">
             <div class="text-center">

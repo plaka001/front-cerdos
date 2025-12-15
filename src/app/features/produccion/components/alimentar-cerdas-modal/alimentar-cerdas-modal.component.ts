@@ -27,7 +27,17 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
         </div>
 
         <!-- Form -->
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-5 space-y-4">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-5 pb-24 space-y-4">
+          
+          <!-- Fecha -->
+           <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Fecha</label>
+            <div class="relative">
+                <input type="date" formControlName="fecha"
+                  class="w-full appearance-none bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 pr-10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  style="color-scheme: dark;">
+            </div>
+          </div>
           
           <!-- Producto -->
           <div>
@@ -198,6 +208,7 @@ export class AlimentarCerdasModalComponent implements OnInit {
   });
 
   form: FormGroup = this.fb.group({
+    fecha: [new Date().toISOString().split('T')[0], Validators.required],
     insumo_id: [null, Validators.required],
     cantidad: [null, [Validators.required, Validators.min(0.1)]],
     etapa: ['']
@@ -294,6 +305,7 @@ export class AlimentarCerdasModalComponent implements OnInit {
       }
 
       await this.produccionService.registrarAlimentacionCerdas({
+        fecha: formVal.fecha,
         insumo_id: formVal.insumo_id,
         cantidad: cantidadKg,
         costo_unitario_momento: insumo.costo_promedio,

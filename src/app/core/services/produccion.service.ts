@@ -849,12 +849,13 @@ export class ProduccionService {
         lote_id: number;
         cantidad: number;
         costo_unitario_momento: number;
+        fecha?: string;
     }): Promise<void> {
         try {
             this.error.set(null);
 
             const salidaData: Partial<SalidaInsumo> = {
-                fecha: new Date().toISOString().split('T')[0],
+                fecha: data.fecha || new Date().toISOString().split('T')[0],
                 insumo_id: data.insumo_id,
                 cantidad: data.cantidad,
                 destino_tipo: 'lote',
@@ -1123,6 +1124,7 @@ export class ProduccionService {
         cantidad: number;  // en kg
         costo_unitario_momento: number;
         etapa: string;  // 'Gestación' o 'Lactancia'
+        fecha?: string;
     }): Promise<void> {
         try {
             this.error.set(null);
@@ -1137,7 +1139,7 @@ export class ProduccionService {
                 .insert({
                     insumo_id: data.insumo_id,
                     cantidad: data.cantidad,
-                    fecha: new Date().toISOString().split('T')[0],
+                    fecha: data.fecha || new Date().toISOString().split('T')[0],
                     costo_unitario_momento: data.costo_unitario_momento,
                     destino_tipo: 'cerda',  // CRÍTICO: Identifica gasto de cerdas
                     lote_id: null,
@@ -1337,12 +1339,14 @@ export class ProduccionService {
                 .from('salidas_insumos')
                 .select(`
                     *,
-                    insumos (
+                    insumos!inner (
                         nombre,
-                        unidad_medida
+                        unidad_medida,
+                        tipo
                     )
                 `)
                 .eq('destino_tipo', 'cerda')
+                .eq('insumos.tipo', 'alimento') // Filter by joined column
                 .order('fecha', { ascending: false });
 
             if (error) {

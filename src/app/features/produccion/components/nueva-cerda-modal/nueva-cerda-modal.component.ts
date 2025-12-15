@@ -28,7 +28,7 @@ import { Corral } from '../../../../core/models';
         </div>
 
         <!-- Form -->
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-5 space-y-4 pb-20">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-5 space-y-4 pb-24">
           
           <!-- Datos Biológicos -->
           <div class="space-y-4">
