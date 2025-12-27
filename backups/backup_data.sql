@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict SMJcWKDxRR64xZjBRu7s5jj0Pd8H7bfZWjyaEHT8WsLieg7rmQjKK1Ee7PU8xv5
+\restrict P7H9cc51yU1d6RyHx8YD3GSToA4WpuPifjTy9zKCLtpN2P9O9NkomCpLaq37diS
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.7 (Ubuntu 17.7-3.pgdg24.04+1)
@@ -110,10 +110,10 @@ COPY public.insumos (id, nombre, tipo, unidad_medida, presentacion_compra, stock
 16	Reemplazo	alimento	kg	40	40	2125.0000000000000000	5	t	2025-12-14 02:36:17+00
 6	Lechón Transición	alimento	kg	40	0	0	200	t	2025-12-07 01:23:09.044215+00
 7	Lechón 337	alimento	kg	40	40	2325.0000000000000000	300	t	2025-12-07 01:23:09.044215+00
-2	Lactancia	alimento	kg	40	10030	0	150	t	2025-12-07 01:23:09.044215+00
-3	Pre-Inicio Fase 1	alimento	kg	40	10000	0	100	t	2025-12-07 01:23:09.044215+00
-4	Pre-Inicio	alimento	kg	40	10000	0	100	t	2025-12-07 01:23:09.044215+00
 5	Medicamento viejo	medicamento	ml	2000	1992	0.00000000000000000000	0	t	2025-12-07 01:23:09.044215+00
+2	Lactancia	alimento	kg	40	30	0	150	t	2025-12-07 01:23:09.044215+00
+3	Pre-Inicio Fase 1	alimento	kg	40	0	0	100	t	2025-12-07 01:23:09.044215+00
+4	Pre-Inicio	alimento	kg	40	0	0	100	t	2025-12-07 01:23:09.044215+00
 \.
 
 
@@ -137,7 +137,7 @@ COPY public.compras_insumos (id, fecha, insumo_id, proveedor, cantidad_comprada,
 --
 
 COPY public.lotes (id, codigo, fecha_inicio, fecha_cierre, ubicacion, cantidad_inicial, cantidad_actual, costo_inicial_lote, estado, created_at, peso_promedio_inicial, observaciones, peso_promedio_actual, corral_id, etapa) FROM stdin;
-1	L-2025-86	2025-12-14	\N	precebo	10	10	0	activo	2025-12-14 02:49:40.94955+00	15	\N	0	3	engorde
+1	L-2025-86	2025-12-14	\N	precebo	10	9	0	activo	2025-12-14 02:49:40.94955+00	15	\N	0	3	engorde
 \.
 
 
@@ -148,6 +148,7 @@ COPY public.lotes (id, codigo, fecha_inicio, fecha_cierre, ubicacion, cantidad_i
 COPY public.eventos_sanitarios (id, fecha, tipo, lote_id, cerda_id, cantidad_afectada, observacion, created_at) FROM stdin;
 5	2025-12-15	tratamiento	\N	7	1	Reemplazo: Circovirus + Mycoplasma (Dosis 1)	2025-12-15 00:16:54.408592+00
 6	2025-12-15	tratamiento	\N	6	1	Reemplazo: Circovirus + Mycoplasma (Dosis 1)	2025-12-15 00:28:57.092453+00
+9	2025-12-23	muerte	1	\N	1	Muerte enfermedad 	2025-12-26 21:30:17.388205+00
 \.
 
 
@@ -256,7 +257,7 @@ SELECT pg_catalog.setval('public.corrales_id_seq', 10, true);
 -- Name: eventos_sanitarios_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.eventos_sanitarios_id_seq', 8, true);
+SELECT pg_catalog.setval('public.eventos_sanitarios_id_seq', 9, true);
 
 
 --
@@ -305,5 +306,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 17, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict SMJcWKDxRR64xZjBRu7s5jj0Pd8H7bfZWjyaEHT8WsLieg7rmQjKK1Ee7PU8xv5
+\unrestrict P7H9cc51yU1d6RyHx8YD3GSToA4WpuPifjTy9zKCLtpN2P9O9NkomCpLaq37diS
 
