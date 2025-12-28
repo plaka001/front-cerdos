@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict cBe42epPmVkKWJo74Gawgxw3zAEAo5c1MrxmGYeveso0g1Drv7e6mWh3kS99wWz
+\restrict etExPW7KtUHA6qkQAPCcjsvv3bfQZBLN2aSBg3r2RMVDB4ewHe0ckO2y11KAfrS
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.7 (Ubuntu 17.7-3.pgdg24.04+1)
@@ -50,8 +50,15 @@ COPY public.categorias_financieras (id, nombre, tipo_flujo, descripcion, created
 --
 
 COPY public.corrales (id, nombre, tipo, capacidad_maxima, activo, created_at) FROM stdin;
-1	Gestacion 1	gestacion	10	t	2025-12-14 03:25:19.553498+00
-3	Corral 1	engorde	20	t	2025-12-14 03:31:19.0992+00
+3	Corral 1	engorde	7	t	2025-12-14 03:31:19.0992+00
+4	Corral 2	engorde	7	t	2025-12-14 23:58:35.009091+00
+5	Corral 3	engorde	6	t	2025-12-14 23:58:46.717474+00
+6	Corral 4	engorde	6	t	2025-12-14 23:58:58.148602+00
+7	Corral 5	engorde	18	t	2025-12-14 23:59:09.617016+00
+8	Paridera 1	paridera	1	t	2025-12-14 23:59:40.658957+00
+9	Paridera 2	paridera	1	t	2025-12-14 23:59:50.839279+00
+1	Gestacion 1	gestacion	12	t	2025-12-14 03:25:19.553498+00
+10	Paridera 3	paridera	1	t	2025-12-15 00:01:03.112561+00
 \.
 
 
@@ -60,7 +67,6 @@ COPY public.corrales (id, nombre, tipo, capacidad_maxima, activo, created_at) FR
 --
 
 COPY public.cerdas (id, chapeta, fecha_nacimiento, raza, estado, partos_acumulados, activa, notas, created_at, corral_id) FROM stdin;
-1	La mona	2024-06-06	large white	lactante	1	t	\N	2025-12-07 01:31:00.681173+00	\N
 9	08	2025-06-15	F1	vacia	0	t	\N	2025-12-07 01:48:33.880781+00	1
 8	07	2025-06-15	F1	vacia	0	t	\N	2025-12-07 01:48:20.569372+00	1
 6	Juana	2025-07-19	F1	vacia	0	t	\N	2025-12-07 01:41:21.818891+00	1
@@ -69,6 +75,7 @@ COPY public.cerdas (id, chapeta, fecha_nacimiento, raza, estado, partos_acumulad
 3	Roci	2024-06-06	F1	gestante	0	t	\N	2025-12-07 01:33:20.78016+00	1
 2	La jardineña	2024-06-06	F1	gestante	0	t	\N	2025-12-07 01:31:02.308943+00	1
 4	La flaca	2024-06-06	F1	gestante	1	t	\N	2025-12-07 01:33:21.343612+00	1
+1	La mona	2024-06-06	large white	lactante	1	t	\N	2025-12-07 01:31:00.681173+00	8
 \.
 
 
@@ -91,8 +98,6 @@ COPY public.ciclos_reproductivos (id, cerda_id, fecha_inseminacion, padre_semen,
 --
 
 COPY public.insumos (id, nombre, tipo, unidad_medida, presentacion_compra, stock_actual, costo_promedio, stock_minimo, activo, created_at) FROM stdin;
-3	Pre-Inicio Fase 1	alimento	kg	40	0	0	100	t	2025-12-07 01:23:09.044215+00
-8	Finalizador 337	alimento	kg	40	0	0	500	t	2025-12-07 01:23:09.044215+00
 9	Vacuna Circovirus + Mycoplasma	biologico	dosis	50	0	0	20	t	2025-12-07 01:57:30.571465+00
 10	Baycox (Toltrazuril)	medicamento	ml	250	0	0	20	t	2025-12-07 01:57:30.571465+00
 11	Complejo B / Vitaminas	medicamento	ml	500	0	0	50	t	2025-12-07 01:57:30.571465+00
@@ -100,13 +105,15 @@ COPY public.insumos (id, nombre, tipo, unidad_medida, presentacion_compra, stock
 13	Purgante Oral (Fenbendazol)	medicamento	ml	1000	0	0	100	t	2025-12-07 01:57:30.571465+00
 14	Hierro Dextrano	medicamento	ml	100	0	0	50	t	2025-12-07 01:57:30.571465+00
 15	Vacuna E. Coli	biologico	dosis	25	0	0	10	t	2025-12-07 01:57:30.571465+00
-1	Gestacion	alimento	kg	40	80	2075.0000000000000000	200	t	2025-12-07 01:23:09.044215+00
-5	Inicio	alimento	kg	40	20	2950.0000000000000000	200	t	2025-12-07 01:23:09.044215+00
-4	Pre-Inicio	alimento	kg	40	0	3500.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
-16	Reemplazo	alimento	kg	40	40	2125.0000000000000000	5	t	2025-12-14 02:36:17+00
-2	Lactancia	alimento	kg	40	30	2275.0000000000000000	150	t	2025-12-07 01:23:09.044215+00
-6	Lechón Transición	alimento	kg	40	0	0	200	t	2025-12-07 01:23:09.044215+00
-7	Lechón 337	alimento	kg	40	40	2325.0000000000000000	300	t	2025-12-07 01:23:09.044215+00
+5	Medicamento viejo	medicamento	ml	2000	1992	0.00000000000000000000	0	t	2025-12-07 01:23:09.044215+00
+4	Pre-Inicio	alimento	kg	40	0	0	100	t	2025-12-07 01:23:09.044215+00
+3	Pre-Inicio Fase 1	alimento	kg	40	40	2050.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
+6	Iniciación 	alimento	kg	40	20	2950.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
+7	Lechón 337	alimento	kg	40	0	2312.5000000000000000	300	t	2025-12-07 01:23:09.044215+00
+2	Lactancia	alimento	kg	40	50	1572.7272727272727273	150	t	2025-12-07 01:23:09.044215+00
+8	Finalizador 337	alimento	kg	40	80	2300.0000000000000000	500	t	2025-12-07 01:23:09.044215+00
+16	Reemplazo	alimento	kg	40	80	2125.0000000000000000	5	t	2025-12-14 02:36:17+00
+1	Gestacion	alimento	kg	40	20	2075.0000000000000000	200	t	2025-12-07 01:23:09.044215+00
 \.
 
 
@@ -121,6 +128,16 @@ COPY public.compras_insumos (id, fecha, insumo_id, proveedor, cantidad_comprada,
 4	2025-12-14	5	Arley	2	80	236000	2950.0000000000000000	\N	2025-12-14 02:33:10.356366+00
 5	2025-12-14	4	Arley	1	40	140000	3500.0000000000000000	\N	2025-12-14 02:34:48.304331+00
 6	2025-12-14	16	Arley	3	120	255000	2125.0000000000000000	\N	2025-12-14 02:36:54.876118+00
+7	2025-12-15	5		1	2000	0	0.00000000000000000000	\N	2025-12-15 00:15:05.13401+00
+8	2025-12-19	7	Arley 	1	40	92000	2300.0000000000000000	\N	2025-12-27 17:41:00.462447+00
+9	2025-12-19	1	\N	3	120	249000	2075.0000000000000000	\N	2025-12-27 17:41:54.777086+00
+10	2025-12-19	2	Arley 	1	40	90000	2250.0000000000000000	\N	2025-12-27 17:42:21.377656+00
+11	2025-12-19	6	Arley 	1	40	118000	2950.0000000000000000	\N	2025-12-27 17:44:39.977428+00
+12	2025-12-24	8	Arley 	1	40	92000	2300.0000000000000000	\N	2025-12-27 17:45:55.400647+00
+13	2025-12-27	16	Arley 	2	80	170000	2125.0000000000000000	\N	2025-12-27 17:48:35.410354+00
+14	2025-12-27	8	\N	2	80	184000	2300.0000000000000000	\N	2025-12-27 17:49:13.041414+00
+15	2025-12-27	2	Arley 	1	40	83000	2075.0000000000000000	\N	2025-12-27 17:49:52.730986+00
+16	2025-12-27	3	Arley 	1	40	82000	2050.0000000000000000	\N	2025-12-27 17:51:59.151479+00
 \.
 
 
@@ -129,7 +146,7 @@ COPY public.compras_insumos (id, fecha, insumo_id, proveedor, cantidad_comprada,
 --
 
 COPY public.lotes (id, codigo, fecha_inicio, fecha_cierre, ubicacion, cantidad_inicial, cantidad_actual, costo_inicial_lote, estado, created_at, peso_promedio_inicial, observaciones, peso_promedio_actual, corral_id, etapa) FROM stdin;
-1	L-2025-86	2025-12-14	\N	precebo	10	10	0	activo	2025-12-14 02:49:40.94955+00	15	\N	0	3	engorde
+1	L-2025-86	2025-12-14	\N	precebo	10	9	0	activo	2025-12-14 02:49:40.94955+00	15	\N	0	3	engorde
 \.
 
 
@@ -138,6 +155,9 @@ COPY public.lotes (id, codigo, fecha_inicio, fecha_cierre, ubicacion, cantidad_i
 --
 
 COPY public.eventos_sanitarios (id, fecha, tipo, lote_id, cerda_id, cantidad_afectada, observacion, created_at) FROM stdin;
+5	2025-12-15	tratamiento	\N	7	1	Reemplazo: Circovirus + Mycoplasma (Dosis 1)	2025-12-15 00:16:54.408592+00
+6	2025-12-15	tratamiento	\N	6	1	Reemplazo: Circovirus + Mycoplasma (Dosis 1)	2025-12-15 00:28:57.092453+00
+9	2025-12-23	muerte	1	\N	1	Muerte enfermedad 	2025-12-26 21:30:17.388205+00
 \.
 
 
@@ -161,6 +181,17 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 5	2025-12-14	egreso	4	236000	Inicio	efectivo	\N	\N	2025-12-14 02:33:10.221717+00
 6	2025-12-14	egreso	4	140000	Pre inicio	efectivo	\N	\N	2025-12-14 02:34:48.164371+00
 7	2025-12-14	egreso	4	255000	Compra	efectivo	\N	\N	2025-12-14 02:36:54.730729+00
+8	2025-12-14	egreso	8	120000	Pago oficial	efectivo	\N	\N	2025-12-14 23:51:38.294988+00
+9	2025-12-15	egreso	5	0	Medicamento prueba	efectivo	\N	\N	2025-12-15 00:15:04.983978+00
+10	2025-12-19	egreso	4	92000	Compra alimento 	efectivo	\N	\N	2025-12-27 17:41:00.14457+00
+11	2025-12-19	egreso	4	249000	Gestación 	efectivo	\N	\N	2025-12-27 17:41:54.536776+00
+12	2025-12-19	egreso	4	90000	Lactancia 	efectivo	\N	\N	2025-12-27 17:42:21.169071+00
+13	2025-12-19	egreso	4	118000	Iniciación 	efectivo	\N	\N	2025-12-27 17:44:39.721582+00
+14	2025-12-24	egreso	4	92000	Finalizador 	efectivo	\N	\N	2025-12-27 17:45:55.164869+00
+15	2025-12-27	egreso	4	170000	Reemplazo 	efectivo	\N	\N	2025-12-27 17:48:34.802098+00
+16	2025-12-27	egreso	4	184000	Finalizador 	efectivo	\N	\N	2025-12-27 17:49:12.476817+00
+17	2025-12-27	egreso	4	83000	Lactancia 	efectivo	\N	\N	2025-12-27 17:49:52.538064+00
+18	2025-12-27	egreso	4	82000	Medio bulto de pre inicio 	efectivo	\N	\N	2025-12-27 17:51:58.800188+00
 \.
 
 
@@ -191,14 +222,23 @@ COPY public.reglas_sanitarias (id, nombre_tarea, dias_target, evento_origen, tip
 --
 
 COPY public.salidas_insumos (id, fecha, insumo_id, cantidad, destino_tipo, lote_id, cerda_id, costo_unitario_momento, notas, created_at) FROM stdin;
-1	2025-12-14	1	240	cerda	\N	\N	2075	AlimentaciÃ³n Grupal - Gestación	2025-12-14 02:43:35.728318+00
 2	2025-12-14	7	80	lote	1	\N	2325	\N	2025-12-14 02:52:55.802403+00
 3	2025-12-14	5	60	lote	1	\N	2950	\N	2025-12-14 02:54:51.928235+00
 4	2025-12-14	4	20	lote	1	\N	3500	\N	2025-12-14 02:55:14.558625+00
 5	2025-12-14	4	20	lote	1	\N	3500	\N	2025-12-14 02:56:26.478182+00
-6	2025-12-14	16	80	cerda	\N	\N	2125	AlimentaciÃ³n Grupal - Gestación	2025-12-14 02:58:46.3964+00
 7	2025-12-14	7	40	lote	1	\N	2325	\N	2025-12-14 02:59:42.086879+00
-8	2025-12-14	2	50	cerda	\N	\N	2275	AlimentaciÃ³n Grupal - Lactancia	2025-12-14 03:02:07.410556+00
+9	2025-12-14	5	20	lote	1	\N	2950	\N	2025-12-14 23:52:53.602615+00
+8	2025-12-14	2	50	cerda	\N	\N	2275	Alimentación Grupal - Lactancia	2025-12-14 03:02:07.410556+00
+6	2025-12-14	16	80	cerda	\N	\N	2125	Alimentación Grupal - Gestación	2025-12-14 02:58:46.3964+00
+1	2025-12-14	1	240	cerda	\N	\N	2075	Alimentación Grupal - Gestación	2025-12-14 02:43:35.728318+00
+16	2025-12-15	5	1	cerda	\N	6	0	Sanidad Cerda 6. Reemplazo: Circovirus + Mycoplasma (Dosis 1)	2025-12-15 00:35:30.357566+00
+17	2025-12-15	5	1	cerda	\N	7	0	Sanidad Cerda 7. Reemplazo: Circovirus + Mycoplasma (Dosis 1)	2025-12-15 00:35:35.595284+00
+18	2025-12-27	6	20	lote	1	\N	2950	\N	2025-12-27 17:54:21.652704+00
+19	2025-12-27	7	80	lote	1	\N	2312.5	\N	2025-12-27 17:55:09.876248+00
+20	2025-12-27	2	60	cerda	\N	\N	1572.7272727272727	Alimentación Grupal - Lactancia	2025-12-27 17:56:05.914949+00
+21	2025-12-27	8	40	lote	1	\N	2300	\N	2025-12-27 17:57:11.917982+00
+22	2025-12-27	16	40	cerda	\N	\N	2125	Alimentación Grupal - Gestación	2025-12-27 17:58:27.134888+00
+23	2025-12-27	1	180	cerda	\N	\N	2075	Alimentación Grupal - Gestación	2025-12-27 18:00:49.007223+00
 \.
 
 
@@ -227,28 +267,28 @@ SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 6, true);
 -- Name: compras_insumos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.compras_insumos_id_seq', 6, true);
+SELECT pg_catalog.setval('public.compras_insumos_id_seq', 16, true);
 
 
 --
 -- Name: corrales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.corrales_id_seq', 3, true);
+SELECT pg_catalog.setval('public.corrales_id_seq', 10, true);
 
 
 --
 -- Name: eventos_sanitarios_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.eventos_sanitarios_id_seq', 1, false);
+SELECT pg_catalog.setval('public.eventos_sanitarios_id_seq', 9, true);
 
 
 --
 -- Name: insumos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.insumos_id_seq', 1, true);
+SELECT pg_catalog.setval('public.insumos_id_seq', 6, true);
 
 
 --
@@ -269,7 +309,7 @@ SELECT pg_catalog.setval('public.lotes_id_seq', 1, true);
 -- Name: movimientos_caja_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 7, true);
+SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 18, true);
 
 
 --
@@ -283,12 +323,12 @@ SELECT pg_catalog.setval('public.reglas_sanitarias_id_seq', 1, false);
 -- Name: salidas_insumos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 8, true);
+SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 23, true);
 
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict tbZErbYYkd2KGFDUiCtgoG5eUlgOUvLk6Ixi3VafeMoLvPj3qV2U0U5DpmlnnNj
+\unrestrict etExPW7KtUHA6qkQAPCcjsvv3bfQZBLN2aSBg3r2RMVDB4ewHe0ckO2y11KAfrS
 
