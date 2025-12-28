@@ -316,6 +316,7 @@ export class RegistroTransaccionComponent implements AfterViewInit {
       this.insumoId.set(null);
       this.cantidad.set(0);
       this.monto.set(0);
+      this.montoFormateado.set(''); // Reset formatted display
       this.afectaInventario.set(false);
 
     } catch (error) {
