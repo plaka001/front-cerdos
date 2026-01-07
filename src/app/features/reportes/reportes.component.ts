@@ -17,6 +17,7 @@ export class ReportesComponent implements OnInit {
     reportes = signal<ReporteRentabilidad[]>([]);
     reporteMaternidad = signal<ReporteCostosMaternidad[]>([]);
     reporteFlujoCaja = signal<ReporteFlujoCaja[]>([]);
+    balanceTotalCaja = signal<number>(0);
 
     activeTab = signal<'lotes' | 'maternidad' | 'flujo'>('lotes');
     loading = signal<boolean>(true);
@@ -125,15 +126,17 @@ export class ReportesComponent implements OnInit {
     async loadReportes() {
         try {
             this.loading.set(true);
-            const [dataLotes, dataMaternidad, dataFlujoCaja] = await Promise.all([
+            const [dataLotes, dataMaternidad, dataFlujoCaja, balanceTotal] = await Promise.all([
                 this.reportesService.getReporteRentabilidad(),
                 this.reportesService.getReporteMaternidad(),
-                this.reportesService.getReporteFlujoCaja()
+                this.reportesService.getReporteFlujoCaja(),
+                this.reportesService.getBalanceGeneral()
             ]);
 
             this.reportes.set(dataLotes);
             this.reporteMaternidad.set(dataMaternidad);
             this.reporteFlujoCaja.set(dataFlujoCaja);
+            this.balanceTotalCaja.set(balanceTotal);
 
             // Seleccionar mes más reciente por defecto
             if (dataFlujoCaja.length > 0) {

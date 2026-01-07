@@ -72,6 +72,21 @@ export class ReportesService {
         }
     }
 
+    async getBalanceGeneral(): Promise<number> {
+        try {
+            const { data, error } = await this.supabase.client
+                .from('vista_balance_total')
+                .select('balance')
+                .single();
+
+            if (error) throw error;
+            return data.balance || 0;
+        } catch (error) {
+            console.error('Error al obtener balance general:', error);
+            throw error;
+        }
+    }
+
     async descargarReporteExcel(anio: number, mes: number): Promise<void> {
         try {
             // 1. Definir rango de fechas para el mes seleccionado

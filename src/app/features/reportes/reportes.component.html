@@ -371,53 +371,88 @@
             </button>
         </div>
 
-        <!-- Big Hero Card (Financial Summary) -->
-        <div class="bg-slate-800 rounded-3xl p-8 border border-slate-700/50 shadow-2xl relative overflow-hidden group">
-            <!-- Background Glow -->
+        <!-- Financial Summary Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+            <!-- Card 1: Balance Monthly -->
             <div
-                class="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-1000">
-            </div>
-
-            <div class="relative z-10">
-                <!-- Top: Net Balance -->
-                <div class="text-center mb-8">
-                    <p class="text-sm font-medium text-slate-400 uppercase tracking-widest mb-2">Balance Neto</p>
-                    <h2 class="text-4xl sm:text-5xl font-black tracking-tight" [class.text-white]="balanceMes() >= 0"
-                        [class.text-red-400]="balanceMes() < 0">
-                        {{ balanceMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
-                    </h2>
+                class="bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-700/50 shadow-2xl relative overflow-hidden group">
+                <!-- Background Glow -->
+                <div
+                    class="absolute -top-20 -right-20 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-colors duration-1000">
                 </div>
 
-                <!-- Divider -->
-                <div class="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent mb-8"></div>
-
-                <!-- Bottom: Split Stats -->
-                <div class="grid grid-cols-2 gap-8">
-                    <!-- Ingresos -->
-                    <div class="text-center border-r border-slate-700/50">
-                        <div
-                            class="inline-flex items-center justify-center p-2 rounded-full bg-emerald-500/10 text-emerald-400 mb-3">
-                            <lucide-icon name="arrow-up" [size]="18"></lucide-icon>
+                <div class="relative z-10">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <p class="text-sm font-medium text-slate-400 uppercase tracking-widest mb-1">Balance Neto
+                                ({{ mesSeleccionado() | date:'MMMM' }})</p>
+                            <h2 class="text-3xl sm:text-4xl font-black tracking-tight"
+                                [class.text-white]="balanceMes() >= 0" [class.text-red-400]="balanceMes() < 0">
+                                {{ balanceMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
+                            </h2>
                         </div>
-                        <p class="text-xs text-slate-500 uppercase font-bold mb-1">Ingresos Totales</p>
-                        <p class="text-xl sm:text-2xl font-bold text-emerald-400">
-                            {{ totalIngresosMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
-                        </p>
+                        <div class="p-3 rounded-xl bg-slate-700/30 text-slate-400">
+                            <lucide-icon name="scale" [size]="24"></lucide-icon>
+                        </div>
                     </div>
 
-                    <!-- Egresos -->
-                    <div class="text-center">
-                        <div
-                            class="inline-flex items-center justify-center p-2 rounded-full bg-red-500/10 text-red-400 mb-3">
-                            <lucide-icon name="arrow-down" [size]="18"></lucide-icon>
+                    <!-- Split Stats -->
+                    <div class="grid grid-cols-2 gap-4 pt-6 border-t border-slate-700/50">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1 text-emerald-400">
+                                <lucide-icon name="arrow-up-circle" [size]="14"></lucide-icon>
+                                <span class="text-xs font-bold uppercase">Ingresos</span>
+                            </div>
+                            <p class="text-lg font-bold text-emerald-400">{{ totalIngresosMes() |
+                                currency:'COP':'symbol-narrow':'1.0-0' }}</p>
                         </div>
-                        <p class="text-xs text-slate-500 uppercase font-bold mb-1">Egresos Totales</p>
-                        <p class="text-xl sm:text-2xl font-bold text-red-400">
-                            {{ totalEgresosMes() | currency:'COP':'symbol-narrow':'1.0-0' }}
-                        </p>
+                        <div>
+                            <div class="flex items-center gap-2 mb-1 text-red-400">
+                                <lucide-icon name="arrow-down-circle" [size]="14"></lucide-icon>
+                                <span class="text-xs font-bold uppercase">Egresos</span>
+                            </div>
+                            <p class="text-lg font-bold text-red-400">{{ totalEgresosMes() |
+                                currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Card 2: Total Cash (Wallet) -->
+            <div
+                class="bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-700/50 shadow-2xl relative overflow-hidden group">
+                <!-- Background Glow -->
+                <div
+                    class="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-1000">
+                </div>
+
+                <div class="relative z-10 h-full flex flex-col justify-between">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm font-medium text-slate-400 uppercase tracking-widest mb-1">Dinero en Caja
+                            </p>
+                            <p class="text-xs text-slate-500 mb-2">Acumulado total histórico</p>
+                            <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-white mb-2">
+                                {{ balanceTotalCaja() | currency:'COP':'symbol-narrow':'1.0-0' }}
+                            </h2>
+                        </div>
+                        <div class="p-3 rounded-xl bg-emerald-500/10 text-emerald-400">
+                            <lucide-icon name="wallet" [size]="24"></lucide-icon>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-slate-700/50">
+                        <div
+                            class="flex items-center gap-3 text-slate-400 text-sm bg-slate-700/20 p-3 rounded-lg border border-slate-700/30">
+                            <lucide-icon name="info" [size]="16" class="text-blue-400 flex-shrink-0"></lucide-icon>
+                            <p class="leading-snug">Este valor representa el dinero real disponible sumando todos los
+                                meses.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- Unified Transactions List (Fintech Style) -->
