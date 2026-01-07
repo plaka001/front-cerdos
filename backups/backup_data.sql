@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict etExPW7KtUHA6qkQAPCcjsvv3bfQZBLN2aSBg3r2RMVDB4ewHe0ckO2y11KAfrS
+\restrict EBoU5pcMwY8pfhYwRAPV6F4zTZl0iiMAuZbj0RoDM28xRQifVL3rF3VNrCHhFAa
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.7 (Ubuntu 17.7-3.pgdg24.04+1)
@@ -192,6 +192,14 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 16	2025-12-27	egreso	4	184000	Finalizador 	efectivo	\N	\N	2025-12-27 17:49:12.476817+00
 17	2025-12-27	egreso	4	83000	Lactancia 	efectivo	\N	\N	2025-12-27 17:49:52.538064+00
 18	2025-12-27	egreso	4	82000	Medio bulto de pre inicio 	efectivo	\N	\N	2025-12-27 17:51:58.800188+00
+19	2025-12-28	egreso	7	740400	Compra materiales corral 	efectivo	\N	https://spoxpbhhjcchwebnpdix.supabase.co/storage/v1/object/public/comprobantes/comprobantes_movimientos/1766952200123_129.jpg	2025-12-28 20:03:24.041278+00
+20	2025-12-28	egreso	7	53900	Compra materiales 	efectivo	\N	https://spoxpbhhjcchwebnpdix.supabase.co/storage/v1/object/public/comprobantes/comprobantes_movimientos/1766952761343_273.jpg	2025-12-28 20:12:44.679117+00
+21	2025-12-28	egreso	7	33600	Compra materiales 	efectivo	\N	https://spoxpbhhjcchwebnpdix.supabase.co/storage/v1/object/public/comprobantes/comprobantes_movimientos/1766955103244_837.jpg	2025-12-28 20:51:44.660381+00
+22	2025-12-28	egreso	7	12800	Compra materiales 	efectivo	\N	https://spoxpbhhjcchwebnpdix.supabase.co/storage/v1/object/public/comprobantes/comprobantes_movimientos/1766955165546_426.jpg	2025-12-28 20:52:47.738994+00
+23	2025-12-28	egreso	7	5200	Compra materiales 	efectivo	\N	https://spoxpbhhjcchwebnpdix.supabase.co/storage/v1/object/public/comprobantes/comprobantes_movimientos/1766955256506_389.jpg	2025-12-28 20:54:18.133742+00
+24	2025-12-28	egreso	7	12900	Compra materiales 	efectivo	\N	https://spoxpbhhjcchwebnpdix.supabase.co/storage/v1/object/public/comprobantes/comprobantes_movimientos/1766955289702_518.jpg	2025-12-28 20:54:51.344719+00
+25	2025-12-28	egreso	7	37600	Compra materiales 	efectivo	\N	https://spoxpbhhjcchwebnpdix.supabase.co/storage/v1/object/public/comprobantes/comprobantes_movimientos/1766955341991_234.jpg	2025-12-28 20:55:43.110228+00
+26	2025-12-29	egreso	8	260000	Pago oficial 	efectivo	\N	\N	2025-12-29 00:34:41.498088+00
 \.
 
 
@@ -309,7 +317,7 @@ SELECT pg_catalog.setval('public.lotes_id_seq', 1, true);
 -- Name: movimientos_caja_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 18, true);
+SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 26, true);
 
 
 --
@@ -330,5 +338,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 23, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict etExPW7KtUHA6qkQAPCcjsvv3bfQZBLN2aSBg3r2RMVDB4ewHe0ckO2y11KAfrS
+\unrestrict EBoU5pcMwY8pfhYwRAPV6F4zTZl0iiMAuZbj0RoDM28xRQifVL3rF3VNrCHhFAa
 
