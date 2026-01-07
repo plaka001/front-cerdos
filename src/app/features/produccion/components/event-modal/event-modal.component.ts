@@ -322,12 +322,25 @@ export class EventModalComponent {
         const activos = data.filter(c => c.activo);
         this.corralesParidera.set(activos.filter(c => c.tipo === 'paridera'));
       } else if (this.tipoEvento === 'destete') {
-        // Use EstadoCorrales for validation
-        const dataConOcupacion = await this.corralesService.getEstadoCorrales();
-        const activos = dataConOcupacion.filter(c => c.activo);
+        const [dataBasica, dataConOcupacion] = await Promise.all([
+          this.corralesService.getCorrales(),
+          this.corralesService.getEstadoCorrales()
+        ]);
 
-        const dataBasica = await this.corralesService.getCorrales();
-        this.corralesGestacion.set(dataBasica.filter(c => c.activo && c.tipo === 'gestacion'));
+        // Merge logic: Base data (with 'activo') + Occupation data
+        const merged = dataBasica.map(basic => {
+          const status = dataConOcupacion.find(s => s.id === basic.id);
+          return {
+            ...basic,
+            ocupacion_total: status?.ocupacion_total || 0,
+            ocupacion_lotes: status?.ocupacion_lotes || 0,
+            ocupacion_cerdas: status?.ocupacion_cerdas || 0
+          } as EstadoCorral;
+        });
+
+        const activos = merged.filter(c => c.activo);
+
+        this.corralesGestacion.set(activos.filter(c => c.tipo === 'gestacion'));
         this.corralesPrecebo.set(activos.filter(c => c.tipo === 'precebo'));
       }
     } catch (e) {
