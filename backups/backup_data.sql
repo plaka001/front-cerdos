@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict V5lsvYU7DmRuQE9dUXROSVfroUGOBmuqCy2UfqdlXeyWvTwy2OD3SYEBpMACV6p
+\restrict sNIlYAERv74n3OAFHSI8rXSK39jQJD3hEs3a6lnoQomvFTUe71tjjnj8PrSqtze
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.7 (Ubuntu 17.7-3.pgdg24.04+1)
@@ -74,8 +74,8 @@ COPY public.cerdas (id, chapeta, fecha_nacimiento, raza, estado, partos_acumulad
 5	La brava	2024-06-06	F1	gestante	0	t	\N	2025-12-07 01:34:20.480166+00	1
 3	Roci	2024-06-06	F1	gestante	0	t	\N	2025-12-07 01:33:20.78016+00	1
 2	La jardineña	2024-06-06	F1	gestante	0	t	\N	2025-12-07 01:31:02.308943+00	1
-1	La mona	2024-06-06	large white	vacia	1	t	\N	2025-12-07 01:31:00.681173+00	1
 4	La flaca	2024-06-06	F1	descarte	1	f	\N	2025-12-07 01:33:21.343612+00	1
+1	La mona	2024-06-06	large white	gestante	1	t	\N	2025-12-07 01:31:00.681173+00	1
 \.
 
 
@@ -90,6 +90,7 @@ COPY public.ciclos_reproductivos (id, cerda_id, fecha_inseminacion, padre_semen,
 2	4	2025-12-03	Semen 	0	\N	2025-12-14	10	0	0	2025-12-14	10	15	cerrado	2025-12-11 05:34:34.489341+00	\N
 6	4	2025-12-03	semen	0	\N	\N	0	0	0	\N	0	\N	abierto	2025-12-14 02:51:57.386614+00	\N
 1	1	2025-08-21	Semen 	0	\N	2025-12-11	15	0	0	2026-01-02	15	8	cerrado	2025-12-11 05:32:20.531263+00	Precebo 15
+7	1	2026-01-09	Semen 	120000	\N	\N	0	0	0	\N	0	\N	abierto	2026-01-10 13:34:30.492173+00	Semen 
 \.
 
 
@@ -112,8 +113,8 @@ COPY public.insumos (id, nombre, tipo, unidad_medida, presentacion_compra, stock
 1	Gestacion	alimento	kg	40	80	2075.0000000000000000	200	t	2025-12-07 01:23:09.044215+00
 16	Reemplazo	alimento	kg	40	80	2125.0000000000000000	5	t	2025-12-14 02:36:17+00
 6	Iniciación 	alimento	kg	40	0	2950.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
+5	Medicamento viejo	medicamento	ml	2000	1985	0.00000000000000000000	0	t	2025-12-07 01:23:09.044215+00
 4	Pre-Inicio	alimento	kg	40	0	0	100	t	2025-12-07 01:23:09.044215+00
-5	Medicamento viejo	medicamento	ml	2000	1987	0.00000000000000000000	0	t	2025-12-07 01:23:09.044215+00
 \.
 
 
@@ -169,6 +170,8 @@ COPY public.eventos_sanitarios (id, fecha, tipo, lote_id, cerda_id, cantidad_afe
 13	2026-01-07	tratamiento	\N	2	1	Primeriza: Vacuna E. Coli (Dosis 2)	2026-01-07 01:37:02.753848+00
 14	2026-01-07	tratamiento	\N	4	1	Vacuna Mycoplasma + Circovirus	2026-01-07 01:37:13.401726+00
 15	2026-01-02	enfermedad	1	\N	1	Enfermedad 	2026-01-07 02:14:03.184967+00
+16	2026-01-10	tratamiento	\N	9	1	Reemplazo: Eri-Parvo-Lepto (Dosis 2)	2026-01-10 13:40:40.713885+00
+17	2026-01-10	tratamiento	\N	8	1	Reemplazo: Eri-Parvo-Lepto (Dosis 2)	2026-01-10 13:40:47.582826+00
 \.
 
 
@@ -217,6 +220,8 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 30	2026-01-07	egreso	4	180000	Compra finalizador	efectivo	\N	\N	2026-01-07 02:01:11.295653+00
 31	2026-01-07	egreso	4	166000	Compra gestacion	efectivo	\N	\N	2026-01-07 02:02:16.025904+00
 32	2026-01-07	egreso	4	170000	Compra reemplazo cuido	efectivo	\N	\N	2026-01-07 02:03:23.598711+00
+33	2026-01-09	egreso	6	120000	Inseminación Cerda La mona - Semen 	efectivo	\N	\N	2026-01-10 13:34:31.251732+00
+34	2026-01-10	egreso	5	30000	Inyecciones parvo 0708	efectivo	\N	\N	2026-01-10 13:41:53.881961+00
 \.
 
 
@@ -275,6 +280,8 @@ COPY public.salidas_insumos (id, fecha, insumo_id, cantidad, destino_tipo, lote_
 32	2026-01-01	8	80	lote	1	\N	2300	\N	2026-01-07 01:56:56.865074+00
 33	2026-01-01	16	80	cerda	\N	\N	2125	Alimentación Grupal - Gestación	2026-01-07 01:57:36.126966+00
 34	2026-01-07	6	20	lote	2	\N	2950	\N	2026-01-07 02:04:12.301938+00
+35	2026-01-10	5	1	cerda	\N	9	0	Sanidad Cerda 9. Reemplazo: Eri-Parvo-Lepto (Dosis 2)	2026-01-10 13:40:40.516806+00
+36	2026-01-10	5	1	cerda	\N	8	0	Sanidad Cerda 8. Reemplazo: Eri-Parvo-Lepto (Dosis 2)	2026-01-10 13:40:47.457159+00
 \.
 
 
@@ -296,7 +303,7 @@ SELECT pg_catalog.setval('public.cerdas_id_seq', 1, false);
 -- Name: ciclos_reproductivos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 6, true);
+SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 7, true);
 
 
 --
@@ -317,7 +324,7 @@ SELECT pg_catalog.setval('public.corrales_id_seq', 10, true);
 -- Name: eventos_sanitarios_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.eventos_sanitarios_id_seq', 15, true);
+SELECT pg_catalog.setval('public.eventos_sanitarios_id_seq', 17, true);
 
 
 --
@@ -345,7 +352,7 @@ SELECT pg_catalog.setval('public.lotes_id_seq', 2, true);
 -- Name: movimientos_caja_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 32, true);
+SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 34, true);
 
 
 --
@@ -359,12 +366,12 @@ SELECT pg_catalog.setval('public.reglas_sanitarias_id_seq', 1, false);
 -- Name: salidas_insumos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 34, true);
+SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 36, true);
 
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict V5lsvYU7DmRuQE9dUXROSVfroUGOBmuqCy2UfqdlXeyWvTwy2OD3SYEBpMACV6p
+\unrestrict sNIlYAERv74n3OAFHSI8rXSK39jQJD3hEs3a6lnoQomvFTUe71tjjnj8PrSqtze
 
