@@ -171,9 +171,23 @@ export class TrasladoEtapaModalComponent implements OnInit {
 
     async cargarCorrales() {
         try {
-            // Get all corrales WITH occupancy
-            const data = await this.corralesService.getEstadoCorrales();
-            this.corrales.set(data);
+            // Get all corrales basic info (has activo status)
+            // AND occupancy info (does not have activo status)
+            const [basicCorrales, estadoCorrales] = await Promise.all([
+                this.corralesService.getCorrales(),
+                this.corralesService.getEstadoCorrales()
+            ]);
+
+            // Merge 'activo' property into the EstadoCorral objects
+            const mergedCorrales = estadoCorrales.map(ec => {
+                const basic = basicCorrales.find(c => c.id === ec.id);
+                return {
+                    ...ec,
+                    activo: basic ? basic.activo : true // Default to true if not found, or careful logic
+                };
+            });
+
+            this.corrales.set(mergedCorrales);
         } catch (error) {
             console.error('Error loading corrales', error);
         }
