@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict il8qKcNWO31AlSRJRaWrUS7O3izyzYyrJJFak0JL1nojiUKjxgEVMpFFkZRw9NS
+\restrict RszwUJ3uyVGYcZtNz8iSmJP2AUM66kD8DBEISAGg1dvzyVxQgyFKeFebNJuudCc
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.7 (Ubuntu 17.7-3.pgdg24.04+1)
@@ -169,8 +169,8 @@ COPY public.compras_insumos (id, fecha, insumo_id, proveedor, cantidad_comprada,
 --
 
 COPY public.lotes (id, codigo, fecha_inicio, fecha_cierre, ubicacion, cantidad_inicial, cantidad_actual, costo_inicial_lote, estado, created_at, peso_promedio_inicial, observaciones, peso_promedio_actual, corral_id, etapa) FROM stdin;
-1	L-2025-86	2025-12-14	\N	precebo	10	8	0	activo	2025-12-14 02:49:40.94955+00	15	\N	0	3	engorde
 2	L-2026-177	2026-01-02	\N	Corral de Precebo	15	15	0	activo	2026-01-07 01:45:53.935409+00	8	\N	15	11	engorde
+1	L-2025-86	2025-12-14	\N	precebo	10	6	0	activo	2025-12-14 02:49:40.94955+00	15	\N	0	3	engorde
 \.
 
 
@@ -265,6 +265,7 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 53	2026-01-27	egreso	4	83000	compra bulto reemplazo	efectivo	\N	\N	2026-01-27 23:40:31.497639+00
 54	2026-01-27	egreso	4	117000	compra bulto iniciación 	efectivo	\N	\N	2026-01-27 23:41:03.493765+00
 55	2026-01-27	egreso	4	93000	compra bulto lechon	efectivo	\N	\N	2026-01-27 23:41:22.734445+00
+56	2026-02-04	ingreso	1	1624000	Venta Lote L-2025-86 - Yeison	efectivo	1	\N	2026-02-04 14:29:28.762195+00
 \.
 
 
@@ -411,7 +412,7 @@ SELECT pg_catalog.setval('public.lotes_id_seq', 2, true);
 -- Name: movimientos_caja_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 55, true);
+SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 56, true);
 
 
 --
@@ -432,5 +433,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 52, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict il8qKcNWO31AlSRJRaWrUS7O3izyzYyrJJFak0JL1nojiUKjxgEVMpFFkZRw9NS
+\unrestrict RszwUJ3uyVGYcZtNz8iSmJP2AUM66kD8DBEISAGg1dvzyVxQgyFKeFebNJuudCc
 
