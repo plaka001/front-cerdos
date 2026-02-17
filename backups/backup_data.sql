@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 7WMcdIulAe5k9LjbeOpYhqDmzqyPWSB8Bii4mXBW7rmA5ekoLuKDCaSk7NEU1pK
+\restrict 7CHcm8BeW8Y0fM6s0hcyod4JpSsb1hdgRruFhxkKf0nL2fDqD70H21CgSjM43xK
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.8 (Ubuntu 17.8-1.pgdg24.04+1)
@@ -68,7 +68,6 @@ COPY public.corrales (id, nombre, tipo, capacidad_maxima, activo, created_at) FR
 --
 
 COPY public.cerdas (id, chapeta, fecha_nacimiento, raza, estado, partos_acumulados, activa, notas, created_at, corral_id) FROM stdin;
-8	07	2025-06-15	F1	vacia	0	t	\N	2025-12-07 01:48:20.569372+00	1
 6	Juana	2025-07-19	F1	vacia	0	t	\N	2025-12-07 01:41:21.818891+00	1
 7	Sol	2025-07-19	F1	vacia	0	t	\N	2025-12-07 01:41:45.996026+00	1
 5	La brava	2024-06-06	F1	gestante	0	t	\N	2025-12-07 01:34:20.480166+00	1
@@ -77,6 +76,7 @@ COPY public.cerdas (id, chapeta, fecha_nacimiento, raza, estado, partos_acumulad
 1	La mona	2024-06-06	large white	gestante	1	t	\N	2025-12-07 01:31:00.681173+00	1
 9	08	2025-06-15	F1	gestante	0	t	\N	2025-12-07 01:48:33.880781+00	1
 2	La jardineña	2024-06-06	F1	lactante	1	t	\N	2025-12-07 01:31:02.308943+00	8
+8	07	2025-06-15	F1	gestante	0	t	\N	2025-12-07 01:48:20.569372+00	1
 \.
 
 
@@ -93,6 +93,7 @@ COPY public.ciclos_reproductivos (id, cerda_id, fecha_inseminacion, padre_semen,
 7	1	2026-01-09	Semen 	120000	\N	\N	0	0	0	\N	0	\N	abierto	2026-01-10 13:34:30.492173+00	Semen 
 8	9	2026-01-14	pic 410	120000	\N	\N	0	0	0	\N	0	\N	abierto	2026-01-15 23:04:31.725834+00	inseminacion 
 5	2	2025-09-29	410	0	\N	2026-01-21	16	2	0	\N	0	\N	abierto	2025-12-14 02:05:13.074701+00	Parto 18 animales
+9	8	2026-02-05	Pig 410	0	\N	\N	0	0	0	\N	0	\N	abierto	2026-02-16 15:02:54.399679+00	\N
 \.
 
 
@@ -363,7 +364,7 @@ SELECT pg_catalog.setval('public.cerdas_id_seq', 1, false);
 -- Name: ciclos_reproductivos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 8, true);
+SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 9, true);
 
 
 --
@@ -433,5 +434,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 52, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 7WMcdIulAe5k9LjbeOpYhqDmzqyPWSB8Bii4mXBW7rmA5ekoLuKDCaSk7NEU1pK
+\unrestrict 7CHcm8BeW8Y0fM6s0hcyod4JpSsb1hdgRruFhxkKf0nL2fDqD70H21CgSjM43xK
 
