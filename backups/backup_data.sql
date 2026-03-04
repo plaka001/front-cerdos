@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict k0dfl031glT8S7x6KeC10CMvg71mQBuEXZzRrN7KWOr1ekTIIbn4F6wb2Zmbc9C
+\restrict 3NI7zC2cvFpc15YVsqrBbVOzkmEhn0OlmNTFYdlFL6OILf5OPY9h6L2XukNxPYd
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.9 (Ubuntu 17.9-1.pgdg24.04+1)
@@ -68,7 +68,6 @@ COPY public.corrales (id, nombre, tipo, capacidad_maxima, activo, created_at) FR
 --
 
 COPY public.cerdas (id, chapeta, fecha_nacimiento, raza, estado, partos_acumulados, activa, notas, created_at, corral_id) FROM stdin;
-6	Juana	2025-07-19	F1	vacia	0	t	\N	2025-12-07 01:41:21.818891+00	1
 7	Sol	2025-07-19	F1	vacia	0	t	\N	2025-12-07 01:41:45.996026+00	1
 5	La brava	2024-06-06	F1	gestante	0	t	\N	2025-12-07 01:34:20.480166+00	1
 3	Roci	2024-06-06	F1	gestante	0	t	\N	2025-12-07 01:33:20.78016+00	1
@@ -77,6 +76,7 @@ COPY public.cerdas (id, chapeta, fecha_nacimiento, raza, estado, partos_acumulad
 9	08	2025-06-15	F1	gestante	0	t	\N	2025-12-07 01:48:33.880781+00	1
 8	07	2025-06-15	F1	gestante	0	t	\N	2025-12-07 01:48:20.569372+00	1
 2	La jardineña	2024-06-06	F1	gestante	1	t	\N	2025-12-07 01:31:02.308943+00	1
+6	Juana	2025-07-19	F1	gestante	0	t	\N	2025-12-07 01:41:21.818891+00	1
 \.
 
 
@@ -95,6 +95,7 @@ COPY public.ciclos_reproductivos (id, cerda_id, fecha_inseminacion, padre_semen,
 9	8	2026-02-05	Pig 410	0	\N	\N	0	0	0	\N	0	\N	abierto	2026-02-16 15:02:54.399679+00	\N
 5	2	2025-09-29	410	0	\N	2026-01-21	16	2	0	2026-02-18	16	8	cerrado	2025-12-14 02:05:13.074701+00	\N
 10	2	2026-02-17	Semen	240000	\N	\N	0	0	0	\N	0	\N	abierto	2026-02-18 00:09:22.6012+00	\N
+11	6	2026-03-03	410	100000	\N	\N	0	0	0	\N	0	\N	abierto	2026-03-03 17:59:47.503181+00	\N
 \.
 
 
@@ -306,6 +307,7 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 74	2026-02-24	egreso	4	117000	Compra iniciacion 	efectivo	\N	\N	2026-02-24 23:35:52.975214+00
 75	2026-02-24	egreso	8	130000	pago oficial 	efectivo	\N	\N	2026-02-25 00:00:04.458207+00
 76	2026-02-25	ingreso	1	1050000	Venta Lote L-2026-42 - Suegro del yeison	efectivo	3	\N	2026-02-25 00:03:40.010216+00
+77	2026-03-03	egreso	6	100000	Inseminación Cerda Juana - 410	efectivo	\N	\N	2026-03-03 17:59:49.561363+00
 \.
 
 
@@ -415,7 +417,7 @@ SELECT pg_catalog.setval('public.cerdas_id_seq', 1, false);
 -- Name: ciclos_reproductivos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 10, true);
+SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 11, true);
 
 
 --
@@ -464,7 +466,7 @@ SELECT pg_catalog.setval('public.lotes_id_seq', 3, true);
 -- Name: movimientos_caja_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 76, true);
+SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 77, true);
 
 
 --
@@ -485,5 +487,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 64, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict k0dfl031glT8S7x6KeC10CMvg71mQBuEXZzRrN7KWOr1ekTIIbn4F6wb2Zmbc9C
+\unrestrict 3NI7zC2cvFpc15YVsqrBbVOzkmEhn0OlmNTFYdlFL6OILf5OPY9h6L2XukNxPYd
 
