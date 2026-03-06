@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict eA9LpvhYmRpO9vSJpGIvobS5oexuaFCS223jfGsV9cNyaylBn1hssKrn0PEVTsw
+\restrict wxUzKDIqqid4g6ri5A1QsnZs3P4QIF24m8vOJCT883HauLB9XMNvIWHV7OMFG0E
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.9 (Ubuntu 17.9-1.pgdg24.04+1)
@@ -110,13 +110,13 @@ COPY public.insumos (id, nombre, tipo, unidad_medida, presentacion_compra, stock
 14	Hierro Dextrano	medicamento	ml	100	0	0	50	t	2025-12-07 01:57:30.571465+00
 15	Vacuna E. Coli	biologico	dosis	25	0	0	10	t	2025-12-07 01:57:30.571465+00
 10	Fostera 	medicamento	dosis	1	0	10000.0000000000000000	0	t	2025-12-07 01:57:30.571465+00
-9	Finalizador	alimento	kg	40	120	2250.0000000000000000	100	t	2025-12-07 01:57:30.571465+00
-3	Pre-Inicio Fase 1	alimento	kg	40	40	2075.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
-1	Gestacion	alimento	kg	40	160	2075.0000000000000000	200	t	2025-12-07 01:23:09.044215+00
-7	Transicion	alimento	kg	40	40	2450.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
-8	lechon 337	alimento	kg	40	40	2325.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
 6	Iniciación 	alimento	kg	40	40	2415.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
 4	Pre-Inicio	alimento	kg	40	0	3700.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
+8	lechon 337	alimento	kg	40	0	2325.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
+7	Transicion	alimento	kg	40	0	2450.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
+3	Pre-Inicio Fase 1	alimento	kg	40	0	2075.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
+9	Finalizador	alimento	kg	40	40	2250.0000000000000000	100	t	2025-12-07 01:57:30.571465+00
+1	Gestacion	alimento	kg	40	40	2075.0000000000000000	200	t	2025-12-07 01:23:09.044215+00
 5	Medicamento viejo	medicamento	ml	2000	1981	0.00000000000000000000	0	t	2025-12-07 01:23:09.044215+00
 16	Reemplazo	alimento	kg	40	0	2075.0000000000000000	5	t	2025-12-14 02:36:17+00
 2	Lactancia	alimento	kg	40	0	2275.0000000000000000	150	t	2025-12-07 01:23:09.044215+00
@@ -308,6 +308,7 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 75	2026-02-24	egreso	8	130000	pago oficial 	efectivo	\N	\N	2026-02-25 00:00:04.458207+00
 76	2026-02-25	ingreso	1	1050000	Venta Lote L-2026-42 - Suegro del yeison	efectivo	3	\N	2026-02-25 00:03:40.010216+00
 77	2026-03-03	egreso	6	100000	Inseminación Cerda Juana - 410	efectivo	\N	\N	2026-03-03 17:59:49.561363+00
+78	2026-03-06	egreso	10	55000	Trasnporte concentrado	efectivo	\N	\N	2026-03-06 00:04:59.869151+00
 \.
 
 
@@ -396,6 +397,11 @@ COPY public.salidas_insumos (id, fecha, insumo_id, cantidad, destino_tipo, lote_
 62	2026-02-24	8	160	lote	1	\N	2325	\N	2026-02-24 23:41:18.38236+00
 63	2026-02-24	6	160	lote	2	\N	2415	\N	2026-02-24 23:42:34.346229+00
 64	2026-02-24	4	40	lote	3	\N	3700	\N	2026-02-24 23:45:27.925241+00
+65	2026-03-05	8	40	lote	2	\N	2325	\N	2026-03-05 23:58:32.905076+00
+66	2026-03-05	7	40	lote	2	\N	2450	\N	2026-03-05 23:58:41.112531+00
+67	2026-03-05	3	40	lote	3	\N	2075	\N	2026-03-05 23:59:21.8302+00
+68	2026-03-06	9	80	lote	1	\N	2250	\N	2026-03-06 00:00:53.340328+00
+69	2026-03-06	1	120	cerda	\N	\N	2075	Alimentación Grupal - Gestación	2026-03-06 00:01:32.800916+00
 \.
 
 
@@ -466,7 +472,7 @@ SELECT pg_catalog.setval('public.lotes_id_seq', 3, true);
 -- Name: movimientos_caja_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 77, true);
+SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 78, true);
 
 
 --
@@ -480,12 +486,12 @@ SELECT pg_catalog.setval('public.reglas_sanitarias_id_seq', 1, false);
 -- Name: salidas_insumos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 64, true);
+SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 69, true);
 
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict eA9LpvhYmRpO9vSJpGIvobS5oexuaFCS223jfGsV9cNyaylBn1hssKrn0PEVTsw
+\unrestrict wxUzKDIqqid4g6ri5A1QsnZs3P4QIF24m8vOJCT883HauLB9XMNvIWHV7OMFG0E
 
