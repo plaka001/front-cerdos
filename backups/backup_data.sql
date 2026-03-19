@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 1hbr0mk9YEYkRer5I1v2BTfQcpPJTBMSFl51pjJvaugI3FYFqKyauH5E5ILGuyE
+\restrict vov3SWetWMoxfodpp3cGzF4ckRPVWJ9ADedO1dcsXKdAwPK8YKO1x5MwE9fUtcS
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.9 (Ubuntu 17.9-1.pgdg24.04+1)
@@ -42,6 +42,7 @@ COPY public.categorias_financieras (id, nombre, tipo_flujo, descripcion, created
 16	Venta de Abono/Porquinaza	operativo	Subproductos	2025-12-07 20:18:37.627452+00	f
 17	Venta de Costales	operativo	Reciclaje	2025-12-07 20:18:37.627452+00	f
 18	Prestamos / Aportes	operativo	Dinero externo o socios	2025-12-07 20:18:37.627452+00	f
+19	Prestamos	administrativo	Prestamos	2026-03-19 00:36:03.807911+00	f
 \.
 
 
@@ -70,13 +71,13 @@ COPY public.corrales (id, nombre, tipo, capacidad_maxima, activo, created_at) FR
 COPY public.cerdas (id, chapeta, fecha_nacimiento, raza, estado, partos_acumulados, activa, notas, created_at, corral_id) FROM stdin;
 7	Sol	2025-07-19	F1	vacia	0	t	\N	2025-12-07 01:41:45.996026+00	1
 5	La brava	2024-06-06	F1	gestante	0	t	\N	2025-12-07 01:34:20.480166+00	1
-3	Roci	2024-06-06	F1	gestante	0	t	\N	2025-12-07 01:33:20.78016+00	1
 4	La flaca	2024-06-06	F1	descarte	1	f	\N	2025-12-07 01:33:21.343612+00	1
 1	La mona	2024-06-06	large white	gestante	1	t	\N	2025-12-07 01:31:00.681173+00	1
 9	08	2025-06-15	F1	gestante	0	t	\N	2025-12-07 01:48:33.880781+00	1
 8	07	2025-06-15	F1	gestante	0	t	\N	2025-12-07 01:48:20.569372+00	1
 2	La jardineña	2024-06-06	F1	gestante	1	t	\N	2025-12-07 01:31:02.308943+00	1
 6	Juana	2025-07-19	F1	gestante	0	t	\N	2025-12-07 01:41:21.818891+00	1
+3	Roci	2024-06-06	F1	lactante	1	t	\N	2025-12-07 01:33:20.78016+00	8
 \.
 
 
@@ -86,7 +87,6 @@ COPY public.cerdas (id, chapeta, fecha_nacimiento, raza, estado, partos_acumulad
 
 COPY public.ciclos_reproductivos (id, cerda_id, fecha_inseminacion, padre_semen, costo_servicio, fecha_parto_probable, fecha_parto_real, nacidos_vivos, nacidos_muertos, momias, fecha_destete, lechones_destetados, peso_promedio_destete, estado, created_at, observaciones) FROM stdin;
 3	5	2025-12-02	Semen	0	\N	\N	0	0	0	\N	0	\N	abierto	2025-12-11 05:35:17.306189+00	Inseminacion
-4	3	2025-11-18	Duroc	0	\N	\N	0	0	0	\N	0	\N	abierto	2025-12-14 01:56:51.642067+00	\N
 2	4	2025-12-03	Semen 	0	\N	2025-12-14	10	0	0	2025-12-14	10	15	cerrado	2025-12-11 05:34:34.489341+00	\N
 6	4	2025-12-03	semen	0	\N	\N	0	0	0	\N	0	\N	abierto	2025-12-14 02:51:57.386614+00	\N
 1	1	2025-08-21	Semen 	0	\N	2025-12-11	15	0	0	2026-01-02	15	8	cerrado	2025-12-11 05:32:20.531263+00	Precebo 15
@@ -96,6 +96,7 @@ COPY public.ciclos_reproductivos (id, cerda_id, fecha_inseminacion, padre_semen,
 5	2	2025-09-29	410	0	\N	2026-01-21	16	2	0	2026-02-18	16	8	cerrado	2025-12-14 02:05:13.074701+00	\N
 10	2	2026-02-17	Semen	240000	\N	\N	0	0	0	\N	0	\N	abierto	2026-02-18 00:09:22.6012+00	\N
 11	6	2026-03-03	410	100000	\N	\N	0	0	0	\N	0	\N	abierto	2026-03-03 17:59:47.503181+00	\N
+4	3	2025-11-18	Duroc	0	\N	2026-03-11	15	3	0	\N	0	\N	abierto	2025-12-14 01:56:51.642067+00	\N
 \.
 
 
@@ -110,16 +111,16 @@ COPY public.insumos (id, nombre, tipo, unidad_medida, presentacion_compra, stock
 14	Hierro Dextrano	medicamento	ml	100	0	0	50	t	2025-12-07 01:57:30.571465+00
 15	Vacuna E. Coli	biologico	dosis	25	0	0	10	t	2025-12-07 01:57:30.571465+00
 10	Fostera 	medicamento	dosis	1	0	10000.0000000000000000	0	t	2025-12-07 01:57:30.571465+00
-6	Iniciación 	alimento	kg	40	40	2415.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
 4	Pre-Inicio	alimento	kg	40	0	3700.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
-8	lechon 337	alimento	kg	40	0	2325.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
 7	Transicion	alimento	kg	40	0	2450.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
 3	Pre-Inicio Fase 1	alimento	kg	40	0	2075.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
-9	Finalizador	alimento	kg	40	40	2250.0000000000000000	100	t	2025-12-07 01:57:30.571465+00
-1	Gestacion	alimento	kg	40	40	2075.0000000000000000	200	t	2025-12-07 01:23:09.044215+00
 5	Medicamento viejo	medicamento	ml	2000	1981	0.00000000000000000000	0	t	2025-12-07 01:23:09.044215+00
+9	Finalizador	alimento	kg	40	0	2225.0000000000000000	100	t	2025-12-07 01:57:30.571465+00
+8	lechon 337	alimento	kg	40	0	2300.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
+6	Iniciación 	alimento	kg	40	0	2900.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
+1	Gestacion	alimento	kg	40	120	2050.0000000000000000	200	t	2025-12-07 01:23:09.044215+00
+2	Lactancia	alimento	kg	40	80	2250.0000000000000000	150	t	2025-12-07 01:23:09.044215+00
 16	Reemplazo	alimento	kg	40	0	2075.0000000000000000	5	t	2025-12-14 02:36:17+00
-2	Lactancia	alimento	kg	40	0	2275.0000000000000000	150	t	2025-12-07 01:23:09.044215+00
 \.
 
 
@@ -179,6 +180,11 @@ COPY public.compras_insumos (id, fecha, insumo_id, proveedor, cantidad_comprada,
 49	2026-02-24	4	Arley	1	40	148000	3700.0000000000000000	\N	2026-02-24 23:34:20.974867+00
 50	2026-02-24	6	Arley	3	120	249000	2075.0000000000000000	\N	2026-02-24 23:35:22.550925+00
 51	2026-02-24	6	Arley	1	40	117000	2925.0000000000000000	\N	2026-02-24 23:35:53.155579+00
+52	2026-03-19	8	Arley	10	400	920000	2300.0000000000000000	\N	2026-03-19 00:23:37.237652+00
+53	2026-03-19	6	Arley	2	80	232000	2900.0000000000000000	\N	2026-03-19 00:24:24.334522+00
+54	2026-03-19	1	Arley	8	320	656000	2050.0000000000000000	\N	2026-03-19 00:25:12.024282+00
+55	2026-03-19	2	Arley 	3	120	270000	2250.0000000000000000	\N	2026-03-19 00:25:35.497966+00
+56	2026-03-19	9	arley	2	80	178000	2225.0000000000000000	\N	2026-03-19 00:26:00.322701+00
 \.
 
 
@@ -309,6 +315,19 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 76	2026-02-25	ingreso	1	1050000	Venta Lote L-2026-42 - Suegro del yeison	efectivo	3	\N	2026-02-25 00:03:40.010216+00
 77	2026-03-03	egreso	6	100000	Inseminación Cerda Juana - 410	efectivo	\N	\N	2026-03-03 17:59:49.561363+00
 78	2026-03-06	egreso	10	55000	Trasnporte concentrado	efectivo	\N	\N	2026-03-06 00:04:59.869151+00
+79	2026-03-19	egreso	4	920000	Compra 10 bultos lechon	efectivo	\N	\N	2026-03-19 00:23:37.002798+00
+80	2026-03-19	egreso	4	232000	combra 2 bultos inicio	efectivo	\N	\N	2026-03-19 00:24:24.182514+00
+81	2026-03-19	egreso	4	656000	compra 8 bultos gestacion	efectivo	\N	\N	2026-03-19 00:25:11.888043+00
+82	2026-03-19	egreso	4	270000	compra 3 bultos lactancia 	efectivo	\N	\N	2026-03-19 00:25:35.341406+00
+83	2026-03-19	egreso	4	178000	compra 2 finalisador	efectivo	\N	\N	2026-03-19 00:26:00.165306+00
+84	2026-03-19	ingreso	17	22000000	Credito cfa 22 millones	efectivo	\N	\N	2026-03-19 00:36:43.93225+00
+85	2026-03-19	egreso	7	1265000	Compra 11 tejas 	efectivo	\N	\N	2026-03-19 00:39:45.746407+00
+86	2026-03-19	egreso	7	21000	amarras	efectivo	\N	\N	2026-03-19 00:40:03.580139+00
+87	2026-03-19	egreso	10	130000	tejas transporte 	efectivo	\N	\N	2026-03-19 00:40:23.747249+00
+88	2026-03-19	egreso	8	336000	jornal aguas  + accesorios 	efectivo	\N	\N	2026-03-19 00:41:35.838512+00
+89	2026-03-19	egreso	7	320700	compora cemento y materiales  y tejas de sim	efectivo	\N	\N	2026-03-19 00:43:18.709989+00
+90	2026-03-19	egreso	5	82000	Compra flumicina y tripen y guantes	efectivo	\N	\N	2026-03-19 00:44:43.583329+00
+91	2026-03-19	egreso	7	400000	compra parideras 	efectivo	\N	\N	2026-03-19 00:45:16.140731+00
 \.
 
 
@@ -402,6 +421,14 @@ COPY public.salidas_insumos (id, fecha, insumo_id, cantidad, destino_tipo, lote_
 67	2026-03-05	3	40	lote	3	\N	2075	\N	2026-03-05 23:59:21.8302+00
 68	2026-03-06	9	80	lote	1	\N	2250	\N	2026-03-06 00:00:53.340328+00
 69	2026-03-06	1	120	cerda	\N	\N	2075	Alimentación Grupal - Gestación	2026-03-06 00:01:32.800916+00
+70	2026-03-19	6	40	lote	3	\N	2415	\N	2026-03-19 00:20:26.266514+00
+71	2026-03-19	9	40	lote	1	\N	2250	\N	2026-03-19 00:20:45.587577+00
+72	2026-03-19	1	40	cerda	\N	\N	2075	Alimentación Grupal - Gestación	2026-03-19 00:20:59.330759+00
+73	2026-03-19	9	80	lote	1	\N	2225	\N	2026-03-19 00:58:20.86376+00
+74	2026-03-19	8	400	lote	2	\N	2300	\N	2026-03-19 00:59:53.447719+00
+75	2026-03-19	6	80	lote	3	\N	2900	\N	2026-03-19 01:00:56.95903+00
+76	2026-03-19	1	200	cerda	\N	\N	2050	Alimentación Grupal - Gestación	2026-03-19 01:05:06.137613+00
+77	2026-03-19	2	40	cerda	\N	\N	2250	Alimentación Grupal - Lactancia	2026-03-19 01:05:31.360843+00
 \.
 
 
@@ -409,7 +436,7 @@ COPY public.salidas_insumos (id, fecha, insumo_id, cantidad, destino_tipo, lote_
 -- Name: categorias_financieras_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.categorias_financieras_id_seq', 18, true);
+SELECT pg_catalog.setval('public.categorias_financieras_id_seq', 19, true);
 
 
 --
@@ -430,7 +457,7 @@ SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 11, true);
 -- Name: compras_insumos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.compras_insumos_id_seq', 51, true);
+SELECT pg_catalog.setval('public.compras_insumos_id_seq', 56, true);
 
 
 --
@@ -472,7 +499,7 @@ SELECT pg_catalog.setval('public.lotes_id_seq', 3, true);
 -- Name: movimientos_caja_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 78, true);
+SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 91, true);
 
 
 --
@@ -486,12 +513,12 @@ SELECT pg_catalog.setval('public.reglas_sanitarias_id_seq', 1, false);
 -- Name: salidas_insumos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 69, true);
+SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 77, true);
 
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 1hbr0mk9YEYkRer5I1v2BTfQcpPJTBMSFl51pjJvaugI3FYFqKyauH5E5ILGuyE
+\unrestrict vov3SWetWMoxfodpp3cGzF4ckRPVWJ9ADedO1dcsXKdAwPK8YKO1x5MwE9fUtcS
 
