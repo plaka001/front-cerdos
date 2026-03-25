@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict UPddL4La8SnmP3em6dzjZqOjq7a9hBKz5CuwRrk5ZTg3OG7SQK6qaQjo8jErLsV
+\restrict GMTLuvUWF9NteYKgtrkgCy5vPygidY1S9GUx8qq7wEcbfAzc6UdljMHBQZRjR0m
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.9 (Ubuntu 17.9-1.pgdg24.04+1)
@@ -309,7 +309,6 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 70	2026-02-24	egreso	4	270000	Compra 3 bultos finalizador 	efectivo	\N	\N	2026-02-24 23:33:13.582802+00
 71	2026-02-24	egreso	4	83000	medio bulto fase 1 	efectivo	\N	\N	2026-02-24 23:33:46.071099+00
 72	2026-02-24	egreso	4	148000	Pre inicio compra bulto	efectivo	\N	\N	2026-02-24 23:34:20.751012+00
-73	2026-02-24	egreso	4	249000	Compra 3 bultos iniciacion 	efectivo	\N	\N	2026-02-24 23:35:22.393884+00
 74	2026-02-24	egreso	4	117000	Compra iniciacion 	efectivo	\N	\N	2026-02-24 23:35:52.975214+00
 75	2026-02-24	egreso	8	130000	pago oficial 	efectivo	\N	\N	2026-02-25 00:00:04.458207+00
 76	2026-02-25	ingreso	1	1050000	Venta Lote L-2026-42 - Suegro del yeison	efectivo	3	\N	2026-02-25 00:03:40.010216+00
@@ -320,7 +319,6 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 81	2026-03-19	egreso	4	656000	compra 8 bultos gestacion	efectivo	\N	\N	2026-03-19 00:25:11.888043+00
 82	2026-03-19	egreso	4	270000	compra 3 bultos lactancia 	efectivo	\N	\N	2026-03-19 00:25:35.341406+00
 83	2026-03-19	egreso	4	178000	compra 2 finalisador	efectivo	\N	\N	2026-03-19 00:26:00.165306+00
-84	2026-03-19	ingreso	17	22000000	Credito cfa 22 millones	efectivo	\N	\N	2026-03-19 00:36:43.93225+00
 85	2026-03-19	egreso	7	1265000	Compra 11 tejas 	efectivo	\N	\N	2026-03-19 00:39:45.746407+00
 86	2026-03-19	egreso	7	21000	amarras	efectivo	\N	\N	2026-03-19 00:40:03.580139+00
 87	2026-03-19	egreso	10	130000	tejas transporte 	efectivo	\N	\N	2026-03-19 00:40:23.747249+00
@@ -328,6 +326,10 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 89	2026-03-19	egreso	7	320700	compora cemento y materiales  y tejas de sim	efectivo	\N	\N	2026-03-19 00:43:18.709989+00
 90	2026-03-19	egreso	5	82000	Compra flumicina y tripen y guantes	efectivo	\N	\N	2026-03-19 00:44:43.583329+00
 91	2026-03-19	egreso	7	400000	compra parideras 	efectivo	\N	\N	2026-03-19 00:45:16.140731+00
+84	2026-03-19	ingreso	19	20500000	Credito cfa 22 millones	efectivo	\N	\N	2026-03-19 00:36:43.93225+00
+73	2026-02-24	egreso	4	166000	Compra 2 bultos gestacion	efectivo	\N	\N	2026-02-24 23:35:22.393884+00
+93	2026-03-02	egreso	4	184000	Compra 2 bultos lechones	efectivo	\N	\N	2026-03-24 15:59:41.718237+00
+94	2026-02-17	egreso	4	592000	Compra 4 bultos preinicio faltantes	efectivo	\N	\N	2026-03-24 15:59:41.718237+00
 \.
 
 
@@ -499,7 +501,7 @@ SELECT pg_catalog.setval('public.lotes_id_seq', 3, true);
 -- Name: movimientos_caja_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 91, true);
+SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 94, true);
 
 
 --
@@ -520,5 +522,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 77, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict UPddL4La8SnmP3em6dzjZqOjq7a9hBKz5CuwRrk5ZTg3OG7SQK6qaQjo8jErLsV
+\unrestrict GMTLuvUWF9NteYKgtrkgCy5vPygidY1S9GUx8qq7wEcbfAzc6UdljMHBQZRjR0m
 
