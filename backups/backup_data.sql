@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 0dDnV5pycCXybfKm2ilzWMvUl7F4kTFrogTf2VX1vdtPQ3Fi8TRWThL2j3EJYog
+\restrict s6YYlzFjxOiCTnJ2jXWY2XTJxtPxs5MGXYttenO2QbfdenpGK8zGmZpM0z1Y52t
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.9 (Ubuntu 17.9-1.pgdg24.04+1)
@@ -356,6 +356,7 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 108	2026-04-08	egreso	10	50000	flete cuido	efectivo	\N	\N	2026-04-08 22:42:24.28166+00
 109	2026-04-08	egreso	5	20000	inyecciones parvo virus	efectivo	\N	\N	2026-04-08 22:43:28.22769+00
 110	2026-04-08	ingreso	1	2680000	Venta Lote L-2025-86 - El yeison	efectivo	1	\N	2026-04-08 22:46:02.487709+00
+111	2026-04-10	egreso	7	759450	compra materiales pago ferreteria	efectivo	\N	\N	2026-04-10 14:52:04.376301+00
 \.
 
 
@@ -529,7 +530,7 @@ SELECT pg_catalog.setval('public.lotes_id_seq', 4, true);
 -- Name: movimientos_caja_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 110, true);
+SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 111, true);
 
 
 --
@@ -550,5 +551,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 79, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 0dDnV5pycCXybfKm2ilzWMvUl7F4kTFrogTf2VX1vdtPQ3Fi8TRWThL2j3EJYog
+\unrestrict s6YYlzFjxOiCTnJ2jXWY2XTJxtPxs5MGXYttenO2QbfdenpGK8zGmZpM0z1Y52t
 
