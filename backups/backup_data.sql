@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 00Rd1NwXcRSeyYSZkPn3HoAQHupIZ8PR3Fden5YjwNCKrqNCIdMe7qvt8Q2p7kt
+\restrict BNfUWKLqG9XCeugFWG9FG5Nkh9z4VjAce5lnqvPqpV32Yd4J5AtljjkyMa8zBv1
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.9 (Ubuntu 17.9-1.pgdg24.04+1)
@@ -69,9 +69,9 @@ COPY public.corrales (id, nombre, tipo, capacidad_maxima, activo, created_at) FR
 --
 
 COPY public.cerdas (id, chapeta, fecha_nacimiento, raza, estado, partos_acumulados, activa, notas, created_at, corral_id) FROM stdin;
-2	La jardineña	2024-06-06	F1	vacia	1	t	\N	2025-12-07 01:31:02.308943+00	1
-5	La brava	2024-06-06	F1	vacia	1	t	\N	2025-12-07 01:34:20.480166+00	1
 7	Sol	2025-07-19	F1	gestante	0	t	\N	2025-12-07 01:41:45.996026+00	1
+2	La jardineña	2024-06-06	F1	gestante	1	t	\N	2025-12-07 01:31:02.308943+00	1
+5	La brava	2024-06-06	F1	gestante	1	t	\N	2025-12-07 01:34:20.480166+00	1
 4	La flaca	2024-06-06	F1	descarte	1	f	\N	2025-12-07 01:33:21.343612+00	1
 1	La mona	2024-06-06	large white	gestante	1	t	\N	2025-12-07 01:31:00.681173+00	1
 9	08	2025-06-15	F1	gestante	0	t	\N	2025-12-07 01:48:33.880781+00	1
@@ -99,6 +99,8 @@ COPY public.ciclos_reproductivos (id, cerda_id, fecha_inseminacion, padre_semen,
 10	2	2026-02-17	Semen	240000	\N	\N	0	0	0	\N	0	\N	fallido	2026-02-18 00:09:22.6012+00	FALLA: sin celo
 3	5	2025-12-02	Semen	0	\N	2026-03-25	13	0	0	2026-04-14	13	8	cerrado	2025-12-11 05:35:17.306189+00	Destete brava
 13	7	2026-04-16	Semen	100000	\N	\N	0	0	0	\N	0	\N	abierto	2026-04-19 00:40:22.978371+00	\N
+14	2	2026-04-26	Guror	100000	\N	\N	0	0	0	\N	0	\N	abierto	2026-04-30 20:13:24.313707+00	Nada
+15	5	2026-04-23	410	100000	\N	\N	0	0	0	\N	0	\N	abierto	2026-04-30 20:14:39.845683+00	No
 \.
 
 
@@ -381,6 +383,8 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 123	2026-04-19	ingreso	1	752000	Venta Lote L-2026-177 - Yeison	efectivo	2	\N	2026-04-19 00:37:03.751358+00
 124	2026-04-16	egreso	6	100000	Inseminación Cerda Sol - Semen	efectivo	\N	\N	2026-04-19 00:40:23.549784+00
 125	2026-04-19	egreso	8	260000	Pago oficial	efectivo	\N	\N	2026-04-19 00:40:56.321881+00
+126	2026-04-26	egreso	6	100000	Inseminación Cerda La jardineña - Guror	efectivo	\N	\N	2026-04-30 20:13:25.739845+00
+127	2026-04-23	egreso	6	100000	Inseminación Cerda La brava - 410	efectivo	\N	\N	2026-04-30 20:14:41.059916+00
 \.
 
 
@@ -511,7 +515,7 @@ SELECT pg_catalog.setval('public.cerdas_id_seq', 1, false);
 -- Name: ciclos_reproductivos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 13, true);
+SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 15, true);
 
 
 --
@@ -560,7 +564,7 @@ SELECT pg_catalog.setval('public.lotes_id_seq', 5, true);
 -- Name: movimientos_caja_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 125, true);
+SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 127, true);
 
 
 --
@@ -581,5 +585,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 85, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 00Rd1NwXcRSeyYSZkPn3HoAQHupIZ8PR3Fden5YjwNCKrqNCIdMe7qvt8Q2p7kt
+\unrestrict BNfUWKLqG9XCeugFWG9FG5Nkh9z4VjAce5lnqvPqpV32Yd4J5AtljjkyMa8zBv1
 
