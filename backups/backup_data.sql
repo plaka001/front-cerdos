@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict dF3JvbHdteElkMApxrUW1wSqH8zLxtb3FT8Y6NZvfLLBx6iAv5eFWw0wrzqX18p
+\restrict 5emAgFoRwVxmHMd2O5ChU6Xm8F1ixbM6syylhiGlz2n8w2gAtQ2jLgp1lpwdD4S
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.9 (Ubuntu 17.9-1.pgdg24.04+1)
@@ -585,5 +585,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 85, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict dF3JvbHdteElkMApxrUW1wSqH8zLxtb3FT8Y6NZvfLLBx6iAv5eFWw0wrzqX18p
+\unrestrict 5emAgFoRwVxmHMd2O5ChU6Xm8F1ixbM6syylhiGlz2n8w2gAtQ2jLgp1lpwdD4S
 
