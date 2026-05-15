@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
-\restrict lXqlLAdo5IDV2576Py37FlJ0suHcpFPmi5UEe0ybDwApMPzzBqpZPlDM71aox5k
+\restrict 9dUUAuasoUFKoEg1YEjzbzxgv6IJwcjrAuSWUhQVYcT7kmk1w3hKxvVv0rcxBde
 
 -- Dumped from database version 17.6
--- Dumped by pg_dump version 17.9 (Ubuntu 17.9-1.pgdg24.04+1)
+-- Dumped by pg_dump version 17.10 (Ubuntu 17.10-1.pgdg24.04+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -627,5 +627,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 91, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict lXqlLAdo5IDV2576Py37FlJ0suHcpFPmi5UEe0ybDwApMPzzBqpZPlDM71aox5k
+\unrestrict 9dUUAuasoUFKoEg1YEjzbzxgv6IJwcjrAuSWUhQVYcT7kmk1w3hKxvVv0rcxBde
 
