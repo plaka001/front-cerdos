@@ -1,4 +1,4 @@
-﻿import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { Cerda, CicloReproductivo, Lote, CerdaDetalle, LoteDetalle, Insumo, SalidaInsumo, EventoSanitario } from '../models';
 
@@ -335,6 +335,14 @@ export class ProduccionService {
         try {
             this.error.set(null);
 
+            // Obtener chapeta de la cerda tempranamente para usar en el nombre del lote o descripción
+            const { data: cerda } = await this.supabase
+                .from('cerdas')
+                .select('chapeta')
+                .eq('id', cerdaId)
+                .single();
+            const cerdaNombre = cerda?.chapeta || cerdaId;
+
             // 1. Cerrar ciclo (Común)
             const { error: errorCiclo } = await this.supabase
                 .from('ciclos_reproductivos')
@@ -351,11 +359,11 @@ export class ProduccionService {
 
             // 2. Bifurcación: Lote vs Venta
             if (data.crear_lote) {
-                // Camino A: Crear Lote
+                // Camino A: Crear Lote con el nombre de la cerda en el código
                 const { error: errorLote } = await this.supabase
                     .from('lotes')
                     .insert({
-                        codigo: `L-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
+                        codigo: `L-${cerdaNombre}-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
                         fecha_inicio: data.fecha,
                         cantidad_inicial: data.cantidad,
                         cantidad_actual: data.cantidad,
@@ -382,14 +390,7 @@ export class ProduccionService {
                     console.warn('Categoría "Venta de Lechones" no encontrada. Se registrará sin categoría.');
                 }
 
-                // Obtener chapeta para descripción
-                const { data: cerda } = await this.supabase
-                    .from('cerdas')
-                    .select('chapeta')
-                    .eq('id', cerdaId)
-                    .single();
-
-                const descripcion = `Venta de Lechones al Destete - Cerda ${cerda?.chapeta || '?'}${data.comprador ? ' - Cliente: ' + data.comprador : ''}`;
+                const descripcion = `Venta de Lechones al Destete - Cerda ${cerdaNombre}${data.comprador ? ' - Cliente: ' + data.comprador : ''}`;
 
                 const { error: errorVenta } = await this.supabase
                     .from('movimientos_caja')
