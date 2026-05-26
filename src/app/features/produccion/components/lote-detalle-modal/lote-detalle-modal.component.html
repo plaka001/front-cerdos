@@ -7,7 +7,18 @@
         <div class="p-6 border-b border-slate-700 bg-slate-800 flex justify-between items-center">
             <div>
                 <h2 class="text-2xl font-bold text-white">Historial del Lote</h2>
-                <p class="text-sm text-slate-400 mt-1">{{ lote.codigo }} - {{ lote.ubicacion }}</p>
+                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-400 mt-1">
+                    <span>{{ lote.codigo }}</span>
+                    <span>•</span>
+                    <span class="capitalize">{{ lote.ubicacion }}</span>
+                    @if (lote.madre) {
+                    <span>•</span>
+                    <span class="text-pink-400 font-medium flex items-center gap-1">
+                        <lucide-icon name="dna" [size]="14"></lucide-icon>
+                        Madre: {{ lote.madre }}
+                    </span>
+                    }
+                </div>
             </div>
             <button (click)="onClose()" class="p-2 rounded-full hover:bg-slate-700 transition-colors">
                 <lucide-icon name="x" [size]="24" class="text-slate-400"></lucide-icon>
@@ -296,6 +307,15 @@
                     <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Información del Lote
                     </h4>
                     <div class="grid grid-cols-2 gap-4">
+                        @if (lote.madre) {
+                        <div class="col-span-2 pb-2 border-b border-slate-600/30">
+                            <p class="text-xs text-slate-400 mb-1">Cerda Madre</p>
+                            <p class="text-lg font-bold text-pink-400 flex items-center gap-2">
+                                <lucide-icon name="dna" [size]="18"></lucide-icon>
+                                {{ lote.madre }}
+                            </p>
+                        </div>
+                        }
                         <div>
                             <p class="text-xs text-slate-400 mb-1">Cantidad Inicial</p>
                             <p class="text-lg font-bold text-white">{{ lote.cantidad_inicial }} animales</p>

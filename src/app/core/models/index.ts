@@ -99,6 +99,7 @@ export interface Lote {
     corral_id?: number | null;
     etapa: 'precebo' | 'engorde'; // Default 'precebo'
     corrales?: { id: number; nombre: string } | null;
+    madre?: string;
 }
 
 export interface LoteDetalle extends Lote {

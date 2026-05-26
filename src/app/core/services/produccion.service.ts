@@ -196,6 +196,15 @@ export class ProduccionService {
                     corrales (
                         id,
                         nombre
+                    ),
+                    lote_origen (
+                        cantidad_aportada,
+                        ciclos_reproductivos (
+                            cerdas (
+                                id,
+                                chapeta
+                            )
+                        )
                     )
                 `)
                 .order('codigo');
@@ -207,7 +216,20 @@ export class ProduccionService {
             }
 
             if (data) {
-                this.lotes.set(data as Lote[]);
+                const lotesConMadre = (data || []).map((lote: any) => {
+                    let madre = '';
+                    if (lote.lote_origen && lote.lote_origen.length > 0) {
+                        const madresList = lote.lote_origen
+                            .map((o: any) => o.ciclos_reproductivos?.cerdas?.chapeta)
+                            .filter((chapeta: any) => !!chapeta);
+                        madre = madresList.join(', ');
+                    }
+                    return {
+                        ...lote,
+                        madre
+                    };
+                });
+                this.lotes.set(lotesConMadre as Lote[]);
             }
         } catch (err: any) {
             console.error('Error inesperado:', err);
@@ -360,7 +382,7 @@ export class ProduccionService {
             // 2. Bifurcación: Lote vs Venta
             if (data.crear_lote) {
                 // Camino A: Crear Lote con el nombre de la cerda en el código
-                const { error: errorLote } = await this.supabase
+                const { data: newLote, error: errorLote } = await this.supabase
                     .from('lotes')
                     .insert({
                         codigo: `L-${cerdaNombre}-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
@@ -372,9 +394,25 @@ export class ProduccionService {
                         etapa: 'precebo',
                         ubicacion: 'Corral de Precebo', // Legacy text field
                         corral_id: data.corral_lote_id // ✅ Linked Corral ID
-                    });
+                    })
+                    .select()
+                    .single();
 
                 if (errorLote) throw errorLote;
+
+                // Registrar en lote_origen para mantener la trazabilidad de la madre
+                if (newLote) {
+                    const { error: errorOrigen } = await this.supabase
+                        .from('lote_origen')
+                        .insert({
+                            lote_id: newLote.id,
+                            ciclo_id: cicloId,
+                            cantidad_aportada: data.cantidad
+                        });
+                    if (errorOrigen) {
+                        console.error('Error al registrar lote_origen:', errorOrigen);
+                    }
+                }
             } else {
                 // Camino B: Venta Inmediata
                 // Buscar categoría 'Venta de Lechones'
@@ -763,6 +801,15 @@ export class ProduccionService {
                 corrales (
                     id,
                     nombre
+                ),
+                lote_origen (
+                    cantidad_aportada,
+                    ciclos_reproductivos (
+                        cerdas (
+                            id,
+                            chapeta
+                        )
+                    )
                 )
             `)
                 .order('estado', { ascending: true })
@@ -785,9 +832,19 @@ export class ProduccionService {
                 const fechaInicio = new Date(lote.fecha_inicio);
                 const diasEnGranja = Math.floor((hoy.getTime() - fechaInicio.getTime()) / (1000 * 60 * 60 * 24));
 
+                // Extract mother names
+                let madre = '';
+                if (lote.lote_origen && lote.lote_origen.length > 0) {
+                    const madresList = lote.lote_origen
+                        .map((o: any) => o.ciclos_reproductivos?.cerdas?.chapeta)
+                        .filter((chapeta: any) => !!chapeta);
+                    madre = madresList.join(', ');
+                }
+
                 return {
                     ...lote,
-                    diasEnGranja
+                    diasEnGranja,
+                    madre
                 };
             });
 
@@ -1270,7 +1327,18 @@ export class ProduccionService {
         try {
             const { data, error } = await this.supabase
                 .from('lotes')
-                .select('*')
+                .select(`
+                    *,
+                    lote_origen (
+                        cantidad_aportada,
+                        ciclos_reproductivos (
+                            cerdas (
+                                id,
+                                chapeta
+                            )
+                        )
+                    )
+                `)
                 .eq('id', id)
                 .single();
 
@@ -1285,9 +1353,19 @@ export class ProduccionService {
             const fechaInicio = new Date(data.fecha_inicio);
             const diasEnGranja = Math.floor((hoy.getTime() - fechaInicio.getTime()) / (1000 * 60 * 60 * 24));
 
+            let madre = '';
+            const rawLote = data as any;
+            if (rawLote.lote_origen && rawLote.lote_origen.length > 0) {
+                const madresList = rawLote.lote_origen
+                    .map((o: any) => o.ciclos_reproductivos?.cerdas?.chapeta)
+                    .filter((chapeta: any) => !!chapeta);
+                madre = madresList.join(', ');
+            }
+
             return {
                 ...data,
-                diasEnGranja
+                diasEnGranja,
+                madre
             } as LoteDetalle;
         } catch (err) {
             console.error('Error fetching lote:', err);

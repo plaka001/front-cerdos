@@ -102,14 +102,22 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h3 class="text-lg font-bold text-white truncate">{{ lote.codigo }}</h3>
-                                @if (lote.corrales) {
-                                <div class="flex items-center gap-1 mt-0.5 text-xs text-emerald-500/80 font-medium">
-                                    <lucide-icon name="map-pin" [size]="12"></lucide-icon>
-                                    <span class="truncate">{{ lote.corrales.nombre }}</span>
+                                <div class="flex flex-col gap-0.5 mt-0.5">
+                                    @if (lote.corrales) {
+                                    <div class="flex items-center gap-1 text-xs text-emerald-500/80 font-medium">
+                                        <lucide-icon name="map-pin" [size]="12"></lucide-icon>
+                                        <span class="truncate">{{ lote.corrales.nombre }}</span>
+                                    </div>
+                                    } @else {
+                                    <p class="text-xs text-slate-400 truncate capitalize">{{ lote.ubicacion }}</p>
+                                    }
+                                    @if (lote.madre) {
+                                    <div class="flex items-center gap-1 text-xs text-pink-400 font-medium">
+                                        <lucide-icon name="dna" [size]="12"></lucide-icon>
+                                        <span class="truncate">Madre: {{ lote.madre }}</span>
+                                    </div>
+                                    }
                                 </div>
-                                } @else {
-                                <p class="text-xs text-slate-400 truncate capitalize">{{ lote.ubicacion }}</p>
-                                }
                             </div>
                         </div>
 
