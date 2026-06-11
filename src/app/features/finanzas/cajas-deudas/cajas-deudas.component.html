@@ -191,10 +191,8 @@
 
         <!-- ========== MODAL: Abonar ========== -->
         @if (abonoProveedor(); as prov) {
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in"
-            (click)="abonoProveedor.set(null)">
-            <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-700 p-6 space-y-4 animate-in zoom-in-95 duration-200"
-                (click)="$event.stopPropagation()">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in">
+            <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-700 p-6 space-y-4 animate-in zoom-in-95 duration-200">
                 <div class="flex items-center gap-3">
                     <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center flex-shrink-0">
                         <lucide-icon name="hand-coins" [size]="24" class="text-amber-400"></lucide-icon>
@@ -252,10 +250,8 @@
 
         <!-- ========== MODAL: Transferencia ========== -->
         @if (transferAbierta()) {
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in"
-            (click)="transferAbierta.set(false)">
-            <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-700 p-6 space-y-4 animate-in zoom-in-95 duration-200"
-                (click)="$event.stopPropagation()">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in">
+            <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-700 p-6 space-y-4 animate-in zoom-in-95 duration-200">
                 <div class="flex items-center gap-3">
                     <div class="w-12 h-12 rounded-2xl bg-sky-500/10 flex items-center justify-center flex-shrink-0">
                         <lucide-icon name="arrow-right-left" [size]="24" class="text-sky-400"></lucide-icon>
@@ -314,10 +310,8 @@
 
         <!-- ========== MODAL: Nuevo proveedor ========== -->
         @if (nuevoProveedorAbierto()) {
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in"
-            (click)="nuevoProveedorAbierto.set(false)">
-            <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-700 p-6 space-y-4 animate-in zoom-in-95 duration-200"
-                (click)="$event.stopPropagation()">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in">
+            <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-700 p-6 space-y-4 animate-in zoom-in-95 duration-200">
                 <div class="flex items-center gap-3">
                     <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
                         <lucide-icon name="truck" [size]="24" class="text-emerald-400"></lucide-icon>

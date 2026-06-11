@@ -9,7 +9,7 @@ import { ProduccionService } from '../../../../core/services/produccion.service'
   standalone: true,
   imports: [CommonModule, LucideAngularModule],
   template: `
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in" (click)="close.emit()">
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in">
       <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-slate-700 animate-in zoom-in-95 duration-200" (click)="$event.stopPropagation()">
         
         <!-- Header -->
