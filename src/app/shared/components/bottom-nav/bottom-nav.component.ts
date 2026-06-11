@@ -32,7 +32,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
     <!-- Logout Confirmation Modal -->
     @if (showLogoutConfirm()) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in" (click)="showLogoutConfirm.set(false)">
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in">
         <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-700 p-6 animate-in zoom-in-95 duration-200" (click)="$event.stopPropagation()">
           <div class="flex items-start gap-4">
             <div class="flex-shrink-0 w-12 h-12 bg-red-900/20 rounded-full flex items-center justify-center">

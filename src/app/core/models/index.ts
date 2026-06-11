@@ -169,6 +169,61 @@ export interface ProveedorSaldo extends Proveedor {
     deuda_actual: number; // saldo_inicial + compras a crédito - abonos
 }
 
+// ============ Reporte "Cuadre del Día" ============
+// Panorama de todo lo REGISTRADO (created_at) en una fecha, sin importar
+// la fecha contable de cada movimiento. Pensado para las sesiones de
+// cuadre semanal/quincenal donde se registra todo en lote.
+
+export interface CuadreCuenta {
+    cuenta: CuentaCaja;
+    saldoInicial: number; // antes de los registros de ese día
+    ingresos: number;
+    egresos: number;
+    saldoFinal: number;
+}
+
+export interface CuadreProveedor {
+    proveedor: Proveedor;
+    deudaInicial: number;
+    comprasCredito: number;
+    abonos: number;
+    deudaFinal: number;
+    movimientos: MovimientoProveedor[]; // el "por qué" del saldo
+}
+
+export interface CuadreMovimiento extends MovimientoCaja {
+    categoria_nombre: string;
+    cuenta_nombre: string;
+}
+
+export interface CuadreCompra extends CompraInsumo {
+    insumo_nombre: string;
+    kg_ingresados: number;
+}
+
+export interface CuadreSalida {
+    insumo_nombre: string;
+    cantidad: number;
+    costo: number;
+    destino: string;
+}
+
+export interface CuadreDia {
+    fecha: string;
+    totalRegistros: number;
+    cuentas: CuadreCuenta[];
+    proveedores: CuadreProveedor[];
+    compras: CuadreCompra[];
+    salidas: CuadreSalida[];
+    ingresos: CuadreMovimiento[];
+    egresos: CuadreMovimiento[];
+    totalIngresos: number;
+    totalEgresos: number;
+    totalComprasContado: number;
+    totalComprasCredito: number;
+    totalConsumo: number;
+}
+
 export interface SalidaInsumo {
     id: number;
     fecha: string; // default current_date

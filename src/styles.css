@@ -345,6 +345,15 @@ body {
    CALENDAR ICON POSITIONING FIX
    ======================================== */
 
+/* El indicador del calendario usa position:absolute, así que el input debe
+   ser su propio contenedor posicionado — si no, el icono se ancla al ancestro
+   posicionado más cercano y queda flotando fuera del campo */
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"] {
+  position: relative;
+}
+
 /* Control del icono del calendario en WebKit (Chrome, Safari, Edge) */
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="datetime-local"]::-webkit-calendar-picker-indicator,

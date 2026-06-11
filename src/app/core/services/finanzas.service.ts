@@ -2,7 +2,8 @@ import { Injectable, inject, signal } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import {
     CategoriaFinanciera, MovimientoCaja, CompraInsumo, Insumo, SalidaInsumo,
-    Proveedor, ProveedorSaldo, MovimientoProveedor, CuentaCaja, CuentaCajaSaldo
+    Proveedor, ProveedorSaldo, MovimientoProveedor, CuentaCaja, CuentaCajaSaldo,
+    CuadreDia, CuadreCuenta, CuadreProveedor, CuadreMovimiento, CuadreCompra, CuadreSalida
 } from '../models';
 
 @Injectable({
@@ -319,6 +320,143 @@ export class FinanzasService {
         if (error) throw error;
         await this.loadProveedores();
         return data as Proveedor;
+    }
+
+    /**
+     * Reporte "Cuadre del Día": todo lo REGISTRADO (created_at, hora Colombia)
+     * en una fecha — cuido comprado y consumido, ingresos/egresos con su caja,
+     * saldo inicial y final de cada cuenta, y deuda inicial y final por proveedor.
+     */
+    async getCuadreDia(fecha: string): Promise<CuadreDia> {
+        // Ventana del día en hora Colombia (UTC-5 fijo)
+        const inicio = `${fecha}T00:00:00-05:00`;
+        const finDate = new Date(`${fecha}T00:00:00-05:00`);
+        finDate.setDate(finDate.getDate() + 1);
+        const fin = finDate.toISOString();
+
+        const [
+            { data: cuentas, error: e1 },
+            { data: movsCuentas, error: e2 },
+            { data: movsDia, error: e3 },
+            { data: comprasDia, error: e4 },
+            { data: salidasDia, error: e5 },
+            { data: proveedores, error: e6 },
+            { data: movsProveedor, error: e7 }
+        ] = await Promise.all([
+            this.supabase.from('cuentas_caja').select('*').eq('activa', true).order('id'),
+            // Todos los movimientos con cuenta (para saldos antes/después)
+            this.supabase.from('movimientos_caja').select('cuenta_id, tipo, monto, created_at').not('cuenta_id', 'is', null),
+            // Detalle de lo registrado ese día
+            this.supabase.from('movimientos_caja')
+                .select('*, categorias_financieras(nombre)')
+                .gte('created_at', inicio).lt('created_at', fin)
+                .order('created_at'),
+            this.supabase.from('compras_insumos')
+                .select('*, insumos(nombre, presentacion_compra, unidad_medida)')
+                .gte('created_at', inicio).lt('created_at', fin)
+                .order('created_at'),
+            this.supabase.from('salidas_insumos')
+                .select('*, insumos(nombre)')
+                .gte('created_at', inicio).lt('created_at', fin)
+                .order('created_at'),
+            this.supabase.from('proveedores').select('*').eq('activo', true).order('nombre'),
+            this.supabase.from('movimientos_proveedor').select('*').order('created_at')
+        ]);
+
+        const error = e1 || e2 || e3 || e4 || e5 || e6 || e7;
+        if (error) throw error;
+
+        const inicioMs = new Date(inicio).getTime();
+        const finMs = finDate.getTime();
+        const enElDia = (createdAt: string) => {
+            const t = new Date(createdAt).getTime();
+            return t >= inicioMs && t < finMs;
+        };
+        const antesDelDia = (createdAt: string) => new Date(createdAt).getTime() < inicioMs;
+
+        // ---- Saldos por cuenta: antes y después de lo registrado ese día ----
+        const cuentasCuadre: CuadreCuenta[] = (cuentas || []).map(cuenta => {
+            const movs = (movsCuentas || []).filter(m => m.cuenta_id === cuenta.id);
+            const neto = (lista: any[]) => lista.reduce(
+                (sum, m) => sum + (m.tipo === 'ingreso' ? (m.monto || 0) : -(m.monto || 0)), 0);
+
+            const saldoInicial = (cuenta.saldo_inicial || 0) + neto(movs.filter(m => antesDelDia(m.created_at)));
+            const movsDelDia = movs.filter(m => enElDia(m.created_at));
+            const ingresos = movsDelDia.filter(m => m.tipo === 'ingreso').reduce((s, m) => s + (m.monto || 0), 0);
+            const egresos = movsDelDia.filter(m => m.tipo === 'egreso').reduce((s, m) => s + (m.monto || 0), 0);
+
+            return {
+                cuenta,
+                saldoInicial,
+                ingresos,
+                egresos,
+                saldoFinal: saldoInicial + ingresos - egresos
+            };
+        });
+
+        // ---- Deuda por proveedor: antes, movimientos del día y después ----
+        const proveedoresCuadre: CuadreProveedor[] = (proveedores || []).map(proveedor => {
+            const movs = (movsProveedor || []).filter(m => m.proveedor_id === proveedor.id);
+            const deudaDe = (lista: any[]) => lista.reduce(
+                (sum, m) => sum + (m.tipo === 'abono' ? -(m.monto || 0) : (m.monto || 0)), 0);
+
+            const deudaInicial = deudaDe(movs.filter(m => antesDelDia(m.created_at)));
+            const movimientosDia = movs.filter(m => enElDia(m.created_at));
+            const comprasCredito = movimientosDia.filter(m => m.tipo !== 'abono').reduce((s, m) => s + (m.monto || 0), 0);
+            const abonos = movimientosDia.filter(m => m.tipo === 'abono').reduce((s, m) => s + (m.monto || 0), 0);
+
+            return {
+                proveedor,
+                deudaInicial,
+                comprasCredito,
+                abonos,
+                deudaFinal: deudaInicial + comprasCredito - abonos,
+                movimientos: movimientosDia as MovimientoProveedor[]
+            };
+        }).filter(p => p.deudaFinal !== 0 || p.movimientos.length > 0 || p.deudaInicial !== 0);
+
+        // ---- Movimientos de caja del día con nombres ----
+        const nombreCuenta = (id: number | null) =>
+            (cuentas || []).find(c => c.id === id)?.nombre || 'Sin caja';
+
+        const movimientos: CuadreMovimiento[] = (movsDia || []).map((m: any) => ({
+            ...m,
+            categoria_nombre: m.categorias_financieras?.nombre || 'Sin categoría',
+            cuenta_nombre: nombreCuenta(m.cuenta_id)
+        }));
+        const ingresos = movimientos.filter(m => m.tipo === 'ingreso');
+        const egresos = movimientos.filter(m => m.tipo === 'egreso');
+
+        // ---- Cuido comprado ese día ----
+        const compras: CuadreCompra[] = (comprasDia || []).map((c: any) => ({
+            ...c,
+            insumo_nombre: c.insumos?.nombre || 'Insumo',
+            kg_ingresados: (c.cantidad_comprada || 0) * (c.insumos?.presentacion_compra || 1)
+        }));
+
+        // ---- Cuido consumido (descargado) ese día ----
+        const salidas: CuadreSalida[] = (salidasDia || []).map((s: any) => ({
+            insumo_nombre: s.insumos?.nombre || 'Insumo',
+            cantidad: s.cantidad || 0,
+            costo: s.costo_total_salida || 0,
+            destino: s.notas || (s.destino_tipo === 'lote' ? `Lote #${s.lote_id}` : s.destino_tipo)
+        }));
+
+        return {
+            fecha,
+            totalRegistros: movimientos.length + compras.length + salidas.length,
+            cuentas: cuentasCuadre,
+            proveedores: proveedoresCuadre,
+            compras,
+            salidas,
+            ingresos,
+            egresos,
+            totalIngresos: ingresos.reduce((s, m) => s + (m.monto || 0), 0),
+            totalEgresos: egresos.reduce((s, m) => s + (m.monto || 0), 0),
+            totalComprasContado: compras.filter(c => c.forma_pago !== 'credito').reduce((s, c) => s + (c.precio_total_factura || 0), 0),
+            totalComprasCredito: compras.filter(c => c.forma_pago === 'credito').reduce((s, c) => s + (c.precio_total_factura || 0), 0),
+            totalConsumo: salidas.reduce((s, x) => s + x.costo, 0)
+        };
     }
 
     private async obtenerCategoriaIdPorNombre(nombre: string): Promise<number> {

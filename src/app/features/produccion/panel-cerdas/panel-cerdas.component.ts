@@ -43,7 +43,7 @@ import { LucideAngularModule } from 'lucide-angular';
       </div>
 
       <!-- Action Sheet Overlay -->
-      <div *ngIf="selectedCerda()" class="fixed inset-0 bg-black bg-opacity-50 z-40" (click)="closeActionSheet()"></div>
+      <div *ngIf="selectedCerda()" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
       
       <!-- Action Sheet -->
       <div *ngIf="selectedCerda()" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-xl z-50 p-4 transform transition-transform duration-300 ease-in-out shadow-xl">

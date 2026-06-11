@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { FinanzasService } from '../../../core/services/finanzas.service';
 import { CuentaCajaSaldo, ProveedorSaldo, MovimientoProveedor } from '../../../core/models';
@@ -8,7 +9,7 @@ import { CuentaCajaSaldo, ProveedorSaldo, MovimientoProveedor } from '../../../c
 @Component({
     selector: 'app-cajas-deudas',
     standalone: true,
-    imports: [CommonModule, FormsModule, LucideAngularModule],
+    imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule],
     templateUrl: './cajas-deudas.component.html'
 })
 export class CajasDeudasComponent implements OnInit {

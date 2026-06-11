@@ -9,7 +9,7 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
     standalone: true,
     imports: [CommonModule, ReactiveFormsModule, InputComponent],
     template: `
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in" (click)="close.emit()">
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in">
       <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200 border border-slate-700" (click)="$event.stopPropagation()">
         
         <div class="p-4 border-b border-slate-700 flex justify-between items-center">
