@@ -239,7 +239,7 @@ export class ProduccionService {
         }
     }
 
-    async registrarInseminacion(cerdaId: number, data: { fecha: string; macho: string; costo?: number; observaciones?: string }) {
+    async registrarInseminacion(cerdaId: number, data: { fecha: string; macho: string; costo?: number; observaciones?: string; cuenta_id?: number | null }) {
         try {
             this.error.set(null);
 
@@ -275,7 +275,8 @@ export class ProduccionService {
                         categoria_id: categoriaId,
                         monto: data.costo,
                         descripcion: `Inseminación Cerda ${cerda?.chapeta || cerdaId} - ${data.macho}`,
-                        metodo_pago: 'efectivo'
+                        metodo_pago: 'efectivo',
+                        ...(data.cuenta_id ? { cuenta_id: data.cuenta_id } : {})
                     });
                 }
             }
@@ -353,6 +354,7 @@ export class ProduccionService {
         comprador?: string;
         corral_madre_id?: number; // ✅ Return to Gestacion
         corral_lote_id?: number; // ✅ New Lote Location
+        cuenta_id?: number | null; // Caja donde entra la plata si es venta inmediata
     }) {
         try {
             this.error.set(null);
@@ -438,7 +440,8 @@ export class ProduccionService {
                         categoria_id: categoriaId,
                         monto: data.valor_venta || 0,
                         descripcion: descripcion,
-                        metodo_pago: 'efectivo'
+                        metodo_pago: 'efectivo',
+                        ...(data.cuenta_id ? { cuenta_id: data.cuenta_id } : {})
                     });
 
                 if (errorVenta) throw errorVenta;
@@ -630,7 +633,8 @@ export class ProduccionService {
         peso: number;
         valor_total: number;
         cliente?: string;
-        motivo?: string
+        motivo?: string;
+        cuenta_id?: number | null;
     }) {
         try {
             this.error.set(null);
@@ -653,7 +657,8 @@ export class ProduccionService {
                     categoria_id: categoriaId,
                     monto: data.valor_total,
                     descripcion: descripcion,
-                    metodo_pago: 'efectivo'
+                    metodo_pago: 'efectivo',
+                    ...(data.cuenta_id ? { cuenta_id: data.cuenta_id } : {})
                 });
 
             if (errorIngreso) throw errorIngreso;
@@ -1029,6 +1034,7 @@ export class ProduccionService {
         precio_por_kilo: number;
         total_venta: number;
         cerrar_lote: boolean;
+        cuenta_id?: number | null; // Caja donde entra la plata de la venta
     }): Promise<void> {
         try {
             this.error.set(null);
@@ -1054,7 +1060,8 @@ export class ProduccionService {
                     categoria_id: categoriaId, // Garantizado que no es null
                     monto: data.total_venta,
                     descripcion: descripcion,
-                    lote_relacionado_id: data.lote_id
+                    lote_relacionado_id: data.lote_id,
+                    ...(data.cuenta_id ? { cuenta_id: data.cuenta_id } : {})
                 });
 
             if (errorIngreso) {
@@ -1111,6 +1118,7 @@ export class ProduccionService {
         valor_compra?: number;
         fecha_compra?: string;
         corral_id?: number | null; // ✅ Added optional corral_id
+        cuenta_id?: number | null; // Caja de donde sale la plata si fue comprada
     }): Promise<void> {
         try {
             this.error.set(null);
@@ -1155,7 +1163,8 @@ export class ProduccionService {
                         categoria_id: categoriaId, // Garantizado que no es null
                         monto: data.valor_compra,
                         descripcion: descripcion,
-                        metodo_pago: 'efectivo'
+                        metodo_pago: 'efectivo',
+                        ...(data.cuenta_id ? { cuenta_id: data.cuenta_id } : {})
                     });
 
                 if (errorEgreso) {

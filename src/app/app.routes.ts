@@ -63,6 +63,10 @@ export const routes: Routes = [
                 component: RegistroTransaccionComponent
             },
             {
+                path: 'finanzas/cajas-deudas',
+                loadComponent: () => import('./features/finanzas/cajas-deudas/cajas-deudas.component').then(m => m.CajasDeudasComponent)
+            },
+            {
                 path: 'reportes',
                 loadComponent: () => import('./features/reportes/reportes.component').then(m => m.ReportesComponent)
             },

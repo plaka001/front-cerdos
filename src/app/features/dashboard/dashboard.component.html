@@ -52,8 +52,34 @@
         </div>
       </div>
 
-      <!-- Enhanced Financial Summary Badge - CLICKEABLE -->
-      <div (click)="navegarA('/finanzas')" class="card-finance mt-4 p-4 cursor-pointer transition-all hover:shadow-md">
+      <!-- Plata Neta del Negocio - CLICKEABLE -->
+      <div (click)="navegarA('/finanzas/cajas-deudas')"
+        class="bg-slate-800 rounded-2xl p-5 mt-4 relative overflow-hidden cursor-pointer hover:ring-1 hover:ring-emerald-500/50 transition-all hover:shadow-lg hover:shadow-emerald-900/10 active:scale-[0.98]">
+        <lucide-icon name="wallet" [size]="90"
+          class="absolute -bottom-5 -right-5 text-emerald-500 opacity-[0.08] transform -rotate-12"></lucide-icon>
+        <div class="relative z-10 flex items-center justify-between">
+          <div>
+            <p class="text-label font-medium" style="color: var(--color-text-secondary);">Plata Neta del Negocio</p>
+            <p class="text-3xl font-extrabold tracking-tight mt-1"
+              [class]="netoNegocio() >= 0 ? 'text-emerald-400' : 'text-red-400'">
+              {{ formatMonto(netoNegocio()) }}
+            </p>
+            <div class="flex items-center gap-3 mt-2">
+              @for (cuenta of cuentasSaldo(); track cuenta.id) {
+              <span class="text-xs text-slate-400">{{ cuenta.nombre }}:
+                <span class="text-slate-200 font-semibold">{{ formatMonto(cuenta.saldo_actual) }}</span></span>
+              }
+            </div>
+            @if (deudaProveedores() > 0) {
+            <p class="text-xs text-amber-400 font-medium mt-1.5">Deuda cuido: {{ formatMonto(deudaProveedores()) }}</p>
+            }
+          </div>
+          <lucide-icon name="chevron-right" [size]="20" class="text-emerald-500 flex-shrink-0"></lucide-icon>
+        </div>
+      </div>
+
+      <!-- Gasto del Mes - CLICKEABLE -->
+      <div (click)="navegarA('/finanzas')" class="card-finance mt-3 p-4 cursor-pointer transition-all hover:shadow-md">
         <div class="flex items-center justify-between">
           <div class="flex items-center">
             <div class="flex items-center justify-center w-10 h-10 rounded-full" style="background: var(--color-info);">

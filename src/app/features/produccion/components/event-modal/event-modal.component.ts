@@ -6,11 +6,12 @@ import { ProduccionService } from '../../../../core/services/produccion.service'
 import { CorralesService } from '../../../../core/services/corrales.service';
 import { CerdaDetalle, Insumo, Corral, EstadoCorral } from '../../../../core/models';
 import { InputComponent } from '../../../../shared/ui/input/input.component';
+import { SelectorCajaComponent } from '../../../../shared/components/selector-caja/selector-caja.component';
 
 @Component({
   selector: 'app-event-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, InputComponent],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, InputComponent, SelectorCajaComponent],
   template: `
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in">
       <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 border border-slate-700">
@@ -35,6 +36,7 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
               <app-input label="Fecha de Inseminación" type="date" formControlName="fecha"></app-input>
               <app-input label="Macho / Semen" formControlName="macho" placeholder="Ej: Duroc 05"></app-input>
               <app-input label="Costo del Servicio / Semen ($)" type="currency" formControlName="costo" placeholder="Ej: 30000"></app-input>
+              <app-selector-caja tipo="egreso" [(cuentaId)]="cuentaId"></app-selector-caja>
               <app-input label="Observaciones (opcional)" formControlName="observaciones" placeholder="Notas adicionales..."></app-input>
             </div>
           }
@@ -146,7 +148,8 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
                   
                   <app-input label="Valor Total Venta ($)" type="currency" formControlName="valor_venta" placeholder="0"></app-input>
                   <app-input label="Cliente / Comprador (Opcional)" formControlName="comprador" placeholder="Nombre del cliente"></app-input>
-                  
+                  <app-selector-caja tipo="ingreso" [(cuentaId)]="cuentaId"></app-selector-caja>
+
                   <p class="text-xs text-blue-300/80 italic">
                     ℹ️ Se registrará un Ingreso en Caja por "Venta de Lechones".
                   </p>
@@ -237,6 +240,7 @@ import { InputComponent } from '../../../../shared/ui/input/input.component';
                 <app-input label="Valor Total ($)" type="currency" formControlName="valor_total" placeholder="0"></app-input>
               </div>
               <app-input label="Cliente" formControlName="cliente" placeholder="Nombre del comprador"></app-input>
+              <app-selector-caja tipo="ingreso" [(cuentaId)]="cuentaId"></app-selector-caja>
               <app-input label="Motivo" formControlName="motivo" placeholder="Edad, baja productividad, etc..."></app-input>
             </div>
           }
@@ -300,6 +304,7 @@ export class EventModalComponent {
   form!: FormGroup;
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
+  cuentaId = signal<number | null>(null);
   maxLechonesDestete = signal<number | null>(null);
   insumos = signal<Insumo[]>([]);
   insumosFiltrados = signal<Insumo[]>([]);
@@ -561,7 +566,7 @@ export class EventModalComponent {
       const val = this.form.value;
 
       if (this.tipoEvento === 'inseminacion') {
-        await this.produccionService.registrarInseminacion(this.cerda.id, val);
+        await this.produccionService.registrarInseminacion(this.cerda.id, { ...val, cuenta_id: this.cuentaId() });
       } else if (this.tipoEvento === 'parto') {
         if (!this.cerda.cicloActivo) {
           this.error.set('Esta cerda no tiene un ciclo reproductivo activo.');
@@ -594,7 +599,8 @@ export class EventModalComponent {
           valor_venta: val.valor_venta,
           comprador: val.comprador,
           corral_madre_id: Number(val.corral_madre_id),
-          corral_lote_id: val.crear_lote ? Number(val.corral_lote_id) : undefined
+          corral_lote_id: val.crear_lote ? Number(val.corral_lote_id) : undefined,
+          cuenta_id: this.cuentaId()
         });
       } else if (this.tipoEvento === 'falla') {
         if (!this.cerda.cicloActivo) {
@@ -628,7 +634,7 @@ export class EventModalComponent {
           nombre_tarea: this.nombreTarea
         });
       } else if (this.tipoEvento === 'venta') {
-        await this.produccionService.registrarVentaDescarte(this.cerda.id, val);
+        await this.produccionService.registrarVentaDescarte(this.cerda.id, { ...val, cuenta_id: this.cuentaId() });
       } else if (this.tipoEvento === 'muerte') {
         await this.produccionService.registrarMuerteCerda(this.cerda.id, val);
       }
