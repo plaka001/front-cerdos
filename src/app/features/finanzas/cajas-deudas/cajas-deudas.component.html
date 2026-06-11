@@ -7,9 +7,11 @@
                 <h1 class="text-h1">Cajas y Deudas</h1>
                 <p class="text-small" style="color: var(--color-text-secondary);">El cuaderno, sin errores de suma</p>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
-                <lucide-icon name="wallet" [size]="24" class="text-emerald-400"></lucide-icon>
-            </div>
+            <a routerLink="/finanzas/cuadre-dia"
+                class="flex items-center gap-2 text-xs font-bold text-sky-400 bg-sky-500/10 border border-sky-500/30 rounded-xl px-4 py-2.5 hover:bg-sky-500/20 active:scale-95 transition-all">
+                <lucide-icon name="clipboard-list" [size]="14"></lucide-icon>
+                Cuadre del día
+            </a>
         </div>
 
         @if (loading()) {

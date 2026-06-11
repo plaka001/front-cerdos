@@ -1,0 +1,315 @@
+<div class="min-h-screen pb-24" style="background-color: var(--color-bg);">
+    <div class="p-5 space-y-6 fade-in w-full sm:max-w-md sm:mx-auto">
+
+        <!-- ========== HEADER ========== -->
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-h1">Cuadre del Día</h1>
+                <p class="text-small capitalize" style="color: var(--color-text-secondary);">{{ fechaLegible() }}</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-sky-500/10 flex items-center justify-center">
+                <lucide-icon name="clipboard-list" [size]="24" class="text-sky-400"></lucide-icon>
+            </div>
+        </div>
+
+        <!-- Selector de fecha -->
+        <div class="flex gap-2">
+            <input type="date" [ngModel]="fecha()" (ngModelChange)="onFechaChange($event)"
+                class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                style="color-scheme: dark;">
+            <button type="button" (click)="irAHoy()"
+                class="px-4 py-2.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 text-sm font-bold hover:bg-sky-500/20 transition-colors">
+                Hoy
+            </button>
+        </div>
+
+        @if (loading()) {
+        <div class="flex items-center justify-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2" style="border-color: var(--color-primary);">
+            </div>
+        </div>
+        } @else if (error()) {
+        <div class="bg-red-900/20 border border-red-700/50 rounded-xl p-4">
+            <p class="text-red-400 text-sm">{{ error() }}</p>
+        </div>
+        } @else {
+        @if (cuadre(); as c) {
+
+        @if (c.totalRegistros === 0) {
+        <div class="text-center py-14 bg-slate-800/40 rounded-2xl border border-slate-700/40">
+            <lucide-icon name="calendar-off" [size]="36" class="text-slate-600 mx-auto mb-3"></lucide-icon>
+            <p class="text-sm text-slate-400 font-medium">No se registró nada este día</p>
+            <p class="text-xs text-slate-500 mt-1">Prueba con otra fecha</p>
+        </div>
+        } @else {
+
+        <!-- ========== RESUMEN DEL DÍA ========== -->
+        <div
+            class="bg-slate-800 rounded-2xl p-5 relative overflow-hidden border border-slate-700/50">
+            <lucide-icon name="clipboard-list" [size]="100"
+                class="absolute -bottom-5 -right-5 text-sky-500 opacity-[0.07] transform -rotate-12"></lucide-icon>
+            <div class="relative z-10">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">
+                    {{ c.totalRegistros }} registros este día</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-wider">Entró a cajas</p>
+                        <p class="text-xl font-extrabold text-emerald-400">{{ formatMonto(c.totalIngresos) }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-wider">Salió de cajas</p>
+                        <p class="text-xl font-extrabold text-red-400">{{ formatMonto(c.totalEgresos) }}</p>
+                    </div>
+                    @if (c.totalComprasCredito > 0) {
+                    <div>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-wider">Cuido fiado</p>
+                        <p class="text-xl font-extrabold text-amber-400">{{ formatMonto(c.totalComprasCredito) }}</p>
+                    </div>
+                    }
+                    @if (c.totalConsumo > 0) {
+                    <div>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-wider">Cuido consumido</p>
+                        <p class="text-xl font-extrabold text-slate-300">{{ formatMonto(c.totalConsumo) }}</p>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== CAJAS: ANTES Y DESPUÉS ========== -->
+        <div>
+            <h2 class="text-h2 mb-3 flex items-center gap-2">
+                <lucide-icon name="wallet" [size]="20" class="text-emerald-400"></lucide-icon>
+                Cajas: antes y después
+            </h2>
+            <div class="space-y-3">
+                @for (cc of c.cuentas; track cc.cuenta.id) {
+                <div class="bg-slate-800 rounded-2xl p-4 border border-slate-700/50">
+                    <p class="text-sm font-bold text-white mb-3">{{ cc.cuenta.nombre }}</p>
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="text-center flex-1">
+                            <p class="text-[10px] text-slate-500 uppercase">Empezó con</p>
+                            <p class="text-sm font-bold text-slate-300">{{ formatMonto(cc.saldoInicial) }}</p>
+                        </div>
+                        <div class="text-center flex-1">
+                            @if (cc.ingresos > 0) {
+                            <p class="text-xs font-bold text-emerald-400">+{{ formatMonto(cc.ingresos) }}</p>
+                            }
+                            @if (cc.egresos > 0) {
+                            <p class="text-xs font-bold text-red-400">−{{ formatMonto(cc.egresos) }}</p>
+                            }
+                            @if (cc.ingresos === 0 && cc.egresos === 0) {
+                            <p class="text-xs text-slate-600">sin movimientos</p>
+                            }
+                        </div>
+                        <lucide-icon name="chevron-right" [size]="16" class="text-slate-600"></lucide-icon>
+                        <div class="text-center flex-1">
+                            <p class="text-[10px] text-slate-500 uppercase">Terminó con</p>
+                            <p class="text-base font-extrabold"
+                                [class]="cc.saldoFinal >= 0 ? 'text-emerald-400' : 'text-red-400'">
+                                {{ formatMonto(cc.saldoFinal) }}</p>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+            <p class="text-[11px] text-slate-500 mt-2 px-1">💡 "Terminó con" es lo que debería haber en cada caja
+                después de este cuadre. Cuéntenla y comparen.</p>
+        </div>
+
+        <!-- ========== DEUDAS: ANTES Y DESPUÉS ========== -->
+        @if (c.proveedores.length > 0) {
+        <div>
+            <h2 class="text-h2 mb-3 flex items-center gap-2">
+                <lucide-icon name="truck" [size]="20" class="text-amber-400"></lucide-icon>
+                Deuda con proveedores
+            </h2>
+            <div class="space-y-3">
+                @for (cp of c.proveedores; track cp.proveedor.id) {
+                <div class="bg-slate-800 rounded-2xl p-4 border border-slate-700/50">
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-sm font-bold text-white">{{ cp.proveedor.nombre }}</p>
+                        <p class="text-lg font-extrabold"
+                            [class]="cp.deudaFinal > 0 ? 'text-amber-400' : 'text-emerald-400'">
+                            {{ formatMonto(cp.deudaFinal) }}</p>
+                    </div>
+
+                    <div class="bg-slate-900/50 rounded-xl p-3 space-y-1.5 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Debía antes del cuadre</span>
+                            <span class="text-slate-200 font-semibold">{{ formatMonto(cp.deudaInicial) }}</span>
+                        </div>
+                        @if (cp.comprasCredito > 0) {
+                        <div class="flex justify-between">
+                            <span class="text-amber-300">+ Cuido fiado este cuadre</span>
+                            <span class="text-amber-300 font-semibold">+{{ formatMonto(cp.comprasCredito) }}</span>
+                        </div>
+                        }
+                        @if (cp.abonos > 0) {
+                        <div class="flex justify-between">
+                            <span class="text-emerald-400">− Abonos este cuadre</span>
+                            <span class="text-emerald-400 font-semibold">−{{ formatMonto(cp.abonos) }}</span>
+                        </div>
+                        }
+                        <div class="flex justify-between border-t border-slate-700 pt-1.5">
+                            <span class="text-white font-bold">Queda debiendo</span>
+                            <span class="font-extrabold"
+                                [class]="cp.deudaFinal > 0 ? 'text-amber-400' : 'text-emerald-400'">
+                                {{ formatMonto(cp.deudaFinal) }}</span>
+                        </div>
+                    </div>
+
+                    @if (cp.movimientos.length > 0) {
+                    <div class="mt-3 space-y-1.5">
+                        @for (mov of cp.movimientos; track mov.id) {
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="text-slate-400 truncate pr-2">
+                                <span class="font-semibold"
+                                    [class]="mov.tipo === 'abono' ? 'text-emerald-400' : 'text-amber-300'">
+                                    {{ tipoMovProveedorLabel(mov.tipo) }}</span>
+                                {{ mov.descripcion }}
+                            </span>
+                            <span class="font-bold whitespace-nowrap"
+                                [class]="mov.tipo === 'abono' ? 'text-emerald-400' : 'text-amber-300'">
+                                {{ mov.tipo === 'abono' ? '−' : '+' }}{{ formatMonto(mov.monto) }}</span>
+                        </div>
+                        }
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- ========== CUIDO REGISTRADO ========== -->
+        @if (c.compras.length > 0) {
+        <div>
+            <h2 class="text-h2 mb-3 flex items-center gap-2">
+                <lucide-icon name="package" [size]="20" class="text-blue-400"></lucide-icon>
+                Cuido / insumos registrados
+            </h2>
+            <div class="bg-slate-800 rounded-2xl border border-slate-700/50 divide-y divide-slate-700/50">
+                @for (compra of c.compras; track compra.id) {
+                <div class="p-4 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-white">
+                            {{ compra.cantidad_comprada }} bulto(s) {{ compra.insumo_nombre }}
+                        </p>
+                        <p class="text-[11px] text-slate-400">
+                            {{ compra.kg_ingresados }} kg al inventario · fecha factura {{ compra.fecha }}
+                        </p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <p class="text-sm font-extrabold text-white">{{ formatMonto(compra.precio_total_factura) }}
+                        </p>
+                        @if (compra.forma_pago === 'credito') {
+                        <span
+                            class="inline-block text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-full px-2 py-0.5 mt-1">📒
+                            Fiado</span>
+                        } @else {
+                        <span
+                            class="inline-block text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-2 py-0.5 mt-1">💵
+                            Contado</span>
+                        }
+                    </div>
+                </div>
+                }
+                <div class="p-3 flex justify-between text-xs bg-slate-900/40">
+                    <span class="text-slate-400 font-semibold">Total: contado {{ formatMonto(c.totalComprasContado)
+                        }} · fiado {{ formatMonto(c.totalComprasCredito) }}</span>
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- ========== CUIDO CONSUMIDO ========== -->
+        @if (c.salidas.length > 0) {
+        <div>
+            <h2 class="text-h2 mb-3 flex items-center gap-2">
+                <lucide-icon name="wheat" [size]="20" class="text-orange-400"></lucide-icon>
+                Cuido descargado (consumo)
+            </h2>
+            <div class="bg-slate-800 rounded-2xl border border-slate-700/50 divide-y divide-slate-700/50">
+                @for (salida of c.salidas; track $index) {
+                <div class="p-3.5 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold text-white">{{ salida.cantidad }} kg
+                            {{ salida.insumo_nombre }}</p>
+                        <p class="text-[11px] text-slate-400 truncate">{{ salida.destino }}</p>
+                    </div>
+                    <p class="text-sm font-bold text-slate-300 whitespace-nowrap">{{ formatMonto(salida.costo) }}</p>
+                </div>
+                }
+                <div class="p-3 flex justify-between text-xs bg-slate-900/40">
+                    <span class="text-slate-400 font-semibold">Total consumo</span>
+                    <span class="text-white font-bold">{{ formatMonto(c.totalConsumo) }}</span>
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- ========== INGRESOS ========== -->
+        @if (c.ingresos.length > 0) {
+        <div>
+            <h2 class="text-h2 mb-3 flex items-center gap-2">
+                <lucide-icon name="arrow-up-circle" [size]="20" class="text-emerald-400"></lucide-icon>
+                Plata que entró
+            </h2>
+            <div class="bg-slate-800 rounded-2xl border border-slate-700/50 divide-y divide-slate-700/50">
+                @for (mov of c.ingresos; track mov.id) {
+                <div class="p-3.5 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold text-white truncate">{{ mov.descripcion || mov.categoria_nombre
+                            }}</p>
+                        <p class="text-[11px] text-slate-400">{{ mov.categoria_nombre }} ·
+                            <span class="text-sky-400 font-semibold">→ {{ mov.cuenta_nombre }}</span> ·
+                            {{ horaRegistro(mov.created_at) }}
+                        </p>
+                    </div>
+                    <p class="text-sm font-extrabold text-emerald-400 whitespace-nowrap">+{{ formatMonto(mov.monto) }}
+                    </p>
+                </div>
+                }
+                <div class="p-3 flex justify-between text-xs bg-slate-900/40">
+                    <span class="text-slate-400 font-semibold">Total ingresos</span>
+                    <span class="text-emerald-400 font-bold">{{ formatMonto(c.totalIngresos) }}</span>
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- ========== EGRESOS ========== -->
+        @if (c.egresos.length > 0) {
+        <div>
+            <h2 class="text-h2 mb-3 flex items-center gap-2">
+                <lucide-icon name="arrow-down-circle" [size]="20" class="text-red-400"></lucide-icon>
+                Plata que salió
+            </h2>
+            <div class="bg-slate-800 rounded-2xl border border-slate-700/50 divide-y divide-slate-700/50">
+                @for (mov of c.egresos; track mov.id) {
+                <div class="p-3.5 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold text-white truncate">{{ mov.descripcion || mov.categoria_nombre
+                            }}</p>
+                        <p class="text-[11px] text-slate-400">{{ mov.categoria_nombre }} ·
+                            <span class="text-sky-400 font-semibold">← {{ mov.cuenta_nombre }}</span> ·
+                            {{ horaRegistro(mov.created_at) }}
+                        </p>
+                    </div>
+                    <p class="text-sm font-extrabold text-red-400 whitespace-nowrap">−{{ formatMonto(mov.monto) }}</p>
+                </div>
+                }
+                <div class="p-3 flex justify-between text-xs bg-slate-900/40">
+                    <span class="text-slate-400 font-semibold">Total egresos</span>
+                    <span class="text-red-400 font-bold">{{ formatMonto(c.totalEgresos) }}</span>
+                </div>
+            </div>
+        </div>
+        }
+
+        }
+        }
+        }
+    </div>
+</div>
