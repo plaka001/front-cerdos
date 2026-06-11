@@ -15,9 +15,13 @@ import { AuthService } from '../../../core/services/auth.service';
           <lucide-icon name="home" [size]="24"></lucide-icon>
           <span class="text-xs mt-1">Inicio</span>
         </a>
-        <a routerLink="/finanzas" routerLinkActive="active-nav-link" class="nav-link flex flex-col items-center justify-center w-full h-full">
+        <a routerLink="/finanzas" routerLinkActive="active-nav-link" [routerLinkActiveOptions]="{ exact: true }" class="nav-link flex flex-col items-center justify-center w-full h-full">
           <lucide-icon name="dollar-sign" [size]="24"></lucide-icon>
           <span class="text-xs mt-1">Finanzas</span>
+        </a>
+        <a routerLink="/finanzas/cajas-deudas" routerLinkActive="active-nav-link" class="nav-link flex flex-col items-center justify-center w-full h-full">
+          <lucide-icon name="wallet" [size]="24"></lucide-icon>
+          <span class="text-xs mt-1">Cajas</span>
         </a>
         <a routerLink="/reportes" routerLinkActive="active-nav-link" class="nav-link flex flex-col items-center justify-center w-full h-full">
           <lucide-icon name="bar-chart-2" [size]="24"></lucide-icon>

@@ -7,11 +7,12 @@ import { CurrencyCopDirective } from '../../../../shared/directives/currency-cop
 import { ProduccionService } from '../../../../core/services/produccion.service';
 import { CorralesService } from '../../../../core/services/corrales.service';
 import { Corral } from '../../../../core/models';
+import { SelectorCajaComponent } from '../../../../shared/components/selector-caja/selector-caja.component';
 
 @Component({
   selector: 'app-nueva-cerda-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, InputComponent, CurrencyCopDirective],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, InputComponent, CurrencyCopDirective, SelectorCajaComponent],
   template: `
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in" (click)="close.emit()">
       <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-slate-700" (click)="$event.stopPropagation()">
@@ -83,6 +84,7 @@ import { Corral } from '../../../../core/models';
                   </div>
                 </div>
                 <app-input label="Fecha de Compra" type="date" formControlName="fecha_compra"></app-input>
+                <app-selector-caja tipo="egreso" [(cuentaId)]="cuentaId"></app-selector-caja>
               </div>
             }
           </div>
@@ -159,6 +161,7 @@ export class NuevaCerdaModalComponent implements OnInit, OnDestroy {
 
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
+  cuentaId = signal<number | null>(null);
 
   form: FormGroup = this.fb.group({
     chapeta: ['', Validators.required],
@@ -210,7 +213,8 @@ export class NuevaCerdaModalComponent implements OnInit, OnDestroy {
         fue_comprada: formVal.fue_comprada,
         valor_compra: formVal.fue_comprada ? formVal.valor_compra : 0,
         fecha_compra: formVal.fue_comprada ? formVal.fecha_compra : null,
-        corral_id: Number(formVal.corral_id)
+        corral_id: Number(formVal.corral_id),
+        cuenta_id: this.cuentaId()
       });
 
       this.saved.emit();

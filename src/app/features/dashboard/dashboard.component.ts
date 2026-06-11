@@ -5,7 +5,9 @@ import { LucideAngularModule } from 'lucide-angular';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { SanidadService } from '../../core/services/sanidad.service'; // NEW
 import { AuthService } from '../../core/services/auth.service';
+import { FinanzasService } from '../../core/services/finanzas.service';
 import { DashboardData, AlertaInsumo, AlertaParto } from '../../core/models/dashboard.model';
+import { CuentaCajaSaldo } from '../../core/models';
 
 @Component({
   selector: 'app-dashboard',
@@ -18,6 +20,7 @@ export class DashboardComponent implements OnInit {
   private sanidadService = inject(SanidadService); // NEW
   private router = inject(Router);
   private authService = inject(AuthService);
+  private finanzasService = inject(FinanzasService);
 
   // Estado para modal de confirmación de salida
   showLogoutConfirm = signal<boolean>(false);
@@ -27,6 +30,10 @@ export class DashboardComponent implements OnInit {
   tareasPendientesCount = signal<number>(0); // NEW
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
+
+  // Cajas y deudas
+  cuentasSaldo = signal<CuentaCajaSaldo[]>([]);
+  deudaProveedores = signal<number>(0);
 
   // Signals para controlar expansión de alertas
   mostrarDetalleInsumos = signal<boolean>(false);
@@ -50,12 +57,16 @@ export class DashboardComponent implements OnInit {
       this.error.set(null);
 
       // Parallel Fetch
-      const [dashboardData, agendaSanitaria] = await Promise.all([
+      const [dashboardData, agendaSanitaria, cuentas, proveedores] = await Promise.all([
         this.dashboardService.getDashboardData(),
-        this.sanidadService.getAgendaSanitaria()
+        this.sanidadService.getAgendaSanitaria(),
+        this.finanzasService.getSaldosCuentas(),
+        this.finanzasService.getProveedoresConSaldo()
       ]);
 
       this.dashboardData.set(dashboardData);
+      this.cuentasSaldo.set(cuentas);
+      this.deudaProveedores.set(proveedores.reduce((sum, p) => sum + p.deuda_actual, 0));
 
       // Calcular pendientes (Atrasados + Hoy)
       const pendientes = agendaSanitaria.filter(t => t.estado === 'atrasado' || t.estado === 'hoy');
@@ -79,6 +90,18 @@ export class DashboardComponent implements OnInit {
 
   navegarA(ruta: string) {
     this.router.navigate([ruta]);
+  }
+
+  totalCajas(): number {
+    return this.cuentasSaldo().reduce((sum, c) => sum + c.saldo_actual, 0);
+  }
+
+  netoNegocio(): number {
+    return this.totalCajas() - this.deudaProveedores();
+  }
+
+  formatMonto(valor: number): string {
+    return '$' + (valor || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 });
   }
 
   formatearFechaParto(fecha: Date): string {

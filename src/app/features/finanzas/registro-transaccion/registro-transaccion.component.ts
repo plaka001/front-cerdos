@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { FinanzasService } from '../../../core/services/finanzas.service';
 import { StorageService } from '../../../core/services/storage.service';
-import { CategoriaFinanciera, Insumo, TipoMovimientoCaja } from '../../../core/models';
+import { CategoriaFinanciera, Insumo, TipoMovimientoCaja, FormaPago } from '../../../core/models';
 
 @Component({
   selector: 'app-registro-transaccion',
@@ -21,6 +21,7 @@ export class RegistroTransaccionComponent implements AfterViewInit {
   tipo = signal<TipoMovimientoCaja>('egreso');
   selectedFile = signal<File | null>(null);
   afectaInventario = signal<boolean>(false);
+  formaPago = signal<FormaPago>('contado');
 
   @ViewChild('montoInput') montoInput?: ElementRef;
 
@@ -42,6 +43,13 @@ export class RegistroTransaccionComponent implements AfterViewInit {
 
   categorias = this.finanzasService.categorias;
   insumos = this.finanzasService.insumos;
+  cuentas = this.finanzasService.cuentas;
+  proveedores = this.finanzasService.proveedores;
+
+  // La compra a crédito no toca caja: solo aplica en gastos de insumo con inventario
+  esCompraCredito = computed(() =>
+    this.tipo() === 'egreso' && this.afectaInventario() && this.formaPago() === 'credito'
+  );
 
   filteredCategorias = computed(() => {
     const t = this.tipo();
@@ -58,6 +66,8 @@ export class RegistroTransaccionComponent implements AfterViewInit {
   ngOnInit(): void {
     this.finanzasService.loadInsumos();
     this.finanzasService.loadCategorias();
+    this.finanzasService.loadCuentas();
+    this.finanzasService.loadProveedores();
   }
 
   ngAfterViewInit(): void {
@@ -138,11 +148,22 @@ export class RegistroTransaccionComponent implements AfterViewInit {
       monto: [null, [Validators.required, Validators.min(0)]],
       descripcion: ['', Validators.required],
       fecha: [new Date().toISOString().split('T')[0], Validators.required],
+      cuenta_id: [null, Validators.required],
       // Campos opcionales para insumos
       insumo_id: [null],
       cantidad_comprada: [null],
-      proveedor: ['']
+      proveedor: [''],
+      proveedor_id: [null]
     });
+
+    // Default de caja: Efectivo Yeison (quien maneja la plata del día a día)
+    effect(() => {
+      const cuentas = this.cuentas();
+      if (cuentas.length > 0 && !this.form.get('cuenta_id')?.value) {
+        const yeison = cuentas.find(c => c.nombre.toLowerCase().includes('yeison'));
+        this.form.get('cuenta_id')?.setValue((yeison || cuentas[0]).id, { emitEvent: false });
+      }
+    }, { allowSignalWrites: true });
 
     // Reaccionar a cambios en categoría para validar insumos
     this.form.get('categoria_id')?.valueChanges.subscribe(catId => {
@@ -196,6 +217,28 @@ export class RegistroTransaccionComponent implements AfterViewInit {
   setTipo(t: TipoMovimientoCaja) {
     this.tipo.set(t);
     this.form.get('categoria_id')?.setValue(null);
+    if (t === 'ingreso') {
+      this.setFormaPago('contado');
+    }
+  }
+
+  setFormaPago(fp: FormaPago) {
+    this.formaPago.set(fp);
+    const provCtrl = this.form.get('proveedor_id');
+    if (fp === 'credito') {
+      provCtrl?.setValidators(Validators.required);
+    } else {
+      provCtrl?.clearValidators();
+    }
+    provCtrl?.updateValueAndValidity();
+  }
+
+  toggleInventario() {
+    this.afectaInventario.set(!this.afectaInventario());
+    if (!this.afectaInventario()) {
+      this.setFormaPago('contado');
+    }
+    this.updateValidators(this.form.get('categoria_id')?.value);
   }
 
   esCompraInsumo(): boolean {
@@ -220,6 +263,13 @@ export class RegistroTransaccionComponent implements AfterViewInit {
 
   updateValidators(catId: number) {
     const esInsumo = this.esCompraInsumo();
+
+    // Si la categoría dejó de ser compra de insumo, apagar inventario y crédito
+    if (!esInsumo && this.afectaInventario()) {
+      this.afectaInventario.set(false);
+      this.setFormaPago('contado');
+    }
+
     const afecta = this.afectaInventario();
     const insumoCtrl = this.form.get('insumo_id');
     const cantCtrl = this.form.get('cantidad_comprada');
@@ -282,18 +332,26 @@ export class RegistroTransaccionComponent implements AfterViewInit {
         monto: val.monto,
         descripcion: val.descripcion,
         metodo_pago: 'efectivo', // Default
-        url_comprobante: urlComprobante
+        url_comprobante: urlComprobante,
+        cuenta_id: val.cuenta_id
       };
 
       let compra = undefined;
+      const esCredito = this.esCompraCredito();
 
       // Escenario B: Compra de Insumo (Impacta Inventario) - Solo para Gastos y si toggle está ON
       if (tipoActual === 'egreso' && this.esCompraInsumo() && this.afectaInventario()) {
+        const proveedorSeleccionado = esCredito
+          ? this.proveedores().find(p => p.id == val.proveedor_id)
+          : null;
+
         compra = {
           fecha: val.fecha,
           insumo_id: val.insumo_id,
           cantidad_comprada: val.cantidad_comprada,
-          proveedor: val.proveedor
+          proveedor: esCredito ? (proveedorSeleccionado?.nombre || '') : val.proveedor,
+          forma_pago: esCredito ? 'credito' as const : 'contado' as const,
+          proveedor_id: esCredito ? val.proveedor_id : null
         };
       }
 
@@ -303,12 +361,15 @@ export class RegistroTransaccionComponent implements AfterViewInit {
       // Éxito - Mensaje específico según tipo
       const mensajeExito = tipoActual === 'ingreso'
         ? 'Ingreso registrado correctamente'
-        : 'Gasto registrado correctamente';
+        : (esCredito
+          ? 'Compra a crédito registrada: la deuda del proveedor quedó actualizada'
+          : 'Gasto registrado correctamente');
       this.showToast(mensajeExito, 'success');
 
-      // Reset form but keep date
+      // Reset form but keep date and cuenta
       const fecha = val.fecha;
-      this.form.reset({ fecha });
+      const cuentaId = val.cuenta_id;
+      this.form.reset({ fecha, cuenta_id: cuentaId });
       this.setTipo('egreso'); // Reset to default
       this.selectedFile.set(null); // Reset file
 
@@ -318,6 +379,7 @@ export class RegistroTransaccionComponent implements AfterViewInit {
       this.monto.set(0);
       this.montoFormateado.set(''); // Reset formatted display
       this.afectaInventario.set(false);
+      this.setFormaPago('contado');
 
     } catch (error) {
       console.error(error);

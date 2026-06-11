@@ -4,11 +4,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { LucideAngularModule } from 'lucide-angular';
 import { ProduccionService } from '../../../../core/services/produccion.service';
 import { LoteDetalle } from '../../../../core/models';
+import { SelectorCajaComponent } from '../../../../shared/components/selector-caja/selector-caja.component';
 
 @Component({
     selector: 'app-registrar-venta-modal',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
+    imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, SelectorCajaComponent],
     templateUrl: './registrar-venta-modal.component.html'
 })
 export class RegistrarVentaModalComponent implements OnInit {
@@ -23,6 +24,7 @@ export class RegistrarVentaModalComponent implements OnInit {
     loading = signal<boolean>(false);
     error = signal<string | null>(null);
     totalVenta = signal<number>(0);
+    cuentaId = signal<number | null>(null);
 
     ngOnInit() {
         this.initForm();
@@ -94,7 +96,8 @@ export class RegistrarVentaModalComponent implements OnInit {
                 peso_total: this.form.get('peso_total')?.value,
                 precio_por_kilo: this.form.get('precio_por_kilo')?.value,
                 total_venta: this.totalVenta(),
-                cerrar_lote: this.form.get('cerrar_lote')?.value
+                cerrar_lote: this.form.get('cerrar_lote')?.value,
+                cuenta_id: this.cuentaId()
             });
 
             this.saved.emit();

@@ -46,6 +46,13 @@ export class DashboardService {
         const primerDiaStr = primerDiaMes.toISOString().split('T')[0];
         const ultimoDiaStr = ultimoDiaMes.toISOString().split('T')[0];
 
+        // Categorías internas que no son gasto real (transferencias entre cajas, ajustes contables)
+        const { data: categoriasInternas } = await this.supabase
+            .from('categorias_financieras')
+            .select('id')
+            .in('nombre', ['Transferencia entre Cajas', 'Ajuste de Caja']);
+        const idsInternas = (categoriasInternas || []).map(c => c.id);
+
         // Ejecutar todas las consultas en paralelo
         const [
             { count: totalCerdas },
@@ -73,13 +80,14 @@ export class DashboardService {
                 .gte('fecha', primerDiaStr)
                 .lte('fecha', ultimoDiaStr),
 
-            // 4. Sumar egresos del mes actual
+            // 4. Sumar egresos del mes actual (excluyendo transferencias internas y ajustes)
             this.supabase
                 .from('movimientos_caja')
                 .select('monto')
                 .eq('tipo', 'egreso')
                 .gte('fecha', primerDiaStr)
                 .lte('fecha', ultimoDiaStr)
+                .not('categoria_id', 'in', `(${idsInternas.length ? idsInternas.join(',') : '0'})`)
         ]);
 
         const totalPrecebo = lotesData?.filter(l => l.etapa === 'precebo').reduce((sum, lote) => sum + (lote.cantidad_actual || 0), 0) || 0;

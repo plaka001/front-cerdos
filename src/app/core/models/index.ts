@@ -114,6 +114,9 @@ export interface LoteOrigen {
     created_at?: string;
 }
 
+export type FormaPago = 'contado' | 'credito';
+export type TipoMovimientoProveedor = 'saldo_inicial' | 'compra_credito' | 'abono';
+
 export interface CompraInsumo {
     id: number;
     fecha: string; // default current_date
@@ -124,7 +127,46 @@ export interface CompraInsumo {
     precio_total_factura: number;
     precio_unitario_final?: number;
     numero_factura?: string;
+    forma_pago?: FormaPago; // default 'contado'
+    proveedor_id?: number | null;
     created_at?: string;
+}
+
+export interface Proveedor {
+    id: number;
+    nombre: string;
+    telefono?: string;
+    activo: boolean;
+    created_at?: string;
+}
+
+export interface MovimientoProveedor {
+    id: number;
+    proveedor_id: number;
+    fecha: string; // default current_date
+    tipo: TipoMovimientoProveedor;
+    monto: number;
+    descripcion?: string;
+    compra_id?: number | null;
+    movimiento_caja_id?: number | null;
+    created_at?: string;
+}
+
+export interface CuentaCaja {
+    id: number;
+    nombre: string;
+    saldo_inicial: number;
+    fecha_corte: string;
+    activa: boolean;
+    created_at?: string;
+}
+
+export interface CuentaCajaSaldo extends CuentaCaja {
+    saldo_actual: number; // saldo_inicial + movimientos asignados a la cuenta
+}
+
+export interface ProveedorSaldo extends Proveedor {
+    deuda_actual: number; // saldo_inicial + compras a crédito - abonos
 }
 
 export interface SalidaInsumo {
@@ -151,6 +193,7 @@ export interface MovimientoCaja {
     metodo_pago: string; // default 'efectivo'
     lote_relacionado_id?: number;
     url_comprobante?: string;
+    cuenta_id?: number | null; // default en BD: Efectivo Yeison
     created_at?: string;
 }
 
