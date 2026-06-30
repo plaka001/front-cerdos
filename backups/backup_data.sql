@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict bgUB6A4agrOnxJTBZzLu1ucieKoUUDcFOBjoYJnAOltXJZcdkXgA9IcuXVTe59o
+\restrict 2hEMcF8b5Yc9RdbzwctU4b0WsO8V6hM8iOunMsEYd3bQnI6LIZQ3TrXuZsQTXcK
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.10 (Ubuntu 17.10-1.pgdg24.04+1)
@@ -77,7 +77,7 @@ COPY public.cerdas (id, chapeta, fecha_nacimiento, raza, estado, partos_acumulad
 5	La brava	2024-06-06	F1	gestante	1	t	\N	2025-12-07 01:34:20.480166+00	1
 8	07	2025-06-15	F1	lactante	1	t	\N	2025-12-07 01:48:20.569372+00	8
 9	08	2025-06-15	F1	gestante	1	t	\N	2025-12-07 01:48:33.880781+00	1
-1	La mona	2024-06-06	large white	vacia	2	t	\N	2025-12-07 01:31:00.681173+00	1
+1	La mona	2024-06-06	large white	gestante	2	t	\N	2025-12-07 01:31:00.681173+00	1
 4	La flaca	2024-06-06	F1	descarte	1	f	\N	2025-12-07 01:33:21.343612+00	1
 6	Juana	2025-07-19	F1	gestante	0	t	\N	2025-12-07 01:41:21.818891+00	1
 3	Roci	2024-06-06	F1	gestante	1	t	\N	2025-12-07 01:33:20.78016+00	1
@@ -105,6 +105,8 @@ COPY public.ciclos_reproductivos (id, cerda_id, fecha_inseminacion, padre_semen,
 8	9	2026-01-14	pic 410	120000	\N	2026-05-06	15	0	0	2026-06-10	15	8	cerrado	2026-01-15 23:04:31.725834+00	Precebo
 16	9	2026-06-01	Semen 	100000	\N	\N	0	0	0	\N	0	\N	abierto	2026-06-10 23:47:13.182856+00	\N
 7	1	2026-01-09	Semen 	120000	\N	2026-05-02	12	0	0	2026-05-19	12	8	cerrado	2026-01-10 13:34:30.492173+00	dESTETE
+17	1	2026-06-30	410	0	\N	\N	0	0	0	\N	0	\N	abierto	2026-06-30 01:37:32.457639+00	\N
+18	1	2026-06-30	410	100000	\N	\N	0	0	0	\N	0	\N	abierto	2026-06-30 01:37:54.03437+00	\N
 \.
 
 
@@ -646,7 +648,7 @@ SELECT pg_catalog.setval('public.cerdas_id_seq', 1, false);
 -- Name: ciclos_reproductivos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 16, true);
+SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 18, true);
 
 
 --
@@ -737,5 +739,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 104, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict bgUB6A4agrOnxJTBZzLu1ucieKoUUDcFOBjoYJnAOltXJZcdkXgA9IcuXVTe59o
+\unrestrict 2hEMcF8b5Yc9RdbzwctU4b0WsO8V6hM8iOunMsEYd3bQnI6LIZQ3TrXuZsQTXcK
 
