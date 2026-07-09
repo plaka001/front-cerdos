@@ -267,17 +267,23 @@ export class ProduccionService {
                 // Buscar categoría 'Compra de Semen/Genética'
                 const categoriaId = await this.obtenerCategoriaId('Compra de Semen/Genética', 'operativo');
 
-                if (categoriaId) {
-                    const { data: cerda } = await this.supabase.from('cerdas').select('chapeta').eq('id', cerdaId).single();
-                    await this.supabase.from('movimientos_caja').insert({
-                        fecha: data.fecha,
-                        tipo: 'egreso',
-                        categoria_id: categoriaId,
-                        monto: data.costo,
-                        descripcion: `Inseminación Cerda ${cerda?.chapeta || cerdaId} - ${data.macho}`,
-                        metodo_pago: 'efectivo',
-                        ...(data.cuenta_id ? { cuenta_id: data.cuenta_id } : {})
-                    });
+                if (!categoriaId) {
+                    throw new Error('La inseminación se guardó, pero NO se pudo registrar el gasto en caja: falta la categoría "Compra de Semen/Genética". Registra el egreso manualmente en Finanzas.');
+                }
+
+                const { data: cerda } = await this.supabase.from('cerdas').select('chapeta').eq('id', cerdaId).single();
+                const { error: errorGasto } = await this.supabase.from('movimientos_caja').insert({
+                    fecha: data.fecha,
+                    tipo: 'egreso',
+                    categoria_id: categoriaId,
+                    monto: data.costo,
+                    descripcion: `Inseminación Cerda ${cerda?.chapeta || cerdaId} - ${data.macho}`,
+                    metodo_pago: 'efectivo',
+                    ...(data.cuenta_id ? { cuenta_id: data.cuenta_id } : {})
+                });
+
+                if (errorGasto) {
+                    throw new Error(`La inseminación se guardó, pero el gasto en caja NO quedó registrado (${errorGasto.message}). Registra el egreso de $${data.costo.toLocaleString('es-CO')} manualmente en Finanzas.`);
                 }
             }
 
