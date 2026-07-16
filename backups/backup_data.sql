@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict AW0FTJtsFXHQQVdmk88cXaIcl4Ol5NZDVD0uBngl5uKk7SgyOewnSjUqc4gJ28T
+\restrict 4egHvyzU8grLHwgqgW6f2xUr9abcPOea62Bn7eqokexunLeKzdojVkLnNxoQLpn
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.10 (Ubuntu 17.10-1.pgdg24.04+1)
@@ -274,7 +274,7 @@ COPY public.lotes (id, codigo, fecha_inicio, fecha_cierre, ubicacion, cantidad_i
 8	L-07-2026-463	2026-07-09	\N	Corral de Precebo	14	10	0	activo	2026-07-09 01:43:39.345373+00	10	\N	0	7	precebo
 6	L-08-2026-780	2026-06-10	\N	Corral de Precebo	15	11	0	activo	2026-06-10 23:44:35.707391+00	8	\N	0	7	precebo
 2	L-2026-177	2026-01-02	2026-07-09	Corral de Precebo	15	0	0	cerrado_vendido	2026-01-07 01:45:53.935409+00	8	\N	15	11	engorde
-3	L-2026-42	2026-02-18	\N	Corral de Precebo	16	4	0	activo	2026-02-18 00:07:22.673749+00	8	\N	50	11	engorde
+3	L-2026-42	2026-02-18	\N	Corral de Precebo	16	3	0	activo	2026-02-18 00:07:22.673749+00	8	\N	50	11	engorde
 \.
 
 
@@ -772,5 +772,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 109, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict AW0FTJtsFXHQQVdmk88cXaIcl4Ol5NZDVD0uBngl5uKk7SgyOewnSjUqc4gJ28T
+\unrestrict 4egHvyzU8grLHwgqgW6f2xUr9abcPOea62Bn7eqokexunLeKzdojVkLnNxoQLpn
 
