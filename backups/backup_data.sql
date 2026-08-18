@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 5VsSok6CTKJRPXbw63svmMiWawtJOAmky5P1NmFNRrehSVTJzlyXkRzaetui4Cc
+\restrict 1sHeyQ5HGOfxOtplo8VwIaejyE1Tgx1GewHpjw3LlbTFcF2stbGRp8MEfGyiR9E
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.11 (Ubuntu 17.11-1.pgdg24.04+2)
@@ -73,13 +73,13 @@ COPY public.corrales (id, nombre, tipo, capacidad_maxima, activo, created_at) FR
 
 COPY public.cerdas (id, chapeta, fecha_nacimiento, raza, estado, partos_acumulados, activa, notas, created_at, corral_id) FROM stdin;
 2	La jardineña	2024-06-06	F1	gestante	1	t	\N	2025-12-07 01:31:02.308943+00	1
-5	La brava	2024-06-06	F1	gestante	1	t	\N	2025-12-07 01:34:20.480166+00	1
 9	08	2025-06-15	F1	gestante	1	t	\N	2025-12-07 01:48:33.880781+00	1
 1	La mona	2024-06-06	large white	gestante	2	t	\N	2025-12-07 01:31:00.681173+00	1
 8	07	2025-06-15	F1	gestante	1	t	\N	2025-12-07 01:48:20.569372+00	1
 6	Juana	2025-07-19	F1	gestante	1	t	\N	2025-12-07 01:41:21.818891+00	1
 3	Roci	2024-06-06	F1	lactante	2	t	\N	2025-12-07 01:33:20.78016+00	8
 7	Sol	2025-07-19	F1	lactante	1	t	\N	2025-12-07 01:41:45.996026+00	8
+5	La brava	2024-06-06	F1	lactante	2	t	\N	2025-12-07 01:34:20.480166+00	8
 4	La flaca	2024-06-06	F1	descarte	1	f	\N	2025-12-07 01:33:21.343612+00	1
 \.
 
@@ -97,7 +97,6 @@ COPY public.ciclos_reproductivos (id, cerda_id, fecha_inseminacion, padre_semen,
 10	2	2026-02-17	Semen	240000	\N	\N	0	0	0	\N	0	\N	fallido	2026-02-18 00:09:22.6012+00	FALLA: sin celo
 3	5	2025-12-02	Semen	0	\N	2026-03-25	13	0	0	2026-04-14	13	8	cerrado	2025-12-11 05:35:17.306189+00	Destete brava
 14	2	2026-04-26	Guror	100000	\N	\N	0	0	0	\N	0	\N	abierto	2026-04-30 20:13:24.313707+00	Nada
-15	5	2026-04-23	410	100000	\N	\N	0	0	0	\N	0	\N	abierto	2026-04-30 20:14:39.845683+00	No
 8	9	2026-01-14	pic 410	120000	\N	2026-05-06	15	0	0	2026-06-10	15	8	cerrado	2026-01-15 23:04:31.725834+00	Precebo
 16	9	2026-06-01	Semen 	100000	\N	\N	0	0	0	\N	0	\N	abierto	2026-06-10 23:47:13.182856+00	\N
 7	1	2026-01-09	Semen 	120000	\N	2026-05-02	12	0	0	2026-05-19	12	8	cerrado	2026-01-10 13:34:30.492173+00	dESTETE
@@ -108,6 +107,7 @@ COPY public.ciclos_reproductivos (id, cerda_id, fecha_inseminacion, padre_semen,
 20	6	2026-07-30	Pi 410	100000	\N	\N	0	0	0	\N	0	\N	abierto	2026-08-05 00:55:42.241125+00	\N
 12	3	2026-04-09	semen duroc	100000	\N	2026-07-31	17	1	0	\N	0	\N	abierto	2026-04-08 22:15:59.170645+00	12 pm
 13	7	2026-04-16	Semen	100000	\N	2026-08-07	12	0	0	\N	0	\N	abierto	2026-04-19 00:40:22.978371+00	2 pm
+15	5	2026-04-23	410	100000	\N	2026-08-14	6	2	1	\N	0	\N	abierto	2026-04-30 20:14:39.845683+00	Ok
 \.
 
 
@@ -122,15 +122,15 @@ COPY public.insumos (id, nombre, tipo, unidad_medida, presentacion_compra, stock
 14	Hierro Dextrano	medicamento	ml	100	0	0	50	t	2025-12-07 01:57:30.571465+00
 10	Fostera 	medicamento	dosis	1	0	10000.0000000000000000	0	t	2025-12-07 01:57:30.571465+00
 4	Pre-Inicio	alimento	kg	40	0	3650.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
-8	lechon 337	alimento	kg	40	80	2300.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
-6	Iniciación 	alimento	kg	40	80	2900.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
-9	Finalizador	alimento	kg	40	1080	2221.2962962962962963	100	t	2025-12-07 01:57:30.571465+00
-1	Gestacion	alimento	kg	40	520	2050.0000000000000000	200	t	2025-12-07 01:23:09.044215+00
-2	Lactancia	alimento	kg	40	120	2250.0000000000000000	150	t	2025-12-07 01:23:09.044215+00
 5	Medicamento viejo	medicamento	ml	2000	1981	0.00000000000000000000	0	t	2025-12-07 01:23:09.044215+00
-7	Transicion	alimento	kg	40	200	2200.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
-3	Pre-Inicio Fase 1	alimento	kg	40	40	4175.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
 15	Vacuna E. Coli	biologico	dosis	25	25	600.0000000000000000	10	t	2025-12-07 01:57:30.571465+00
+7	Transicion	alimento	kg	40	0	2200.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
+6	Iniciación 	alimento	kg	40	0	2900.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
+3	Pre-Inicio Fase 1	alimento	kg	40	0	4175.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
+8	lechon 337	alimento	kg	40	520	2300.0000000000000000	100	t	2025-12-07 01:23:09.044215+00
+9	Finalizador	alimento	kg	40	360	2225.0000000000000000	100	t	2025-12-07 01:57:30.571465+00
+1	Gestacion	alimento	kg	40	120	2050.0000000000000000	200	t	2025-12-07 01:23:09.044215+00
+2	Lactancia	alimento	kg	40	80	2250.0000000000000000	150	t	2025-12-07 01:23:09.044215+00
 16	Reemplazo	alimento	kg	40	0	2075.0000000000000000	5	t	2025-12-14 02:36:17+00
 \.
 
@@ -265,6 +265,11 @@ COPY public.compras_insumos (id, fecha, insumo_id, proveedor, cantidad_comprada,
 115	2026-07-21	7	Arley	4	160	352000	2200.0000000000000000	\N	2026-07-25 00:47:30.973628+00	credito	1
 116	2026-07-21	3	Arley	1	40	167000	4175.0000000000000000	\N	2026-07-25 00:47:30.973628+00	credito	1
 117	2026-07-25	15	\N	1	25	15000	600.0000000000000000	\N	2026-07-25 01:02:08.174545+00	contado	\N
+118	2026-08-02	8	Arley	2	80	184000	2300.0000000000000000	\N	2026-08-17 23:59:03.21143+00	credito	1
+119	2026-08-05	8	Arley	11	440	1012000	2300.0000000000000000	\N	2026-08-17 23:59:03.21143+00	credito	1
+120	2026-08-05	9	Arley	9	360	801000	2225.0000000000000000	\N	2026-08-17 23:59:03.21143+00	credito	1
+121	2026-08-05	1	Arley	3	120	246000	2050.0000000000000000	\N	2026-08-17 23:59:03.21143+00	credito	1
+122	2026-08-05	2	Arley	2	80	180000	2250.0000000000000000	\N	2026-08-17 23:59:03.21143+00	credito	1
 \.
 
 
@@ -284,14 +289,14 @@ COPY public.cuentas_caja (id, nombre, saldo_inicial, fecha_corte, activa, create
 
 COPY public.lotes (id, codigo, fecha_inicio, fecha_cierre, ubicacion, cantidad_inicial, cantidad_actual, costo_inicial_lote, estado, created_at, peso_promedio_inicial, observaciones, peso_promedio_actual, corral_id, etapa) FROM stdin;
 1	L-2025-86	2025-12-14	2026-04-19	precebo	10	0	0	cerrado_vendido	2025-12-14 02:49:40.94955+00	15	\N	0	3	engorde
-5	L-2026-429	2026-04-14	\N	Corral de Precebo	13	2	0	activo	2026-04-19 00:39:12.317886+00	8	\N	0	7	precebo
 7	L-La mona-2026-242	2026-05-19	2026-06-11	Corral de Precebo	12	0	0	cerrado_vendido	2026-06-10 23:49:05.540985+00	8	\N	0	7	precebo
 8	L-07-2026-463	2026-07-09	\N	Corral de Precebo	14	10	0	activo	2026-07-09 01:43:39.345373+00	10	\N	0	7	precebo
 2	L-2026-177	2026-01-02	2026-07-09	Corral de Precebo	15	0	0	cerrado_vendido	2026-01-07 01:45:53.935409+00	8	\N	15	11	engorde
-9	L-Juana-2026-427	2026-07-25	\N	Corral de Precebo	7	7	0	activo	2026-07-25 00:54:51.924837+00	10	\N	0	7	precebo
 6	L-08-2026-780	2026-06-10	\N	Corral de Precebo	15	10	0	activo	2026-06-10 23:44:35.707391+00	8	\N	0	7	precebo
-4	L-2026-360	2026-04-03	\N	Corral de Precebo	15	11	0	activo	2026-04-08 22:15:30.071768+00	8	\N	0	7	precebo
-3	L-2026-42	2026-02-18	\N	Corral de Precebo	16	2	0	activo	2026-02-18 00:07:22.673749+00	8	\N	50	11	engorde
+3	L-2026-42	2026-02-18	2026-08-18	Corral de Precebo	16	0	0	cerrado_vendido	2026-02-18 00:07:22.673749+00	8	\N	50	11	engorde
+5	L-2026-429	2026-04-14	2026-08-18	Corral de Precebo	13	0	0	cerrado_vendido	2026-04-19 00:39:12.317886+00	8	\N	0	7	precebo
+4	L-2026-360	2026-04-03	\N	Corral de Precebo	15	5	0	activo	2026-04-08 22:15:30.071768+00	8	\N	0	7	precebo
+9	L-Juana-2026-427	2026-07-25	2026-08-18	Corral de Precebo	7	0	0	cerrado_vendido	2026-07-25 00:54:51.924837+00	10	\N	0	7	precebo
 \.
 
 
@@ -318,6 +323,7 @@ COPY public.eventos_sanitarios (id, fecha, tipo, lote_id, cerda_id, cantidad_afe
 22	2026-02-18	muerte	2	\N	2	Se murieron por infarto	2026-02-18 00:06:14.065371+00
 23	2026-02-18	tratamiento	\N	2	1	Vacuna Mycoplasma + Circovirus	2026-02-18 00:16:42.369455+00
 24	2026-07-25	muerte	6	\N	1	Se enfermo y murio	2026-07-25 00:56:27.138444+00
+25	2026-08-18	muerte	4	\N	1	Muerte	2026-08-18 00:17:10.640953+00
 \.
 
 
@@ -537,6 +543,25 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 198	2026-07-25	ingreso	1	896000	Venta Lote L-2026-42 (1 cerdo, 112kg)	efectivo	3	\N	2026-07-25 01:02:08.174545+00	2
 199	2026-07-31	egreso	6	125000	Inseminación Cerda 07 - 410	efectivo	\N	\N	2026-07-31 05:30:02.793264+00	2
 200	2026-07-30	egreso	6	100000	Inseminación Cerda Juana - Pi 410	efectivo	\N	\N	2026-08-05 00:55:43.935712+00	2
+201	2026-08-03	egreso	20	1200000	Abono deuda Arley	efectivo	\N	\N	2026-08-17 23:59:03.21143+00	2
+202	2026-08-10	egreso	20	2000000	Abono deuda Arley	efectivo	\N	\N	2026-08-17 23:59:03.21143+00	2
+203	2026-08-18	egreso	10	50000	Flete cuido	efectivo	\N	\N	2026-08-18 00:02:09.389647+00	2
+204	2026-08-18	egreso	5	64000	Vetadicristicina	efectivo	\N	\N	2026-08-18 00:06:29.371845+00	2
+205	2026-08-18	egreso	5	91500	Kyrofosfan	efectivo	\N	\N	2026-08-18 00:06:29.371845+00	2
+206	2026-08-18	egreso	5	61000	Hierro	efectivo	\N	\N	2026-08-18 00:06:29.371845+00	2
+207	2026-08-18	egreso	5	79000	Flumicina + Tripen	efectivo	\N	\N	2026-08-18 00:06:29.371845+00	2
+208	2026-08-18	egreso	5	38000	Ivermectina + Estrozoo	efectivo	\N	\N	2026-08-18 00:06:29.371845+00	2
+209	2026-08-18	egreso	5	30000	Anticidial + Sincronizador	efectivo	\N	\N	2026-08-18 00:09:43.380633+00	2
+210	2026-08-18	egreso	8	50000	Pago Yoselin - cuidado cerdos	efectivo	\N	\N	2026-08-18 00:15:14.674045+00	2
+211	2026-08-18	ingreso	1	1734000	Venta Lote L-2026-42 - Carlos	efectivo	3	\N	2026-08-18 00:16:00.593709+00	2
+212	2026-08-18	ingreso	1	532000	Venta Lote L-2026-429 - Gladys	efectivo	5	\N	2026-08-18 00:18:46.122159+00	2
+213	2026-08-18	ingreso	1	770000	Venta Lote L-2026-429 - Pastor pueblorrico	efectivo	5	\N	2026-08-18 00:19:13.191085+00	2
+214	2026-08-18	ingreso	1	1088000	Venta Lote L-2026-360 - Yeison	efectivo	4	\N	2026-08-18 00:19:47.133246+00	2
+215	2026-08-18	ingreso	1	880000	Venta Lote L-2026-360 - Yeison	efectivo	4	\N	2026-08-18 00:20:13.91346+00	2
+216	2026-08-18	ingreso	1	826000	Venta Lote L-2026-360 - Claudia	efectivo	4	\N	2026-08-18 00:20:37.244258+00	2
+217	2026-08-18	ingreso	1	992000	Venta Lote L-2026-360 - Yeison	efectivo	4	\N	2026-08-18 00:20:58.080925+00	2
+218	2026-08-18	ingreso	1	637000	Venta Lote L-2026-360 - Profesor  Juan	efectivo	4	\N	2026-08-18 00:21:41.008955+00	2
+219	2026-08-18	ingreso	1	840000	Venta Lote L-Juana-2026-427 (7 cerdos x $120.000 c/u)	efectivo	9	\N	2026-08-18 00:23:26.704902+00	2
 \.
 
 
@@ -571,6 +596,13 @@ COPY public.movimientos_proveedor (id, proveedor_id, fecha, tipo, monto, descrip
 26	1	2026-07-19	abono	1500000	Abono cuaderno 19-jul	\N	192	2026-07-25 00:47:43.313817+00
 27	1	2026-07-21	abono	500000	Abono cuaderno 21-jul	\N	193	2026-07-25 00:47:43.313817+00
 28	1	2026-07-25	abono	10000	Ajuste cuadre cuaderno (redondeo bloque 15-19 jul)	\N	\N	2026-07-25 00:49:24.546694+00
+29	1	2026-08-02	compra_credito	184000	Cuido cuaderno (registrado hoy)	118	\N	2026-08-17 23:59:03.21143+00
+30	1	2026-08-05	compra_credito	1012000	Cuido cuaderno (registrado hoy)	119	\N	2026-08-17 23:59:03.21143+00
+31	1	2026-08-05	compra_credito	801000	Cuido cuaderno (registrado hoy)	120	\N	2026-08-17 23:59:03.21143+00
+32	1	2026-08-05	compra_credito	246000	Cuido cuaderno (registrado hoy)	121	\N	2026-08-17 23:59:03.21143+00
+33	1	2026-08-05	compra_credito	180000	Cuido cuaderno (registrado hoy)	122	\N	2026-08-17 23:59:03.21143+00
+34	1	2026-08-03	abono	1200000	Abono cuaderno	\N	201	2026-08-17 23:59:03.21143+00
+35	1	2026-08-10	abono	2000000	Abono cuaderno	\N	202	2026-08-17 23:59:03.21143+00
 \.
 
 
@@ -710,6 +742,13 @@ COPY public.salidas_insumos (id, fecha, insumo_id, cantidad, destino_tipo, lote_
 113	2026-07-25	6	80	lote	6	\N	2900	Vaciado de inventario - precebo (cuadre físico)	2026-07-25 00:43:13.119148+00
 114	2026-07-25	4	40	lote	5	\N	3650	Vaciado de inventario - precebo (cuadre físico)	2026-07-25 00:43:13.119148+00
 115	2026-07-25	8	40	lote	4	\N	2300	Vaciado de inventario - precebo (cuadre físico)	2026-07-25 00:43:13.119148+00
+116	2026-08-17	1	520	cerda	\N	\N	2050	Vaciado de inventario - alimentación grupal gestantes (cuadre físico)	2026-08-17 23:52:57.109495+00
+117	2026-08-17	2	120	cerda	\N	\N	2250	Vaciado de inventario - alimentación grupal lactancia (cuadre físico)	2026-08-17 23:52:57.109495+00
+118	2026-08-17	9	1080	lote	3	\N	2221.30	Vaciado de inventario - ceba/engorde (cuadre físico)	2026-08-17 23:52:57.109495+00
+119	2026-08-17	7	200	lote	9	\N	2200	Vaciado de inventario - precebo/transición (cuadre físico)	2026-08-17 23:52:57.109495+00
+120	2026-08-17	6	80	lote	6	\N	2900	Vaciado de inventario - precebo (cuadre físico)	2026-08-17 23:52:57.109495+00
+121	2026-08-17	3	40	lote	8	\N	4175	Vaciado de inventario - precebo (cuadre físico)	2026-08-17 23:52:57.109495+00
+122	2026-08-17	8	80	lote	5	\N	2300	Vaciado de inventario - precebo (cuadre físico)	2026-08-17 23:52:57.109495+00
 \.
 
 
@@ -738,7 +777,7 @@ SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 20, true);
 -- Name: compras_insumos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.compras_insumos_id_seq', 117, true);
+SELECT pg_catalog.setval('public.compras_insumos_id_seq', 122, true);
 
 
 --
@@ -759,7 +798,7 @@ SELECT pg_catalog.setval('public.cuentas_caja_id_seq', 2, true);
 -- Name: eventos_sanitarios_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.eventos_sanitarios_id_seq', 24, true);
+SELECT pg_catalog.setval('public.eventos_sanitarios_id_seq', 25, true);
 
 
 --
@@ -787,14 +826,14 @@ SELECT pg_catalog.setval('public.lotes_id_seq', 9, true);
 -- Name: movimientos_caja_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 200, true);
+SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 219, true);
 
 
 --
 -- Name: movimientos_proveedor_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movimientos_proveedor_id_seq', 28, true);
+SELECT pg_catalog.setval('public.movimientos_proveedor_id_seq', 35, true);
 
 
 --
@@ -815,12 +854,12 @@ SELECT pg_catalog.setval('public.reglas_sanitarias_id_seq', 1, false);
 -- Name: salidas_insumos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 115, true);
+SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 122, true);
 
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 5VsSok6CTKJRPXbw63svmMiWawtJOAmky5P1NmFNRrehSVTJzlyXkRzaetui4Cc
+\unrestrict 1sHeyQ5HGOfxOtplo8VwIaejyE1Tgx1GewHpjw3LlbTFcF2stbGRp8MEfGyiR9E
 
