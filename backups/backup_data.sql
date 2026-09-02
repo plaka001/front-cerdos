@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict UwYkO1hppsJAbpnhoSGVhyCI3KZUSswpEvnnTRJRYnu6mzp9IxFSoxRF0cDc9kh
+\restrict 3g5dejZ9hAQiyVYnnrOQTxJsrd0v8zbvweChG6HUSfdSyEeshTrcHtE0L1nyvdE
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.11 (Ubuntu 17.11-1.pgdg24.04+2)
@@ -76,10 +76,10 @@ COPY public.cerdas (id, chapeta, fecha_nacimiento, raza, estado, partos_acumulad
 1	La mona	2024-06-06	large white	gestante	2	t	\N	2025-12-07 01:31:00.681173+00	1
 8	07	2025-06-15	F1	gestante	1	t	\N	2025-12-07 01:48:20.569372+00	1
 6	Juana	2025-07-19	F1	gestante	1	t	\N	2025-12-07 01:41:21.818891+00	1
-3	Roci	2024-06-06	F1	lactante	2	t	\N	2025-12-07 01:33:20.78016+00	8
-7	Sol	2025-07-19	F1	lactante	1	t	\N	2025-12-07 01:41:45.996026+00	8
 5	La brava	2024-06-06	F1	lactante	2	t	\N	2025-12-07 01:34:20.480166+00	8
 2	La jardineña	2024-06-06	F1	lactante	2	t	\N	2025-12-07 01:31:02.308943+00	9
+3	Roci	2024-06-06	F1	gestante	2	t	\N	2025-12-07 01:33:20.78016+00	1
+7	Sol	2025-07-19	F1	vacia	1	t	\N	2025-12-07 01:41:45.996026+00	1
 4	La flaca	2024-06-06	F1	descarte	1	f	\N	2025-12-07 01:33:21.343612+00	1
 \.
 
@@ -104,10 +104,11 @@ COPY public.ciclos_reproductivos (id, cerda_id, fecha_inseminacion, padre_semen,
 11	6	2026-03-03	410	100000	\N	2026-06-29	8	0	0	2026-07-25	7	10	cerrado	2026-03-03 17:59:47.503181+00	\N
 19	8	2026-07-31	410	125000	\N	\N	0	0	0	\N	0	\N	abierto	2026-07-31 05:30:01.759312+00	\N
 20	6	2026-07-30	Pi 410	100000	\N	\N	0	0	0	\N	0	\N	abierto	2026-08-05 00:55:42.241125+00	\N
-12	3	2026-04-09	semen duroc	100000	\N	2026-07-31	17	1	0	\N	0	\N	abierto	2026-04-08 22:15:59.170645+00	12 pm
-13	7	2026-04-16	Semen	100000	\N	2026-08-07	12	0	0	\N	0	\N	abierto	2026-04-19 00:40:22.978371+00	2 pm
 15	5	2026-04-23	410	100000	\N	2026-08-14	6	2	1	\N	0	\N	abierto	2026-04-30 20:14:39.845683+00	Ok
 14	2	2026-04-26	Guror	100000	\N	2026-08-18	10	2	3	\N	0	\N	abierto	2026-04-30 20:13:24.313707+00	11
+12	3	2026-04-09	semen duroc	100000	\N	2026-07-31	17	1	0	2026-08-28	16	7	cerrado	2026-04-08 22:15:59.170645+00	Bien
+21	3	2026-08-29	410	100000	\N	\N	0	0	0	\N	0	\N	abierto	2026-09-02 00:55:23.469632+00	\N
+13	7	2026-04-16	Semen	100000	\N	2026-08-07	12	0	0	2026-08-28	12	7	cerrado	2026-04-19 00:40:22.978371+00	\N
 \.
 
 
@@ -288,6 +289,8 @@ COPY public.cuentas_caja (id, nombre, saldo_inicial, fecha_corte, activa, create
 --
 
 COPY public.lotes (id, codigo, fecha_inicio, fecha_cierre, ubicacion, cantidad_inicial, cantidad_actual, costo_inicial_lote, estado, created_at, peso_promedio_inicial, observaciones, peso_promedio_actual, corral_id, etapa) FROM stdin;
+10	L-Roci-2026-901	2026-08-28	\N	Corral de Precebo	16	16	0	activo	2026-09-02 00:54:10.073513+00	7	\N	0	7	precebo
+11	L-Sol-2026-479	2026-08-28	\N	Corral de Precebo	12	12	0	activo	2026-09-02 00:58:25.789866+00	7	\N	0	7	precebo
 1	L-2025-86	2025-12-14	2026-04-19	precebo	10	0	0	cerrado_vendido	2025-12-14 02:49:40.94955+00	15	\N	0	3	engorde
 7	L-La mona-2026-242	2026-05-19	2026-06-11	Corral de Precebo	12	0	0	cerrado_vendido	2026-06-10 23:49:05.540985+00	8	\N	0	7	precebo
 8	L-07-2026-463	2026-07-09	\N	Corral de Precebo	14	10	0	activo	2026-07-09 01:43:39.345373+00	10	\N	0	7	precebo
@@ -341,6 +344,8 @@ COPY public.lote_origen (id, lote_id, ciclo_id, cantidad_aportada, created_at) F
 7	7	7	12	2026-06-10 23:49:05.677957+00
 8	8	9	14	2026-07-09 01:43:39.483951+00
 9	9	11	7	2026-07-25 00:54:52.097491+00
+10	10	12	16	2026-09-02 00:54:10.374822+00
+11	11	13	12	2026-09-02 00:58:25.973553+00
 \.
 
 
@@ -562,6 +567,7 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 217	2026-08-18	ingreso	1	992000	Venta Lote L-2026-360 - Yeison	efectivo	4	\N	2026-08-18 00:20:58.080925+00	2
 218	2026-08-18	ingreso	1	637000	Venta Lote L-2026-360 - Profesor  Juan	efectivo	4	\N	2026-08-18 00:21:41.008955+00	2
 219	2026-08-18	ingreso	1	840000	Venta Lote L-Juana-2026-427 (7 cerdos x $120.000 c/u)	efectivo	9	\N	2026-08-18 00:23:26.704902+00	2
+220	2026-08-29	egreso	6	100000	Inseminación Cerda Roci - 410	efectivo	\N	\N	2026-09-02 00:55:24.445133+00	2
 \.
 
 
@@ -770,7 +776,7 @@ SELECT pg_catalog.setval('public.cerdas_id_seq', 1, false);
 -- Name: ciclos_reproductivos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 20, true);
+SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 21, true);
 
 
 --
@@ -812,21 +818,21 @@ SELECT pg_catalog.setval('public.insumos_id_seq', 10, true);
 -- Name: lote_origen_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.lote_origen_id_seq', 9, true);
+SELECT pg_catalog.setval('public.lote_origen_id_seq', 11, true);
 
 
 --
 -- Name: lotes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.lotes_id_seq', 9, true);
+SELECT pg_catalog.setval('public.lotes_id_seq', 11, true);
 
 
 --
 -- Name: movimientos_caja_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 219, true);
+SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 220, true);
 
 
 --
@@ -861,5 +867,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 122, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict UwYkO1hppsJAbpnhoSGVhyCI3KZUSswpEvnnTRJRYnu6mzp9IxFSoxRF0cDc9kh
+\unrestrict 3g5dejZ9hAQiyVYnnrOQTxJsrd0v8zbvweChG6HUSfdSyEeshTrcHtE0L1nyvdE
 
