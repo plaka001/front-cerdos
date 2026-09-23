@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict P8hjbBcFs0fRxNRHStFEYh9widXMSPFfN9yOhVaUkrCfp1QqurCgZXIa6Y2srDq
+\restrict V3BETerr4IYHRuCQLqye5cjJZ7bxsm54rwJeBdK29EX5lwsVk4pgACkcdRrzssx
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.11 (Ubuntu 17.11-1.pgdg24.04+2)
@@ -78,8 +78,8 @@ COPY public.cerdas (id, chapeta, fecha_nacimiento, raza, estado, partos_acumulad
 6	Juana	2025-07-19	F1	gestante	1	t	\N	2025-12-07 01:41:21.818891+00	1
 2	La jardineña	2024-06-06	F1	lactante	2	t	\N	2025-12-07 01:31:02.308943+00	9
 3	Roci	2024-06-06	F1	gestante	2	t	\N	2025-12-07 01:33:20.78016+00	1
-7	Sol	2025-07-19	F1	vacia	1	t	\N	2025-12-07 01:41:45.996026+00	1
 5	La brava	2024-06-06	F1	gestante	2	t	\N	2025-12-07 01:34:20.480166+00	1
+7	Sol	2025-07-19	F1	gestante	1	t	\N	2025-12-07 01:41:45.996026+00	1
 4	La flaca	2024-06-06	F1	descarte	1	f	\N	2025-12-07 01:33:21.343612+00	1
 \.
 
@@ -110,6 +110,7 @@ COPY public.ciclos_reproductivos (id, cerda_id, fecha_inseminacion, padre_semen,
 13	7	2026-04-16	Semen	100000	\N	2026-08-07	12	0	0	2026-08-28	12	7	cerrado	2026-04-19 00:40:22.978371+00	\N
 15	5	2026-04-23	410	100000	\N	2026-08-14	6	2	1	2026-09-04	6	5	cerrado	2026-04-30 20:14:39.845683+00	Bien
 22	5	2026-09-11	410	100000	\N	\N	0	0	0	\N	0	\N	abierto	2026-09-12 23:57:46.266474+00	\N
+23	7	2026-09-20	410	10000	\N	\N	0	0	0	\N	0	\N	abierto	2026-09-22 10:59:17.433864+00	\N
 \.
 
 
@@ -603,6 +604,7 @@ COPY public.movimientos_caja (id, fecha, tipo, categoria_id, monto, descripcion,
 234	2026-08-21	ingreso	1	360000	Venta Lote L-08-2026-780 - Carlos Agudelo (3 lechones x $120.000 c/u)	efectivo	6	\N	2026-09-10 01:31:03.079981+00	2
 235	2026-09-04	ingreso	1	520000	Venta Lote L-Roci-2026-901 (4 lechones x $130.000 c/u)	efectivo	10	\N	2026-09-10 01:31:03.079981+00	2
 236	2026-09-11	egreso	6	100000	Inseminación Cerda La brava - 410	efectivo	\N	\N	2026-09-12 23:57:47.427063+00	2
+237	2026-09-20	egreso	6	10000	Inseminación Cerda Sol - 410	efectivo	\N	\N	2026-09-22 10:59:18.546888+00	2
 \.
 
 
@@ -834,7 +836,7 @@ SELECT pg_catalog.setval('public.cerdas_id_seq', 1, false);
 -- Name: ciclos_reproductivos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 22, true);
+SELECT pg_catalog.setval('public.ciclos_reproductivos_id_seq', 23, true);
 
 
 --
@@ -890,7 +892,7 @@ SELECT pg_catalog.setval('public.lotes_id_seq', 12, true);
 -- Name: movimientos_caja_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 236, true);
+SELECT pg_catalog.setval('public.movimientos_caja_id_seq', 237, true);
 
 
 --
@@ -925,5 +927,5 @@ SELECT pg_catalog.setval('public.salidas_insumos_id_seq', 126, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict P8hjbBcFs0fRxNRHStFEYh9widXMSPFfN9yOhVaUkrCfp1QqurCgZXIa6Y2srDq
+\unrestrict V3BETerr4IYHRuCQLqye5cjJZ7bxsm54rwJeBdK29EX5lwsVk4pgACkcdRrzssx
 
